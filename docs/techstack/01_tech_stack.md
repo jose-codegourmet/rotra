@@ -20,21 +20,23 @@
 
 ## 1. Monorepo Overview
 
-ROTRA is a **Turborepo monorepo** with multiple apps sharing a common component library, database layer, and configuration packages.
+ROTRA is a **Turborepo monorepo** with multiple apps sharing a database layer and configuration packages.
 
 ### Directory Structure
 
 ```
 rotra/
 ├── apps/
-│   ├── client/          # Player-facing app (Next.js 15, SSR-first)
-│   │   └── .storybook/  # App-local component stories (client-specific UI)
-│   ├── admin/           # Internal platform dashboard (Next.js 15, SSR-first)
-│   │   └── .storybook/  # App-local component stories (admin-specific UI)
-│   └── umpire/          # Live scoring interface (Next.js 15, lightweight PWA)
+│   ├── client/              # Player-facing app (Next.js 15, SSR-first)
+│   │   ├── src/components/  # shadcn + client-specific components
+│   │   └── .storybook/      # Client component stories
+│   ├── admin/               # Internal platform dashboard (Next.js 15, SSR-first)
+│   │   ├── src/components/  # shadcn + admin-specific components
+│   │   └── .storybook/      # Admin component stories
+│   └── umpire/              # Live scoring interface (Next.js 15, lightweight PWA)
+│       ├── src/components/  # shadcn + umpire-specific components
+│       └── .storybook/      # Umpire component stories
 ├── packages/
-│   ├── ui/              # Shared component library (shadcn + ROTRA design system)
-│   │   └── .storybook/  # Primary design system Storybook (all shared components)
 │   ├── db/              # Prisma schema, client, generated types, and role helpers
 │   └── config/          # Shared tsconfig, tailwind base config
 ├── turbo.json
@@ -45,7 +47,7 @@ rotra/
 ### Why Turborepo
 
 - **Incremental builds** — only rebuilds what changed (critical as the codebase grows)
-- **Shared packages** without publishing to npm — `@rotra/ui`, `@rotra/db` are first-class workspace packages
+- **Shared packages** without publishing to npm — `@rotra/db` and `@rotra/config` are first-class workspace packages
 - **Parallel task execution** — `turbo build`, `turbo dev`, and `turbo lint` run across all apps simultaneously
 - **Remote caching** — CI builds are dramatically faster; Vercel's Turborepo remote cache is supported natively
 
@@ -144,15 +146,6 @@ A **lightweight, mobile-first PWA** purpose-built for live match scoring. Access
 
 ### 2.4 Shared Packages
 
-#### `packages/ui` — ROTRA Component Library
-
-Built on top of **shadcn/ui** with the ROTRA design system applied as a custom theme. All components in this package are used by all three apps.
-
-- shadcn/ui provides the unstyled base (Radix UI primitives)
-- ROTRA CSS variables override the default shadcn token set
-- Custom components not in shadcn (e.g. `CourtCard`, `PlayerRow`, `ScoreDisplay`, `StatusBadge`) live here as first-class exports
-- **Storybook** is the primary development environment for this package — every shared component has a story that demonstrates its variants, states, and dark-mode appearance
-
 #### `packages/db` — Database Layer
 
 - Prisma schema (`schema.prisma`) lives here — single source of truth for the entire DB
@@ -236,8 +229,8 @@ Built on top of **shadcn/ui** with the ROTRA design system applied as a custom t
 
 | Technology | Version | Used In |
 |------------|---------|---------|
-| **Tailwind CSS** | 4.x | All apps & `packages/ui` |
-| **shadcn/ui** | Latest | `packages/ui` (base components) |
+| **Tailwind CSS** | 4.x | All apps |
+| **shadcn/ui** | Latest | Each app's own `src/components/shadcn/` |
 | **CSS Custom Properties** | — | ROTRA design tokens as CSS variables |
 
 **Tailwind CSS 4** is used because:
@@ -248,9 +241,9 @@ Built on top of **shadcn/ui** with the ROTRA design system applied as a custom t
 **shadcn/ui** is used because:
 - It generates unstyled, accessible component primitives (built on Radix UI) into the codebase — components are owned and modified, not installed as a black-box dependency.
 - shadcn's theming system uses CSS custom properties, which maps cleanly to the ROTRA token system.
-- Components are copied into `packages/ui` and customized to match the ROTRA dark-mode-only design.
+- Components are generated into each app's `src/components/shadcn/` and customized to match the ROTRA dark-mode-only design.
 
-> shadcn/ui components are **not installed as an npm package** — they are generated into `packages/ui/src/components/` and owned by this codebase.
+> shadcn/ui components are **not installed as an npm package** — they are generated into each app's `src/components/shadcn/` and owned by that app.
 
 ---
 
@@ -266,7 +259,7 @@ TanStack Table is used exclusively in the Admin App for:
 - Immutable audit log (read-only, virtualized for large datasets)
 - Platform analytics breakdowns
 
-The Client App does **not** use TanStack Table — player-facing lists (leaderboard, match history, queue) use custom `PlayerRow` and `MatchCard` components from `packages/ui` that are optimized for mobile dense layouts, not data grid patterns.
+The Client App does **not** use TanStack Table — player-facing lists (leaderboard, match history, queue) use app-local `PlayerRow` and `MatchCard` components in `apps/client/src/components/` that are optimized for mobile dense layouts, not data grid patterns.
 
 ---
 
@@ -303,7 +296,7 @@ The Client App does **not** use TanStack Table — player-facing lists (leaderbo
 |------|------------|---------|
 | Push (in-app) | Supabase Realtime subscription | Queue updates, match assignments, waitlist promotion |
 | Push (device) | Web Push API via service worker | Umpire assignment notification, no-show alerts |
-| In-app toasts | `packages/ui` Toast component | Action confirmations, real-time event feedback |
+| In-app toasts | App-local Toast component | Action confirmations, real-time event feedback |
 
 ---
 
@@ -324,22 +317,23 @@ The Client App does **not** use TanStack Table — player-facing lists (leaderbo
 
 ### 3.9 Component Development — Storybook
 
+Each app has its own `.storybook/` configuration. There is no shared design system Storybook — every component is owned by the app that uses it.
+
 | Location | Scope | Who Uses It |
 |----------|-------|-------------|
-| `packages/ui/.storybook` | All shared components (`@rotra/ui`) — the ROTRA design system catalog | Entire team |
-| `apps/client/.storybook` | Client-specific components not in `packages/ui` | Frontend dev working on the client app |
-| `apps/admin/.storybook` | Admin-specific components (data tables, approval forms, kill switch toggles) | Frontend dev working on the admin app |
+| `apps/client/.storybook` | Client components (`PlayerRow`, `CourtCard`, `SessionSetupForm`, etc.) | Frontend dev working on the client app |
+| `apps/admin/.storybook` | Admin components (`KillSwitchRow`, `ApprovalCard`, data tables, etc.) | Frontend dev working on the admin app |
+| `apps/umpire/.storybook` | Umpire components (`ScoreDisplay`, `PointButton`, etc.) | Frontend dev working on the umpire app |
 
-**Why Storybook in individual apps as well as `packages/ui`:**
+**Why per-app Storybook:**
 
-Not all components belong in the shared library. App-local components (e.g. the Admin App's `KillSwitchRow`, `ApprovalCard`, or the Client App's `SessionSetupForm`) are too specific to a single app to justify being in `packages/ui`, but still benefit from isolated development and visual testing.
+All components are app-local — there is no shared library to maintain. Each app's Storybook covers only the components that app owns, keeping stories co-located with the code they test and eliminating cross-app dependency overhead.
 
 **Storybook conventions:**
 
-- Every component in `packages/ui` must have a `.stories.tsx` file co-located with it
 - Stories must cover: default state, all named variants, disabled/loading states, and dark-mode (always active)
-- App-local components are encouraged but not required to have stories — prioritise complex or stateful components
-- The shared Tailwind config and CSS variables from `packages/ui/src/styles/globals.css` are imported in all three Storybook instances so tokens render correctly
+- Complex or stateful components should have stories; simple presentational components are encouraged but not required
+- Each app's Storybook imports the shared Tailwind config from `packages/config` and its own `src/app/globals.css` so tokens render correctly
 
 ---
 
@@ -446,7 +440,7 @@ import type { Config } from 'tailwindcss'
 
 const config: Config = {
   ...baseConfig,
-  content: ['./src/**/*.{ts,tsx}', '../../packages/ui/src/**/*.{ts,tsx}'],
+  content: ['./src/**/*.{ts,tsx}'],
 }
 
 export default config
@@ -459,7 +453,7 @@ export default config
 Applied in the root `layout.tsx` of each app via a global stylesheet. These map shadcn's expected variable names to ROTRA values:
 
 ```css
-/* packages/ui/src/styles/globals.css */
+/* apps/[app]/src/app/globals.css — identical in each app */
 :root,
 .dark {
   --background:    #0B0B0C;
@@ -489,40 +483,74 @@ Applied in the root `layout.tsx` of each app via a global stylesheet. These map 
 
 ---
 
-### 4.3 Component Conventions in `packages/ui`
+### 4.3 Component Conventions
+
+Each app owns its components. There is no shared library — components live inside the app that uses them.
 
 #### Folder Structure
 
+Every component — regardless of category (`shadcn`, `rotra`, `layout`) — must live in its own named subfolder. A single flat `.tsx` file at the category root is never permitted.
+
 ```
-packages/ui/src/
-├── components/
-│   ├── shadcn/           # shadcn/ui generated components (Button, Input, Dialog, etc.)
-│   ├── rotra/            # ROTRA-specific components
-│   │   ├── PlayerRow/
-│   │   ├── CourtCard/
-│   │   ├── StatusBadge/
-│   │   ├── ScoreDisplay/
-│   │   ├── TierBadge/
-│   │   └── QueueSlider/
-│   └── layout/
-│       ├── BottomNav/
-│       └── PageShell/
-├── styles/
-│   └── globals.css
-├── hooks/
-│   └── use-toast.ts
-└── index.ts              # Barrel export
+apps/client/src/components/
+├── shadcn/                   # shadcn/ui generated components (Button, Input, Dialog, etc.)
+│   └── button/
+│       ├── Button.tsx
+│       ├── Button.stories.tsx
+│       └── index.ts
+├── rotra/                    # Client-specific components
+│   ├── PlayerRow/
+│   │   ├── PlayerRow.tsx
+│   │   ├── PlayerRow.types.ts
+│   │   ├── PlayerRow.stories.tsx
+│   │   └── index.ts
+│   ├── CourtCard/
+│   ├── StatusBadge/
+│   ├── TierBadge/
+│   ├── QueueSlider/
+│   └── FeatureGate/
+└── layout/
+    ├── BottomNav/
+    │   ├── BottomNav.tsx
+    │   ├── BottomNav.stories.tsx
+    │   └── index.ts
+    └── PageShell/
+
+apps/admin/src/components/
+├── shadcn/                   # shadcn/ui generated components
+├── rotra/                    # Admin-specific components
+│   ├── KillSwitchRow/
+│   ├── ApprovalCard/
+│   └── FeatureGate/
+└── layout/
+
+apps/umpire/src/components/
+├── shadcn/                   # shadcn/ui generated components
+└── rotra/                    # Umpire-specific components
+    ├── ScoreDisplay/
+    └── PointButton/
 ```
 
 #### Component File Structure
 
-Every component follows the same file structure:
+Every component follows the same file structure, regardless of whether it lives under `shadcn/`, `rotra/`, or `layout/`:
+
+```
+components/<category>/<ComponentName>/
+├── <ComponentName>.tsx          # Component implementation
+├── <ComponentName>.types.ts     # Props interface (if not inlined in .tsx)
+├── <ComponentName>.stories.tsx  # Storybook stories
+└── index.ts                     # Re-export
+```
+
+Example:
 
 ```
 components/rotra/PlayerRow/
-├── PlayerRow.tsx          # Component implementation
-├── PlayerRow.types.ts     # Props interface
-└── index.ts               # Re-export
+├── PlayerRow.tsx
+├── PlayerRow.types.ts
+├── PlayerRow.stories.tsx
+└── index.ts
 ```
 
 #### Component Rules
@@ -539,6 +567,8 @@ components/rotra/PlayerRow/
 | Type | Convention | Example |
 |------|------------|---------|
 | Component files | PascalCase | `PlayerRow.tsx` |
+| Component story files | `[Name].stories.tsx` | `PlayerRow.stories.tsx` |
+| Component folder | PascalCase matching the component | `PlayerRow/` |
 | Component props interface | `[Name]Props` | `PlayerRowProps` |
 | Hook files | `use-kebab-case.ts` | `use-session-state.ts` |
 | Utility files | `kebab-case.ts` | `format-score.ts` |
@@ -549,7 +579,7 @@ components/rotra/PlayerRow/
 
 ### 4.4 shadcn/ui Component Overrides
 
-The following shadcn components are generated into `packages/ui` and customized:
+The following shadcn components are generated into each app's `src/components/shadcn/` and customized:
 
 | shadcn Component | ROTRA Override |
 |-----------------|----------------|
@@ -823,7 +853,7 @@ No event queue, no flush logic, no partial sync — the complete score is always
 Kill switch state is fetched server-side on each page render (via the feature flag store in Supabase). Components wrap kill-switched features in a `<FeatureGate>` component:
 
 ```tsx
-// packages/ui/src/components/rotra/FeatureGate/FeatureGate.tsx
+// apps/client/src/components/rotra/FeatureGate/FeatureGate.tsx
 export function FeatureGate({
   flag,
   fallback = null,
@@ -846,7 +876,7 @@ Kill switch evaluation is always **server-authoritative**. Client-side `useFeatu
 | Framework | Next.js 15 (App Router) | All three apps |
 | Language | TypeScript 5 | Strict mode; shared types via `@rotra/db` |
 | Styling | Tailwind CSS 4 + shadcn/ui | Dark mode only; ROTRA tokens in shared config |
-| Component library | `@rotra/ui` (shadcn base + custom) | All apps consume this package |
+| Component library | Per-app components (shadcn/ui) | Each app owns its own `src/components/` |
 | Server state | React Query v5 | Client + Admin apps |
 | Client state | Redux Toolkit | Client app (session), Umpire app (local score) |
 | Data tables | TanStack Table v8 | Admin app only |
@@ -857,4 +887,4 @@ Kill switch evaluation is always **server-authoritative**. Client-side `useFeatu
 | Auth (umpire guest) | One-time DB token | Looked up in Next.js middleware |
 | Deployment | Vercel (3 projects) | Separate deploys per app |
 | Storage | Supabase Storage | Player profile photos |
-| Component dev | Storybook | `packages/ui` (design system) + `apps/client` + `apps/admin` |
+| Component dev | Storybook | `apps/client` + `apps/admin` + `apps/umpire` (each app-local) |

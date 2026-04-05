@@ -78,9 +78,9 @@ pnpm --filter @rotra/db db:studio     # open Prisma Studio
 ### Storybook
 
 ```bash
-pnpm --filter @rotra/ui     storybook   # design system catalog   → http://localhost:6006
-pnpm --filter @rotra/client storybook   # client-specific stories  → http://localhost:6007
-pnpm --filter @rotra/admin  storybook   # admin-specific stories   → http://localhost:6008
+pnpm --filter @rotra/client storybook   # client stories  → http://localhost:6006
+pnpm --filter @rotra/admin  storybook   # admin stories   → http://localhost:6007
+pnpm --filter @rotra/umpire storybook   # umpire stories  → http://localhost:6008
 ```
 
 ---
@@ -94,7 +94,6 @@ rotra/
 │   ├── admin/      # Internal dashboard (Next.js 15, SSR-first, email + MFA)
 │   └── umpire/     # Live scoring PWA  (Next.js 15, CSR, one-time token auth)
 ├── packages/
-│   ├── ui/         # @rotra/ui     — shared component library (shadcn + ROTRA design system)
 │   ├── db/         # @rotra/db     — Prisma schema, client singleton, generated types
 │   └── config/     # @rotra/config — shared tsconfig, ESLint rules, Tailwind tokens
 ├── turbo.json
@@ -131,7 +130,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY="..."
 | Framework | Next.js 15 (App Router) |
 | Language | TypeScript 5 (strict) |
 | Styling | Tailwind CSS 4 + shadcn/ui |
-| Component library | `@rotra/ui` |
+| Component library | Per-app components (shadcn/ui) |
 | Server state | TanStack Query v5 |
 | Client state | Redux Toolkit |
 | ORM | Prisma 6 |

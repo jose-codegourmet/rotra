@@ -1,4 +1,4 @@
-.PHONY: dev build lint type-check install
+.PHONY: dev build lint type-check install format storybook storybook-client storybook-admin storybook-umpire build-storybook
 
 # Load nvm and run all apps in parallel via Turborepo
 dev:
@@ -16,6 +16,30 @@ build:
 lint:
 	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm lint
 
+# Format and auto-fix all files in apps/ via Biome
+format:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm biome format --write apps/
+
 # TypeScript check across the monorepo
 type-check:
 	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm type-check
+
+# Run all Storybooks in parallel (client: 6006, admin: 6007, umpire: 6008)
+storybook:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter client storybook & pnpm --filter admin storybook & pnpm --filter umpire storybook & wait
+
+# Run Storybook for the client app (port 6006)
+storybook-client:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter client storybook
+
+# Run Storybook for the admin app (port 6007)
+storybook-admin:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter admin storybook
+
+# Run Storybook for the umpire app (port 6008)
+storybook-umpire:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter umpire storybook
+
+# Build Storybook for all apps
+build-storybook:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter client build-storybook && pnpm --filter admin build-storybook && pnpm --filter umpire build-storybook
