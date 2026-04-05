@@ -36,7 +36,7 @@ rotra/
 │   ├── ui/              # Shared component library (shadcn + ROTRA design system)
 │   │   └── .storybook/  # Primary design system Storybook (all shared components)
 │   ├── db/              # Prisma schema, client, generated types, and role helpers
-│   └── config/          # Shared tsconfig, eslint, tailwind base config
+│   └── config/          # Shared tsconfig, tailwind base config
 ├── turbo.json
 ├── package.json
 └── pnpm-workspace.yaml
@@ -164,7 +164,6 @@ Built on top of **shadcn/ui** with the ROTRA design system applied as a custom t
 #### `packages/config` — Shared Config
 
 - `tsconfig.base.json` — base TypeScript config extended by all apps
-- `eslint-config/` — shared ESLint rules
 - `tailwind-config/` — shared Tailwind base config with ROTRA tokens
 
 ---
@@ -317,7 +316,9 @@ The Client App does **not** use TanStack Table — player-facing lists (leaderbo
 | **Vercel** | Deployment (all three Next.js apps deployed as separate Vercel projects) |
 | **Supabase** | Hosted Postgres + Realtime + Storage (player photos) |
 | **Prettier** | Code formatting (shared config in `packages/config`) |
-| **ESLint** | Linting (shared config in `packages/config`) |
+| **Biome** | Linting (configured at workspace root via `biome.json`) |
+| **Husky** | Git hooks (`pre-commit`: lint; `pre-push`: lint + build) |
+| **commitlint** | Enforces Conventional Commits format on every commit message |
 
 ---
 
