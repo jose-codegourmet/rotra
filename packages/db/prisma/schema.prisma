@@ -1,0 +1,14 @@
+// This is the single source of truth for the ROTRA database schema.
+// All apps import types from @rotra/db — never define DB types elsewhere.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Models will be added here as features are built out.

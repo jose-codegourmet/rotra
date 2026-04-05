@@ -1,0 +1,22 @@
+{
+  "name": "rotra",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\""
+  },
+  "devDependencies": {
+    "turbo": "latest",
+    "typescript": "^5.8.3",
+    "prettier": "^3.5.3"
+  },
+  "packageManager": "pnpm@10.7.1",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=10"
+  }
+}

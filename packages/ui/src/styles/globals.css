@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+/* ROTRA CSS custom properties — mapped to shadcn/ui variable names.
+   Dark mode is always active; the `dark` class is set unconditionally on <html>. */
+:root,
+.dark {
+  --background: #0b0b0c;
+  --foreground: #f0f0f2;
+  --card: #1a1a1d;
+  --card-foreground: #f0f0f2;
+  --popover: #1a1a1d;
+  --popover-foreground: #f0f0f2;
+  --primary: #00ff88;
+  --primary-foreground: #0b0b0c;
+  --secondary: #2a2a2e;
+  --secondary-foreground: #f0f0f2;
+  --muted: #2a2a2e;
+  --muted-foreground: #9090a0;
+  --accent: #2a2a2e;
+  --accent-foreground: #f0f0f2;
+  --destructive: #ff4d4d;
+  --destructive-foreground: #f0f0f2;
+  --border: #2a2a2e;
+  --input: #2a2a2e;
+  --ring: #00ff88;
+  --radius: 10px;
+}
+
+/* Row update pulse — applied when a real-time row changes (queue, score, status) */
+@keyframes pulse-accent {
+  0% {
+    background-color: rgba(0, 255, 136, 0.13);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.animate-pulse-accent {
+  animation: pulse-accent 400ms ease-out forwards;
+}
