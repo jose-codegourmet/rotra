@@ -5,31 +5,31 @@ const config: Omit<Config, 'content'> = {
   theme: {
     extend: {
       colors: {
-        // Background scale
-        'bg-base': '#0B0B0C',
-        'bg-surface': '#1A1A1D',
-        'bg-elevated': '#2A2A2E',
-        'bg-overlay': '#3A3A3F',
+        // Background scale — values defined per-theme in globals.css
+        'bg-base':     'var(--color-bg-base)',
+        'bg-surface':  'var(--color-bg-surface)',
+        'bg-elevated': 'var(--color-bg-elevated)',
+        'bg-overlay':  'var(--color-bg-overlay)',
 
         // Text scale
-        'text-primary': '#F0F0F2',
-        'text-secondary': '#9090A0',
-        'text-disabled': '#4A4A55',
+        'text-primary':   'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'text-disabled':  'var(--color-text-disabled)',
 
         // Accent
-        accent: '#00FF88',
-        'accent-dim': '#00CC6A',
-        'accent-subtle': 'rgba(0, 255, 136, 0.13)',
+        accent:          'var(--color-accent)',
+        'accent-dim':    'var(--color-accent-dim)',
+        'accent-subtle': 'var(--color-accent-subtle)',
 
         // Semantic
-        error: '#FF4D4D',
-        warning: '#FFB800',
-        border: '#2A2A2E',
-        'border-strong': '#404048',
+        error:          'var(--color-error)',
+        warning:        'var(--color-warning)',
+        border:         'var(--color-border)',
+        'border-strong':'var(--color-border-strong)',
       },
 
       fontFamily: {
-        sans: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-satoshi)', 'system-ui', 'sans-serif'],
       },
 
       fontSize: {

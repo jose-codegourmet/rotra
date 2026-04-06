@@ -1,8 +1,20 @@
-.PHONY: dev build lint type-check install format storybook storybook-client storybook-admin storybook-umpire build-storybook
+.PHONY: dev dev-client dev-admin dev-umpire build lint check-fix type-check install format storybook storybook-client storybook-admin storybook-umpire build-storybook
 
 # Load nvm and run all apps in parallel via Turborepo
 dev:
 	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm dev
+
+# Run dev server for the client app only
+dev-client:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter client dev
+
+# Run dev server for the admin app only
+dev-admin:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter admin dev
+
+# Run dev server for the umpire app only
+dev-umpire:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter umpire dev
 
 # Install all workspace dependencies
 install:
@@ -15,6 +27,10 @@ build:
 # Lint all apps and packages
 lint:
 	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm lint
+
+# Auto-fix safe lint/format issues across all apps via Biome
+check-fix:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter client check:fix && pnpm --filter admin check:fix && pnpm --filter umpire check:fix
 
 # Format and auto-fix all files in apps/ via Biome
 format:

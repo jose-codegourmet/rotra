@@ -2,11 +2,25 @@ import type { Preview } from '@storybook/react'
 import '../src/app/globals.css'
 
 const preview: Preview = {
-  parameters: {
-    backgrounds: {
-      default: 'dark',
-      values: [{ name: 'dark', value: '#0B0B0C' }],
+  globalTypes: {
+    theme: {
+      description: 'Color theme',
+      toolbar: {
+        title: 'Theme',
+        icon: 'circlehollow',
+        items: [
+          { value: 'light', icon: 'sun', title: 'Light' },
+          { value: 'dark', icon: 'moon', title: 'Dark' },
+        ],
+        dynamicTitle: true,
+      },
     },
+  },
+  initialGlobals: {
+    theme: 'dark',
+  },
+  parameters: {
+    backgrounds: { disable: true },
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
       matchers: {
@@ -16,8 +30,11 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story) => {
-      document.documentElement.classList.add('dark')
+    (Story, context) => {
+      const theme = (context.globals.theme as string) ?? 'dark'
+      document.documentElement.classList.toggle('dark', theme === 'dark')
+      document.documentElement.style.backgroundColor =
+        theme === 'dark' ? '#0b0b0c' : '#ffffff'
       return Story()
     },
   ],
