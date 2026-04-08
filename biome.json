@@ -5,7 +5,8 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "error"
+        "noExplicitAny": "error",
+        "noArrayIndexKey": "off"
       },
       "correctness": {
         "noUnusedVariables": "error"

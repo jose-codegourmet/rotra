@@ -10,6 +10,7 @@
 2. [App Architecture](#2-app-architecture)
 3. [Tech Stack Reference](#3-tech-stack-reference)
 4. [Coding Design System](#4-coding-design-system)
+   - [4.6 Responsive Breakpoints & Container Queries](#46-responsive-breakpoints--container-queries)
 5. [File & Naming Conventions](#5-file--naming-conventions)
 6. [State Layer Rules](#6-state-layer-rules)
 7. [Data Fetching Conventions](#7-data-fetching-conventions)
@@ -237,6 +238,8 @@ A **lightweight, mobile-first PWA** purpose-built for live match scoring. Access
 - Utility-first classes map directly to the ROTRA spacing, color, and typography tokens.
 - Tailwind's JIT mode produces minimal CSS — critical for the Umpire App's lightweight target.
 - The shared `packages/config/tailwind-config` package ensures every app uses identical tokens.
+
+**Breakpoints and container queries use explicit px values** — Tailwind v4's defaults are rem-based, which we override. All responsive variants (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`) and container query variants (`@sm:`, `@md:`, etc.) produce px-based `@media` / `@container` rules. See section 4.6 for details.
 
 **shadcn/ui** is used because:
 - It generates unstyled, accessible component primitives (built on Radix UI) into the codebase — components are owned and modified, not installed as a black-box dependency.
@@ -496,14 +499,12 @@ apps/client/src/components/
 ├── shadcn/                   # shadcn/ui generated components (Button, Input, Dialog, etc.)
 │   └── button/
 │       ├── Button.tsx
-│       ├── Button.stories.tsx
-│       └── index.ts
+│       └── Button.stories.tsx
 ├── rotra/                    # Client-specific components
 │   ├── PlayerRow/
 │   │   ├── PlayerRow.tsx
 │   │   ├── PlayerRow.types.ts
-│   │   ├── PlayerRow.stories.tsx
-│   │   └── index.ts
+│   │   └── PlayerRow.stories.tsx
 │   ├── CourtCard/
 │   ├── StatusBadge/
 │   ├── TierBadge/
@@ -512,8 +513,7 @@ apps/client/src/components/
 └── layout/
     ├── BottomNav/
     │   ├── BottomNav.tsx
-    │   ├── BottomNav.stories.tsx
-    │   └── index.ts
+    │   └── BottomNav.stories.tsx
     └── PageShell/
 
 apps/admin/src/components/
@@ -539,8 +539,7 @@ Every component follows the same file structure, regardless of whether it lives 
 components/<category>/<ComponentName>/
 ├── <ComponentName>.tsx          # Component implementation
 ├── <ComponentName>.types.ts     # Props interface (if not inlined in .tsx)
-├── <ComponentName>.stories.tsx  # Storybook stories
-└── index.ts                     # Re-export
+└── <ComponentName>.stories.tsx  # Storybook stories
 ```
 
 Example:
@@ -549,9 +548,10 @@ Example:
 components/rotra/PlayerRow/
 ├── PlayerRow.tsx
 ├── PlayerRow.types.ts
-├── PlayerRow.stories.tsx
-└── index.ts
+└── PlayerRow.stories.tsx
 ```
+
+> **No `index.ts` barrel files.** Import directly from the component file — `import { PlayerRow } from '@/components/rotra/PlayerRow/PlayerRow'`, not from the folder. Barrel files (`index.ts`) obscure where symbols come from and slow down TypeScript resolution. Reference the actual file.
 
 #### Component Rules
 
@@ -612,6 +612,59 @@ Used when: a row in the queue updates in real-time (new player status, score cha
 
 ---
 
+### 4.6 Responsive Breakpoints & Container Queries
+
+Tailwind v4 ships with rem-based breakpoints by default (`--breakpoint-md: 48rem`). We override all of them with px values — a round number you can read, test against, and reason about without any unit conversion.
+
+#### Breakpoint Scale (responsive variants — `sm:`, `md:`, …)
+
+Defined in `packages/config/tailwind-config/index.ts` under `theme.screens`:
+
+| Variant | px value | Use case |
+|---------|----------|----------|
+| `sm:`   | 640px    | Small tablet / large phone landscape |
+| `md:`   | 768px    | Tablet portrait |
+| `lg:`   | 1024px   | Small laptop / tablet landscape |
+| `xl:`   | 1280px   | Standard desktop |
+| `2xl:`  | 1536px   | Large / wide desktop |
+
+These map directly to standard device widths. No conversion needed.
+
+#### Container Query Scale (`@sm:`, `@md:`, …)
+
+Defined in each app's `globals.css` via `@theme`, mirroring the screen scale:
+
+```css
+@theme {
+  --container-sm:  640px;
+  --container-md:  768px;
+  --container-lg:  1024px;
+  --container-xl:  1280px;
+  --container-2xl: 1536px;
+}
+```
+
+#### Usage
+
+```tsx
+// Responsive (viewport width)
+<div className="flex-col md:flex-row lg:gap-8" />
+
+// Container query (container width)
+<div className="@container">
+  <div className="flex-col @md:flex-row @lg:gap-8" />
+</div>
+```
+
+#### Rules
+
+1. **Never use rem in media queries** — write `640px` not `40rem`. The whole point is readability.
+2. **Don't add custom one-off breakpoints** — use only `sm` / `md` / `lg` / `xl` / `2xl`. If you need a mid-point, reconsider the layout.
+3. **Mobile-first** — start with the base style, then layer `md:` / `lg:` overrides. Never write `max-md:` to undo a desktop default.
+4. **Container queries over media queries for components** — if a component adapts to its container size (not the viewport), reach for `@container` + `@md:`. Reserve viewport breakpoints for layout-level decisions (columns, sidebars, page shell).
+
+---
+
 ## 5. File & Naming Conventions
 
 ### App Directory Structure (Next.js App Router)
@@ -655,6 +708,25 @@ apps/client/src/
 | Server Actions are in `server/actions/[feature].ts` | `server/actions/session.ts` |
 | Redux slices in `lib/store/slices/[feature]Slice.ts` | `lib/store/slices/sessionSlice.ts` |
 | React Query keys in `lib/api/keys.ts` (constants object) | `QUERY_KEYS.session(id)` |
+
+### Constants & Mocks
+
+All app-wide constants and mock data live in `apps/client/src/app/constants/`. This is the single source of truth for static values and development/Storybook mocks used across the client app.
+
+```
+apps/client/src/app/constants/
+├── nav.ts          # Navigation link definitions
+├── mock-club.ts    # Mock club data for Storybook stories and development
+└── ...             # Other constants and mocks as features grow
+```
+
+**Rules:**
+
+1. **Constants go here, not inline** — if a value is reused across more than one file, it belongs in `constants/`, not duplicated at the usage site.
+2. **Mocks go here, not in stories** — Storybook stories import mock data from `constants/`; they do not define their own fixture objects inline.
+3. **One file per domain** — group related constants and mocks in a single file named after the domain (`mock-club.ts`, `nav.ts`, etc.). Do not create one file per constant.
+4. **No runtime logic** — files in `constants/` are pure data. No async calls, no imports from `server/`, no side effects.
+5. **Named after domain, not type** — prefer `mock-club.ts` over `mocks.ts` or `club-constants.ts`.
 
 ---
 

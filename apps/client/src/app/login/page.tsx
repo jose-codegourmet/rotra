@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import DarkVeil from '@/components/ui/dark-veil/DarkVeil'
-import { Logo } from '@/components/ui/logo'
+import { Logo } from '@/components/ui/logo/Logo'
 import { LoginCard } from './LoginCard'
 
 export const metadata: Metadata = {

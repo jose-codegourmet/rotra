@@ -1,6 +1,15 @@
 @import "tailwindcss";
 @config "../../tailwind.config.ts";
 
+/* px-based container query breakpoints — mirrors the responsive screen scale */
+@theme {
+  --container-sm:  640px;
+  --container-md:  768px;
+  --container-lg:  1024px;
+  --container-xl:  1280px;
+  --container-2xl: 1536px;
+}
+
 /* ROTRA CSS custom properties — light mode (default) */
 :root {
   /* shadcn/ui variable names */
