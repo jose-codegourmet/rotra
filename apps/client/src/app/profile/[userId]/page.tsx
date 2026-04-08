@@ -56,10 +56,11 @@ const MOCK_PLAYER = {
   ],
 }
 
-export default function PlayerProfilePage({ params }: { params: { userId: string } }) {
+export default async function PlayerProfilePage({ params }: { params: Promise<{ userId: string }> }) {
+  const { userId } = await params
   const player = MOCK_PLAYER
 
-  console.log('[+] params = ', params)
+  console.log('[+] userId = ', userId)
 
   return (
     <div className="max-w-[1100px] mx-auto p-4 md:p-8">

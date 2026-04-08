@@ -8,10 +8,11 @@ export const metadata: Metadata = {
   description: 'View club details and sessions.',
 }
 
-export default function ClubProfilePage({ params }: { params: { clubId: string } }) {
+export default async function ClubProfilePage({ params }: { params: Promise<{ clubId: string }> }) {
+  const { clubId } = await params
   const club = MOCK_CLUB
 
-  console.log('[+] params = ', params)
+  console.log('[+] clubId = ', clubId)
 
   return (
     <div className="max-w-[1100px] mx-auto p-4 md:p-8">
