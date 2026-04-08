@@ -1,53 +1,12 @@
 import { MapPin, Search, Users } from "lucide-react";
 import type { Metadata } from "next";
 
+import { MOCK_CLUBS } from "@/constants/mock-clubs";
+
 export const metadata: Metadata = {
 	title: "Explore Clubs — ROTRA",
 	description: "Discover and join badminton clubs near you.",
 };
-
-const MOCK_CLUBS = [
-	{
-		id: "1",
-		name: "Sunrise Badminton Club",
-		location: "Quezon City",
-		members: 24,
-		description:
-			"Competitive-social club focused on doubles rotational play. Open to all levels.",
-		founded: "Jan 2024",
-		status: "member",
-	},
-	{
-		id: "2",
-		name: "Metro Badminton",
-		location: "Makati",
-		members: 12,
-		description:
-			"Casual social play for working professionals. Friendly atmosphere.",
-		founded: "Mar 2024",
-		status: "not-member",
-	},
-	{
-		id: "3",
-		name: "Shuttle Kings PH",
-		location: "Pasig City",
-		members: 38,
-		description:
-			"Competitive club with weekly ranked sessions and monthly tournaments.",
-		founded: "Jun 2023",
-		status: "pending",
-	},
-	{
-		id: "4",
-		name: "Birdie Club Manila",
-		location: "Manila",
-		members: 19,
-		description:
-			"Mixed-level club with structured coaching and skill development sessions.",
-		founded: "Nov 2023",
-		status: "not-member",
-	},
-];
 
 export default function ExplorePage() {
 	return (

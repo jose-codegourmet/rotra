@@ -1,33 +1,20 @@
 "use client";
 
-import {
-	CalendarClock,
-	Gauge,
-	Moon,
-	MoreVertical,
-	Sun,
-	Trophy,
-	User,
-	X,
-} from "lucide-react";
+import { Moon, MoreVertical, Sun, User, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo/Logo";
-import type { NavItemId } from "@/components/ui/sidebar/Sidebar";
+import { NAV_ITEMS } from "@/constants/nav";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeMobileDrawer } from "@/store/slices/uiSlice";
 
-const NAV_ITEMS = [
-	{ id: "home" as NavItemId, label: "Home", Icon: Gauge },
-	{ id: "clubs" as NavItemId, label: "Clubs", Icon: Trophy },
-	{ id: "sessions" as NavItemId, label: "Sessions", Icon: CalendarClock },
-	{ id: "profile" as NavItemId, label: "Profile", Icon: User },
-];
-
-export interface MobileDrawerProps {
-	activeItem?: NavItemId;
-}
-
-export function MobileDrawer({ activeItem = "home" }: MobileDrawerProps) {
+export function MobileDrawer() {
+	const pathname = usePathname();
+	const activeItem =
+		NAV_ITEMS.find(
+			(item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
+		)?.id ?? "home";
 	const dispatch = useAppDispatch();
 	const isOpen = useAppSelector((state) => state.ui.isMobileDrawerOpen);
 
@@ -72,12 +59,13 @@ export function MobileDrawer({ activeItem = "home" }: MobileDrawerProps) {
 
 				{/* Nav items */}
 				<nav className="flex-1 py-4">
-					{NAV_ITEMS.map(({ id, label, Icon }) => {
+					{NAV_ITEMS.map(({ id, label, Icon, href }) => {
 						const isActive = activeItem === id;
 						return (
-							<button
+							<Link
 								key={id}
-								type="button"
+								href={href}
+								onClick={() => dispatch(closeMobileDrawer())}
 								className={cn(
 									"w-full flex items-center px-6 py-4 transition-colors duration-default",
 									isActive
@@ -98,7 +86,7 @@ export function MobileDrawer({ activeItem = "home" }: MobileDrawerProps) {
 								>
 									{label}
 								</span>
-							</button>
+							</Link>
 						);
 					})}
 

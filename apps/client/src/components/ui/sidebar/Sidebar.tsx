@@ -1,17 +1,20 @@
 "use client";
 
 import { MoreVertical, Plus, User } from "lucide-react";
-import { NAV_ITEMS, type NavItemId } from "@/app/constants/nav";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo/Logo";
+import { NAV_ITEMS, type NavItemId } from "@/constants/nav";
 import { cn } from "@/lib/utils";
 
 export type { NavItemId };
 
-export interface SidebarProps {
-	activeItem?: NavItemId;
-}
-
-export function Sidebar({ activeItem = "home" }: SidebarProps) {
+export function Sidebar() {
+	const pathname = usePathname();
+	const activeItem =
+		NAV_ITEMS.find(
+			(item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
+		)?.id ?? "home";
 	return (
 		<aside className="hidden md:flex flex-col fixed left-0 top-0 h-full w-20 lg:w-64 bg-bg-base border-r border-border z-50 py-8">
 			{/* Logo */}
@@ -21,12 +24,12 @@ export function Sidebar({ activeItem = "home" }: SidebarProps) {
 
 			{/* Nav items */}
 			<nav className="flex-1 space-y-1">
-				{NAV_ITEMS.map(({ id, label, Icon }) => {
+				{NAV_ITEMS.map(({ id, label, Icon, href }) => {
 					const isActive = activeItem === id;
 					return (
-						<button
+						<Link
 							key={id}
-							type="button"
+							href={href}
 							className={cn(
 								"w-full flex items-center px-6 py-4 transition-all duration-default",
 								isActive
@@ -38,7 +41,7 @@ export function Sidebar({ activeItem = "home" }: SidebarProps) {
 							<span className="hidden lg:block text-label font-medium uppercase tracking-widest">
 								{label}
 							</span>
-						</button>
+						</Link>
 					);
 				})}
 			</nav>

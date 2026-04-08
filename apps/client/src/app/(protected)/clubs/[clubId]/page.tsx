@@ -1,7 +1,7 @@
 import { CalendarClock, MapPin, MoreVertical, Users } from "lucide-react";
 import type { Metadata } from "next";
 
-import { MOCK_CLUB } from "@/app/constants/mock-club";
+import { MOCK_CLUB } from "@/constants/mock-club";
 
 export const metadata: Metadata = {
 	title: "Club Profile — ROTRA",

@@ -1,59 +1,16 @@
 import { MoreVertical, Share2 } from "lucide-react";
 import type { Metadata } from "next";
 
+import {
+	ADVANCED_STATS,
+	MOCK_PLAYER,
+	SKILL_RATINGS,
+} from "@/constants/mock-player";
+import { SKILL_DIMENSIONS } from "@/constants/skills";
+
 export const metadata: Metadata = {
 	title: "Player Profile — ROTRA",
 	description: "View player profile.",
-};
-
-const MOCK_PLAYER = {
-	id: "u1",
-	name: "Alex Santos",
-	level: "Intermediate",
-	tier: "Warrior 2",
-	exp: 620,
-	initials: "AS",
-	stats: [
-		{ label: "Games", value: "42" },
-		{ label: "Wins", value: "28" },
-		{ label: "Win Rate", value: "67%", accent: true },
-		{ label: "Sessions", value: "12" },
-		{ label: "Clubs", value: "3" },
-		{ label: "Rating", value: "★ 3.8", accent: true },
-	],
-	playStyle: ["Doubles", "Front Court", "Social"],
-	gear: [
-		{
-			category: "RACKETS",
-			items: [
-				{
-					title: "Main Racket",
-					brand: "Yonex",
-					model: "Astrox 99",
-					specs: ["Head Heavy", "BG80", "26 lbs"],
-				},
-			],
-		},
-		{ category: "SHOES", items: [] },
-	],
-	recentMatches: [
-		{
-			id: "m1",
-			date: "Mar 22",
-			club: "Sunrise BC",
-			result: "W",
-			teams: "Alex+Maria vs Jose+Ana",
-			score: "21 – 15",
-		},
-		{
-			id: "m2",
-			date: "Mar 15",
-			club: "Sunrise BC",
-			result: "L",
-			teams: "Alex+Jose vs Maria+Ana",
-			score: "14 – 21",
-		},
-	],
 };
 
 export default async function PlayerProfilePage({
@@ -232,15 +189,8 @@ export default async function PlayerProfilePage({
 							<span className="text-body font-semibold text-accent">★ 3.8</span>
 						</div>
 
-						{[
-							"Attack",
-							"Defense",
-							"Net & Touch",
-							"Precision & Control",
-							"Athleticism",
-							"Game Intelligence",
-						].map((dimension, i) => {
-							const value = [4.1, 3.5, 3.2, 3.8, 4.0, 3.6][i] ?? 0;
+						{SKILL_DIMENSIONS.map((dimension, i) => {
+							const value = SKILL_RATINGS[i] ?? 0;
 							return (
 								<div key={dimension} className="flex items-center gap-3">
 									<span className="text-body text-text-primary w-40 shrink-0">
@@ -316,12 +266,7 @@ export default async function PlayerProfilePage({
 						<p className="text-small text-text-disabled">
 							Unlocks at 20 matches · {42} played
 						</p>
-						{[
-							{ label: "Most frequent partner", value: "Maria Cruz" },
-							{ label: "Best partner win rate", value: "80%" },
-							{ label: "Toughest opponent", value: "Jose B." },
-							{ label: "Peak skill rating", value: "★ 4.1" },
-						].map((row) => (
+						{ADVANCED_STATS.map((row) => (
 							<div
 								key={row.label}
 								className="flex items-center justify-between py-1"
