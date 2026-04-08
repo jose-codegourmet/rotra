@@ -45,8 +45,8 @@ export function MobileDrawer() {
 			>
 				{/* Header */}
 				<div className="p-6 flex justify-between items-center border-b border-border">
-					<div className="flex items-center gap-2">
-						<Logo variant="dark" className="w-24" />
+					<div className="flex items-center gap-2 w-full">
+						<Logo variant="dark" className="w-full" />
 					</div>
 					<button
 						type="button"
