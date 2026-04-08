@@ -1,9 +1,10 @@
 "use client";
 
-import { Moon, MoreVertical, Sun, User, X } from "lucide-react";
+import { MoreVertical, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo/Logo";
+import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle";
 import { NAV_ITEMS } from "@/constants/nav";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -44,8 +45,8 @@ export function MobileDrawer() {
 			>
 				{/* Header */}
 				<div className="p-6 flex justify-between items-center border-b border-border">
-					<div className="flex items-center gap-2">
-						<Logo variant="dark" className="w-24" />
+					<div className="flex items-center gap-2 w-full">
+						<Logo variant="dark" className="w-full" />
 					</div>
 					<button
 						type="button"
@@ -91,27 +92,7 @@ export function MobileDrawer() {
 					})}
 
 					{/* Theme toggle */}
-					<button
-						type="button"
-						className="w-full flex items-center px-6 py-4 text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-colors duration-default"
-					>
-						<Moon
-							size={20}
-							strokeWidth={1.5}
-							className="mr-4 shrink-0 dark:hidden"
-						/>
-						<Sun
-							size={20}
-							strokeWidth={1.5}
-							className="mr-4 shrink-0 hidden dark:block"
-						/>
-						<span className="text-label font-medium uppercase tracking-widest dark:hidden">
-							Dark Mode
-						</span>
-						<span className="text-label font-medium uppercase tracking-widest hidden dark:block">
-							Light Mode
-						</span>
-					</button>
+					<ThemeToggle variant="row" />
 				</nav>
 
 				{/* User section */}

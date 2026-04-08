@@ -19,7 +19,7 @@ export function Sidebar() {
 		<aside className="hidden md:flex flex-col fixed left-0 top-0 h-full w-20 lg:w-64 bg-bg-base border-r border-border z-50 py-8">
 			{/* Logo */}
 			<div className="px-5 mb-10">
-				<Logo variant="dark" className="w-8 lg:w-36" />
+				<Logo variant="dark" className="w-full" />
 			</div>
 
 			{/* Nav items */}

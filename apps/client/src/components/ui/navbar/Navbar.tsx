@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut, Moon, Search, Settings, Sun } from "lucide-react";
+import { LogOut, Search, Settings } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle";
 
 export interface NavbarProps {
 	pageTitle?: string;
@@ -26,14 +27,7 @@ export function Navbar({
 
 			{/* Right: actions */}
 			<div className="flex items-center gap-6">
-				<button
-					type="button"
-					className="text-text-disabled hover:text-accent transition-colors duration-default"
-					aria-label="Toggle theme"
-				>
-					<Moon size={20} strokeWidth={1.5} className="dark:hidden" />
-					<Sun size={20} strokeWidth={1.5} className="hidden dark:block" />
-				</button>
+				<ThemeToggle />
 				<button
 					type="button"
 					className="text-text-disabled hover:text-accent transition-colors duration-default"
