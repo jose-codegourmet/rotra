@@ -1,9 +1,9 @@
-import baseConfig from '@rotra/config/tailwind'
-import type { Config } from 'tailwindcss'
+import baseConfig from "@rotra/config/tailwind";
+import type { Config } from "tailwindcss";
 
 const config: Config = {
-  ...baseConfig,
-  content: ['./src/**/*.{ts,tsx}'],
-}
+	...baseConfig,
+	content: ["./src/**/*.{ts,tsx}"],
+};
 
-export default config
+export default config;

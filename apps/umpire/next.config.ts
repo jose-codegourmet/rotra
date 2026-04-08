@@ -1,7 +1,7 @@
-import type { NextConfig } from 'next'
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@rotra/ui', '@rotra/db'],
-}
+	transpilePackages: ["@rotra/ui", "@rotra/db"],
+};
 
-export default nextConfig
+export default nextConfig;

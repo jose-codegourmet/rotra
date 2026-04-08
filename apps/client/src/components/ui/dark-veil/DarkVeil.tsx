@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { Mesh, Program, Renderer, Triangle, Vec2 } from 'ogl'
-import { useEffect, useRef } from 'react'
+import { Mesh, Program, Renderer, Triangle, Vec2 } from "ogl";
+import { useEffect, useRef } from "react";
 
 const vertex = `
 attribute vec2 position;
 void main(){gl_Position=vec4(position,0.0,1.0);}
-`
+`;
 
 const fragment = `
 #ifdef GL_ES
@@ -73,101 +73,110 @@ void main(){
  col.rgb+=(rand(gl_FragCoord.xy+uTime)-0.5)*uNoise;
  gl_FragColor=vec4(clamp(col.rgb,0.0,1.0),1.0);
 }
-`
+`;
 
 type Props = {
-  hueShift?: number
-  noiseIntensity?: number
-  scanlineIntensity?: number
-  speed?: number
-  scanlineFrequency?: number
-  warpAmount?: number
-  resolutionScale?: number
-}
+	hueShift?: number;
+	noiseIntensity?: number;
+	scanlineIntensity?: number;
+	speed?: number;
+	scanlineFrequency?: number;
+	warpAmount?: number;
+	resolutionScale?: number;
+};
 
 export default function DarkVeil({
-  hueShift = 78,
-  noiseIntensity = 0,
-  scanlineIntensity = 0,
-  speed = 0.5,
-  scanlineFrequency = 0,
-  warpAmount = 0,
-  resolutionScale = 1,
+	hueShift = 78,
+	noiseIntensity = 0,
+	scanlineIntensity = 0,
+	speed = 0.5,
+	scanlineFrequency = 0,
+	warpAmount = 0,
+	resolutionScale = 1,
 }: Props) {
-  const ref = useRef<HTMLCanvasElement>(null)
+	const ref = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    const canvas = ref.current
-    if (!canvas) return
-    const parent = canvas.parentElement
-    if (!parent) return
+	useEffect(() => {
+		const canvas = ref.current;
+		if (!canvas) return;
+		const parent = canvas.parentElement;
+		if (!parent) return;
 
-    const renderer = new Renderer({
-      dpr: Math.min(window.devicePixelRatio, 2),
-      canvas,
-    })
+		const renderer = new Renderer({
+			dpr: Math.min(window.devicePixelRatio, 2),
+			canvas,
+		});
 
-    const gl = renderer.gl
-    const geometry = new Triangle(gl)
+		const gl = renderer.gl;
+		const geometry = new Triangle(gl);
 
-    const program = new Program(gl, {
-      vertex,
-      fragment,
-      uniforms: {
-        uTime: { value: 0 },
-        uResolution: { value: new Vec2() },
-        uHueShift: { value: hueShift },
-        uNoise: { value: noiseIntensity },
-        uScan: { value: scanlineIntensity },
-        uScanFreq: { value: scanlineFrequency },
-        uWarp: { value: warpAmount },
-      },
-    })
+		const program = new Program(gl, {
+			vertex,
+			fragment,
+			uniforms: {
+				uTime: { value: 0 },
+				uResolution: { value: new Vec2() },
+				uHueShift: { value: hueShift },
+				uNoise: { value: noiseIntensity },
+				uScan: { value: scanlineIntensity },
+				uScanFreq: { value: scanlineFrequency },
+				uWarp: { value: warpAmount },
+			},
+		});
 
-    const mesh = new Mesh(gl, { geometry, program })
+		const mesh = new Mesh(gl, { geometry, program });
 
-    const resize = () => {
-      const w = parent.clientWidth
-      const h = parent.clientHeight
-      renderer.setSize(w * resolutionScale, h * resolutionScale)
-      program.uniforms.uResolution.value.set(w, h)
-    }
+		const resize = () => {
+			const w = parent.clientWidth;
+			const h = parent.clientHeight;
+			renderer.setSize(w * resolutionScale, h * resolutionScale);
+			program.uniforms.uResolution.value.set(w, h);
+		};
 
-    window.addEventListener('resize', resize)
-    resize()
+		window.addEventListener("resize", resize);
+		resize();
 
-    const start = performance.now()
-    let frame = 0
+		const start = performance.now();
+		let frame = 0;
 
-    const loop = () => {
-      program.uniforms.uTime.value = ((performance.now() - start) / 1000) * speed
-      program.uniforms.uHueShift.value = hueShift
-      program.uniforms.uNoise.value = noiseIntensity
-      program.uniforms.uScan.value = scanlineIntensity
-      program.uniforms.uScanFreq.value = scanlineFrequency
-      program.uniforms.uWarp.value = warpAmount
-      renderer.render({ scene: mesh })
-      frame = requestAnimationFrame(loop)
-    }
+		const loop = () => {
+			program.uniforms.uTime.value =
+				((performance.now() - start) / 1000) * speed;
+			program.uniforms.uHueShift.value = hueShift;
+			program.uniforms.uNoise.value = noiseIntensity;
+			program.uniforms.uScan.value = scanlineIntensity;
+			program.uniforms.uScanFreq.value = scanlineFrequency;
+			program.uniforms.uWarp.value = warpAmount;
+			renderer.render({ scene: mesh });
+			frame = requestAnimationFrame(loop);
+		};
 
-    loop()
+		loop();
 
-    return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('resize', resize)
-    }
-  }, [hueShift, noiseIntensity, scanlineIntensity, speed, scanlineFrequency, warpAmount, resolutionScale])
+		return () => {
+			cancelAnimationFrame(frame);
+			window.removeEventListener("resize", resize);
+		};
+	}, [
+		hueShift,
+		noiseIntensity,
+		scanlineIntensity,
+		speed,
+		scanlineFrequency,
+		warpAmount,
+		resolutionScale,
+	]);
 
-  return (
-    <canvas
-      ref={ref}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        display: 'block',
-      }}
-    />
-  )
+	return (
+		<canvas
+			ref={ref}
+			style={{
+				position: "absolute",
+				inset: 0,
+				width: "100%",
+				height: "100%",
+				display: "block",
+			}}
+		/>
+	);
 }

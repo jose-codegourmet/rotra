@@ -3,120 +3,120 @@
 
 /* px-based container query breakpoints — mirrors the responsive screen scale */
 @theme {
-  --container-sm:  640px;
-  --container-md:  768px;
-  --container-lg:  1024px;
-  --container-xl:  1280px;
-  --container-2xl: 1536px;
+	--container-sm: 640px;
+	--container-md: 768px;
+	--container-lg: 1024px;
+	--container-xl: 1280px;
+	--container-2xl: 1536px;
 }
 
 /* ROTRA CSS custom properties — light mode (default) */
 :root {
-  /* shadcn/ui variable names */
-  --background: #ffffff;
-  --foreground: #0b0b0c;
-  --card: #f5f5f7;
-  --card-foreground: #0b0b0c;
-  --popover: #f5f5f7;
-  --popover-foreground: #0b0b0c;
-  --primary: #00cc6a;
-  --primary-foreground: #ffffff;
-  --secondary: #ebebef;
-  --secondary-foreground: #0b0b0c;
-  --muted: #ebebef;
-  --muted-foreground: #4a4a55;
-  --accent: #ebebef;
-  --accent-foreground: #0b0b0c;
-  --destructive: #d93232;
-  --destructive-foreground: #ffffff;
-  --border: #e4e4e9;
-  --input: #e4e4e9;
-  --ring: #00cc6a;
-  --radius: 10px;
+	/* shadcn/ui variable names */
+	--background: #ffffff;
+	--foreground: #0b0b0c;
+	--card: #f5f5f7;
+	--card-foreground: #0b0b0c;
+	--popover: #f5f5f7;
+	--popover-foreground: #0b0b0c;
+	--primary: #00cc6a;
+	--primary-foreground: #ffffff;
+	--secondary: #ebebef;
+	--secondary-foreground: #0b0b0c;
+	--muted: #ebebef;
+	--muted-foreground: #4a4a55;
+	--accent: #ebebef;
+	--accent-foreground: #0b0b0c;
+	--destructive: #d93232;
+	--destructive-foreground: #ffffff;
+	--border: #e4e4e9;
+	--input: #e4e4e9;
+	--ring: #00cc6a;
+	--radius: 10px;
 
-  /* ROTRA semantic tokens */
-  --color-bg-base:      #ffffff;
-  --color-bg-surface:   #f5f5f7;
-  --color-bg-elevated:  #ebebef;
-  --color-bg-overlay:   #e0e0e6;
-  --color-text-primary:   #0b0b0c;
-  --color-text-secondary: #4a4a55;
-  --color-text-disabled:  #9090a0;
-  --color-accent:         #00cc6a;
-  --color-accent-dim:     #00a855;
-  --color-accent-subtle:  rgba(0, 204, 106, 0.13);
-  --color-error:          #d93232;
-  --color-warning:        #d97706;
-  --color-border:         #e4e4e9;
-  --color-border-strong:  #d0d0d8;
+	/* ROTRA semantic tokens */
+	--color-bg-base: #ffffff;
+	--color-bg-surface: #f5f5f7;
+	--color-bg-elevated: #ebebef;
+	--color-bg-overlay: #e0e0e6;
+	--color-text-primary: #0b0b0c;
+	--color-text-secondary: #4a4a55;
+	--color-text-disabled: #9090a0;
+	--color-accent: #00cc6a;
+	--color-accent-dim: #00a855;
+	--color-accent-subtle: rgba(0, 204, 106, 0.13);
+	--color-error: #d93232;
+	--color-warning: #d97706;
+	--color-border: #e4e4e9;
+	--color-border-strong: #d0d0d8;
 }
 
 /* ROTRA CSS custom properties — dark mode */
 .dark {
-  /* shadcn/ui variable names */
-  --background: #0b0b0c;
-  --foreground: #f0f0f2;
-  --card: #1a1a1d;
-  --card-foreground: #f0f0f2;
-  --popover: #1a1a1d;
-  --popover-foreground: #f0f0f2;
-  --primary: #00ff88;
-  --primary-foreground: #0b0b0c;
-  --secondary: #2a2a2e;
-  --secondary-foreground: #f0f0f2;
-  --muted: #2a2a2e;
-  --muted-foreground: #9090a0;
-  --accent: #2a2a2e;
-  --accent-foreground: #f0f0f2;
-  --destructive: #ff4d4d;
-  --destructive-foreground: #f0f0f2;
-  --border: #2a2a2e;
-  --input: #2a2a2e;
-  --ring: #00ff88;
+	/* shadcn/ui variable names */
+	--background: #0b0b0c;
+	--foreground: #f0f0f2;
+	--card: #1a1a1d;
+	--card-foreground: #f0f0f2;
+	--popover: #1a1a1d;
+	--popover-foreground: #f0f0f2;
+	--primary: #00ff88;
+	--primary-foreground: #0b0b0c;
+	--secondary: #2a2a2e;
+	--secondary-foreground: #f0f0f2;
+	--muted: #2a2a2e;
+	--muted-foreground: #9090a0;
+	--accent: #2a2a2e;
+	--accent-foreground: #f0f0f2;
+	--destructive: #ff4d4d;
+	--destructive-foreground: #f0f0f2;
+	--border: #2a2a2e;
+	--input: #2a2a2e;
+	--ring: #00ff88;
 
-  /* ROTRA semantic tokens */
-  --color-bg-base:      #0b0b0c;
-  --color-bg-surface:   #1a1a1d;
-  --color-bg-elevated:  #2a2a2e;
-  --color-bg-overlay:   #3a3a3f;
-  --color-text-primary:   #f0f0f2;
-  --color-text-secondary: #9090a0;
-  --color-text-disabled:  #4a4a55;
-  --color-accent:         #00ff88;
-  --color-accent-dim:     #00cc6a;
-  --color-accent-subtle:  rgba(0, 255, 136, 0.13);
-  --color-error:          #ff4d4d;
-  --color-warning:        #ffb800;
-  --color-border:         #2a2a2e;
-  --color-border-strong:  #404048;
+	/* ROTRA semantic tokens */
+	--color-bg-base: #0b0b0c;
+	--color-bg-surface: #1a1a1d;
+	--color-bg-elevated: #2a2a2e;
+	--color-bg-overlay: #3a3a3f;
+	--color-text-primary: #f0f0f2;
+	--color-text-secondary: #9090a0;
+	--color-text-disabled: #4a4a55;
+	--color-accent: #00ff88;
+	--color-accent-dim: #00cc6a;
+	--color-accent-subtle: rgba(0, 255, 136, 0.13);
+	--color-error: #ff4d4d;
+	--color-warning: #ffb800;
+	--color-border: #2a2a2e;
+	--color-border-strong: #404048;
 }
 
 /* Row update pulse — applied when a real-time row changes (queue, score, status) */
 @keyframes pulse-accent {
-  0% {
-    background-color: rgba(0, 255, 136, 0.13);
-  }
-  100% {
-    background-color: transparent;
-  }
+	0% {
+		background-color: rgba(0, 255, 136, 0.13);
+	}
+	100% {
+		background-color: transparent;
+	}
 }
 
 .animate-pulse-accent {
-  animation: pulse-accent 400ms ease-out forwards;
+	animation: pulse-accent 400ms ease-out forwards;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
-  font-weight: 300 900;
-  font-style: normal;
-  font-display: swap;
+	font-family: "Satoshi";
+	src: url("/fonts/Satoshi-Variable.woff2") format("woff2");
+	font-weight: 300 900;
+	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi-VariableItalic.woff2') format('woff2');
-  font-weight: 300 900;
-  font-style: italic;
-  font-display: swap;
+	font-family: "Satoshi";
+	src: url("/fonts/Satoshi-VariableItalic.woff2") format("woff2");
+	font-weight: 300 900;
+	font-style: italic;
+	font-display: swap;
 }

@@ -9,6 +9,7 @@
 1. [Monorepo Overview](#1-monorepo-overview)
 2. [App Architecture](#2-app-architecture)
 3. [Tech Stack Reference](#3-tech-stack-reference)
+   - [3.1.1 Next.js 15 — Breaking Changes & Coding Rules](#311-nextjs-15--breaking-changes--coding-rules)
 4. [Coding Design System](#4-coding-design-system)
    - [4.6 Responsive Breakpoints & Container Queries](#46-responsive-breakpoints--container-queries)
 5. [File & Naming Conventions](#5-file--naming-conventions)
@@ -177,6 +178,56 @@ A **lightweight, mobile-first PWA** purpose-built for live match scoring. Access
 - Layouts handle role-based auth guards at the router level.
 - Middleware handles token validation for the Umpire App before the page renders.
 - Streaming with Suspense gives progressive loading on data-heavy pages (admin analytics, leaderboard).
+
+---
+
+### 3.1.1 Next.js 15 — Breaking Changes & Coding Rules
+
+Next.js 15 introduced several async APIs that **break silently at runtime but fail loudly at build time**. Every page and layout author must follow these rules.
+
+#### Dynamic Route `params` are a Promise
+
+In Next.js 15, the `params` prop passed to `page.tsx`, `layout.tsx`, `generateMetadata`, and `generateStaticParams` is now a **`Promise`**, not a plain object.
+
+**Wrong (Next.js 14 style — fails to build in Next.js 15):**
+```tsx
+export default function ClubProfilePage({ params }: { params: { clubId: string } }) {
+  const { clubId } = params // ❌ TypeScript error: params is Promise<any>
+  ...
+}
+```
+
+**Correct (Next.js 15):**
+```tsx
+export default async function ClubProfilePage({
+  params,
+}: {
+  params: Promise<{ clubId: string }>
+}) {
+  const { clubId } = await params // ✅
+  ...
+}
+```
+
+**Rules:**
+1. **Always type `params` as `Promise<{ ... }>`** — never the raw object shape.
+2. **Always make the component `async`** — you cannot `await` inside a sync Server Component.
+3. **Applies everywhere `params` is consumed** — `page.tsx`, `layout.tsx`, `generateMetadata`, `generateStaticParams`.
+4. **`searchParams` follows the same pattern** — `searchParams: Promise<{ [key: string]: string | string[] | undefined }>`.
+
+**`generateMetadata` example:**
+```tsx
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ clubId: string }>
+}): Promise<Metadata> {
+  const { clubId } = await params
+  return { title: `Club ${clubId} — ROTRA` }
+}
+```
+
+> **Why this changed:** Next.js 15 made dynamic APIs asynchronous to support streaming and partial prerendering (PPR). `params` is resolved lazily on the server — awaiting it opts the segment into dynamic rendering only when necessary.
 
 ---
 
