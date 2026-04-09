@@ -1,6 +1,6 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 
-import { MatchDateBlock } from "./MatchDateBlock";
+import { MatchDateBlock } from "../MatchDateBlock/MatchDateBlock";
 
 export interface Match {
 	id: string;

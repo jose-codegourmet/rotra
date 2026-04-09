@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { CurrentGearCard } from "@/app/components/module/profile/CurrentGearCard/CurrentGearCard";
-import { MatchHistory } from "@/app/components/module/profile/MatchHistory/MatchHistory";
-import { MetricsCard } from "@/app/components/module/profile/MetricsCard/MetricsCard";
-import { PlayerHeaderCard } from "@/app/components/module/profile/PlayerHeaderCard/PlayerHeaderCard";
-import { PlayStyleCard } from "@/app/components/module/profile/PlayStyleCard/PlayStyleCard";
-import { SkillCalibrationCard } from "@/app/components/module/profile/SkillCalibrationCard/SkillCalibrationCard";
-import { StatsCards } from "@/app/components/module/profile/StatsCards/StatsCards";
+import { CurrentGearCard } from "@/components/modules/profile/CurrentGearCard/CurrentGearCard";
+import { MatchHistory } from "@/components/modules/profile/MatchHistory/MatchHistory";
+import { MetricsCard } from "@/components/modules/profile/MetricsCard/MetricsCard";
+import { PlayerHeaderCard } from "@/components/modules/profile/PlayerHeaderCard/PlayerHeaderCard";
+import { PlayStyleCard } from "@/components/modules/profile/PlayStyleCard/PlayStyleCard";
+import { SkillCalibrationCard } from "@/components/modules/profile/SkillCalibrationCard/SkillCalibrationCard";
+import { StatsCards } from "@/components/modules/profile/StatsCards/StatsCards";
 import { MOCK_PLAYER } from "@/constants/mock-player";
 
 export const metadata: Metadata = {

@@ -1,4 +1,4 @@
-import { SkillRadarChart } from "@/components/rotra/SkillRadarChart/SkillRadarChart";
+import { SkillRadarChart } from "@/components/modules/profile/SkillRadarChart/SkillRadarChart";
 import { SKILL_RATINGS } from "@/constants/mock-player";
 import { SKILL_DIMENSIONS } from "@/constants/skills";
 import type { TPlayerModel } from "@/types/player";

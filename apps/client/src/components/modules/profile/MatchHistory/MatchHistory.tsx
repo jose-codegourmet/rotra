@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { type Match, MatchCard } from "./MatchCard";
+import { type Match, MatchCard } from "../MatchCard/MatchCard";
 
 interface MatchHistoryProps {
 	matches: Match[];
