@@ -16,6 +16,7 @@
 		"@radix-ui/react-slot": "latest",
 		"@reduxjs/toolkit": "^2.11.2",
 		"@rotra/db": "workspace:*",
+		"@tanstack/react-query": "^5.96.2",
 		"class-variance-authority": "latest",
 		"clsx": "latest",
 		"lucide-react": "^1.7.0",
