@@ -1,9 +1,10 @@
 "use client";
 
-import { MoreVertical, Plus, User } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo/Logo";
+import { SidebarUserMenu } from "@/components/ui/sidebar/SidebarUserMenu/SidebarUserMenu";
 import { NAV_ITEMS, type NavItemId } from "@/constants/nav";
 import { cn } from "@/lib/utils";
 
@@ -60,33 +61,7 @@ export function Sidebar() {
 			</div>
 
 			{/* User section */}
-			<div className="mt-auto pt-6 border-t border-border px-4">
-				<div className="flex items-center gap-3 lg:bg-bg-surface lg:p-3 rounded-lg transition-colors hover:bg-bg-elevated cursor-pointer group">
-					<div className="relative shrink-0">
-						<div className="w-10 h-10 rounded-full bg-bg-elevated border-2 border-accent flex items-center justify-center group-hover:scale-105 transition-transform">
-							<User
-								size={18}
-								strokeWidth={1.5}
-								className="text-text-secondary"
-							/>
-						</div>
-						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-accent rounded-full border-2 border-bg-base" />
-					</div>
-					<div className="hidden lg:flex flex-col overflow-hidden">
-						<span className="text-small font-black text-text-primary uppercase tracking-wider truncate">
-							Alex Santos
-						</span>
-						<span className="text-micro font-bold text-accent uppercase tracking-tight">
-							Warrior 2
-						</span>
-					</div>
-					<MoreVertical
-						size={16}
-						strokeWidth={1.5}
-						className="hidden lg:block ml-auto text-text-disabled"
-					/>
-				</div>
-			</div>
+			<SidebarUserMenu />
 		</aside>
 	);
 }
