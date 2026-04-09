@@ -1,6 +1,8 @@
 import { CalendarClock, Plus } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
+import { SessionRegisterButton } from "@/components/modules/session";
 import {
 	SESSION_FILTER_TABS,
 	SESSIONS,
@@ -62,93 +64,150 @@ export default function SessionsPage() {
 							const config = STATUS_CONFIG[session.status];
 							const isLive = session.status === "live";
 							const isCompleted = session.status === "completed";
+							const hrefToLiveDashboard =
+								session.status === "live" ||
+								session.status === "upcoming" ||
+								session.status === "open";
+
+							const cardClass = `bg-bg-surface border border-border rounded-lg p-4 shadow-card flex flex-col gap-3 transition-colors duration-default ${
+								isLive ? "lg:col-span-2" : ""
+							}`;
+
+							const sessionHref = `/sessions/${session.id}`;
+
+							const statusBlock = (
+								<div className="flex items-center gap-2">
+									{config.dotColor && (
+										<span
+											className={`size-2 rounded-full ${config.dotColor} animate-pulse`}
+										/>
+									)}
+									<span
+										className={`text-micro font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${config.className}`}
+									>
+										{config.label}
+									</span>
+									<span className="text-small text-text-disabled ml-auto">
+										{session.club}
+									</span>
+								</div>
+							);
+
+							const dateBlock = (
+								<div>
+									<p className="text-heading font-semibold text-text-primary">
+										{session.date}
+									</p>
+									<div className="flex items-center gap-1 text-small text-text-secondary mt-0.5">
+										<CalendarClock size={13} strokeWidth={1.5} />
+										<span>
+											{session.venue} · {session.time}
+										</span>
+									</div>
+								</div>
+							);
+
+							const slotsText = (
+								<div className="flex flex-col gap-0.5 min-w-0">
+									<span className="text-small text-text-secondary">
+										{session.slots}/{session.total} slots ·{" "}
+										{session.registrationStatus === "accepted" && (
+											<span className="text-accent font-bold">Accepted</span>
+										)}
+										{!session.registrationStatus && "Not Registered"}
+									</span>
+									<span className="text-small text-text-secondary">
+										₱{session.cost}/player · {session.format}
+									</span>
+								</div>
+							);
+
+							const completedFooter = (
+								<div className="flex items-center justify-between">
+									<span className="text-small text-text-secondary">
+										{session.total} players ·{" "}
+										{
+											(
+												session as typeof session & {
+													matchesPlayed?: number;
+												}
+											).matchesPlayed
+										}{" "}
+										matches played
+									</span>
+									<button
+										type="button"
+										className="h-9 px-4 text-small font-bold uppercase tracking-widest text-text-secondary border border-border rounded-md hover:bg-bg-elevated transition-colors duration-default"
+									>
+										View Results
+									</button>
+								</div>
+							);
+
+							const activeSessionFooter = session.registrationStatus ? (
+								<div className="flex items-center justify-between">
+									{slotsText}
+								</div>
+							) : (
+								<div className="flex items-center justify-between gap-3">
+									<Link
+										href={sessionHref}
+										className="min-w-0 flex-1 rounded-md text-text-primary outline-offset-2 focus-visible:outline focus-visible:ring-2 focus-visible:ring-accent"
+									>
+										{slotsText}
+									</Link>
+									<SessionRegisterButton />
+								</div>
+							);
+
+							if (!hrefToLiveDashboard) {
+								return (
+									<div key={session.id} className={cardClass}>
+										{statusBlock}
+										{dateBlock}
+										{!isCompleted ? (
+											<div className="flex items-center justify-between gap-3">
+												<div className="min-w-0 flex-1">{slotsText}</div>
+												{!session.registrationStatus ? (
+													<SessionRegisterButton />
+												) : null}
+											</div>
+										) : (
+											completedFooter
+										)}
+									</div>
+								);
+							}
+
+							/* Live / upcoming / open: avoid <button> inside a single card-wide <Link> */
+							if (!session.registrationStatus && !isCompleted) {
+								return (
+									<div
+										key={session.id}
+										className={`${cardClass} hover:bg-bg-elevated`}
+									>
+										<Link
+											href={sessionHref}
+											className="flex flex-col gap-3 rounded-lg text-inherit no-underline outline-offset-2 focus-visible:outline focus-visible:ring-2 focus-visible:ring-accent"
+										>
+											{statusBlock}
+											{dateBlock}
+										</Link>
+										{activeSessionFooter}
+									</div>
+								);
+							}
 
 							return (
-								<div
+								<Link
 									key={session.id}
-									className={`bg-bg-surface border border-border rounded-lg p-4 shadow-card flex flex-col gap-3 cursor-pointer hover:bg-bg-elevated transition-colors duration-default ${
-										isLive ? "lg:col-span-2" : ""
-									}`}
+									href={sessionHref}
+									className={`${cardClass} cursor-pointer hover:bg-bg-elevated`}
 								>
-									{/* Status badge */}
-									<div className="flex items-center gap-2">
-										{config.dotColor && (
-											<span
-												className={`size-2 rounded-full ${config.dotColor} animate-pulse`}
-											/>
-										)}
-										<span
-											className={`text-micro font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${config.className}`}
-										>
-											{config.label}
-										</span>
-										<span className="text-small text-text-disabled ml-auto">
-											{session.club}
-										</span>
-									</div>
-
-									{/* Date + venue */}
-									<div>
-										<p className="text-heading font-semibold text-text-primary">
-											{session.date}
-										</p>
-										<div className="flex items-center gap-1 text-small text-text-secondary mt-0.5">
-											<CalendarClock size={13} strokeWidth={1.5} />
-											<span>
-												{session.venue} · {session.time}
-											</span>
-										</div>
-									</div>
-
-									{/* Slots + cost */}
-									{!isCompleted ? (
-										<div className="flex items-center justify-between">
-											<div className="flex flex-col gap-0.5">
-												<span className="text-small text-text-secondary">
-													{session.slots}/{session.total} slots ·{" "}
-													{session.registrationStatus === "accepted" && (
-														<span className="text-accent font-bold">
-															Accepted
-														</span>
-													)}
-													{!session.registrationStatus && "Not Registered"}
-												</span>
-												<span className="text-small text-text-secondary">
-													₱{session.cost}/player · {session.format}
-												</span>
-											</div>
-
-											{!session.registrationStatus && (
-												<button
-													type="button"
-													className="h-9 px-4 text-small font-bold uppercase tracking-widest text-bg-base bg-accent rounded-md hover:opacity-90 transition-opacity duration-default"
-												>
-													Register
-												</button>
-											)}
-										</div>
-									) : (
-										<div className="flex items-center justify-between">
-											<span className="text-small text-text-secondary">
-												{session.total} players ·{" "}
-												{
-													(
-														session as typeof session & {
-															matchesPlayed?: number;
-														}
-													).matchesPlayed
-												}{" "}
-												matches played
-											</span>
-											<button
-												type="button"
-												className="h-9 px-4 text-small font-bold uppercase tracking-widest text-text-secondary border border-border rounded-md hover:bg-bg-elevated transition-colors duration-default"
-											>
-												View Results
-											</button>
-										</div>
-									)}
-								</div>
+									{statusBlock}
+									{dateBlock}
+									{!isCompleted ? activeSessionFooter : completedFooter}
+								</Link>
 							);
 						})}
 					</div>
