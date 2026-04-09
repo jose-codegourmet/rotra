@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 @config "../../tailwind.config.ts";
 
 /* px-based container query breakpoints — mirrors the responsive screen scale */
@@ -13,26 +17,23 @@
 /* ROTRA CSS custom properties — light mode (default) */
 :root {
 	/* shadcn/ui variable names */
-	--background: #ffffff;
-	--foreground: #0b0b0c;
-	--card: #f5f5f7;
-	--card-foreground: #0b0b0c;
-	--popover: #f5f5f7;
-	--popover-foreground: #0b0b0c;
-	--primary: #00cc6a;
-	--primary-foreground: #ffffff;
-	--secondary: #ebebef;
-	--secondary-foreground: #0b0b0c;
-	--muted: #ebebef;
-	--muted-foreground: #4a4a55;
-	--accent: #ebebef;
-	--accent-foreground: #0b0b0c;
-	--destructive: #d93232;
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.145 0 0);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.145 0 0);
+	--primary: oklch(0.205 0 0);
+	--primary-foreground: oklch(0.985 0 0);
+	--secondary: oklch(0.97 0 0);
+	--secondary-foreground: oklch(0.205 0 0);
+	--muted: oklch(0.97 0 0);
+	--muted-foreground: oklch(0.556 0 0);
+	--accent: oklch(0.97 0 0);
+	--accent-foreground: oklch(0.205 0 0);
+	--destructive: oklch(0.577 0.245 27.325);
 	--destructive-foreground: #ffffff;
-	--border: #e4e4e9;
-	--input: #e4e4e9;
-	--ring: #00cc6a;
-	--radius: 10px;
+	--border: oklch(0.922 0 0);
+	--input: oklch(0.922 0 0);
+	--radius: 0.625rem;
 
 	/* ROTRA semantic tokens */
 	--color-bg-base: #ffffff;
@@ -49,30 +50,46 @@
 	--color-warning: #d97706;
 	--color-border: #e4e4e9;
 	--color-border-strong: #d0d0d8;
+	/* Focus ring — branding §12 (uses ROTRA accent once tokens above exist) */
+	--ring: var(--color-accent);
+	--background: oklch(1 0 0);
+	--foreground: oklch(0.145 0 0);
+	--chart-1: oklch(0.87 0 0);
+	--chart-2: oklch(0.556 0 0);
+	--chart-3: oklch(0.439 0 0);
+	--chart-4: oklch(0.371 0 0);
+	--chart-5: oklch(0.269 0 0);
+	--sidebar: oklch(0.985 0 0);
+	--sidebar-foreground: oklch(0.145 0 0);
+	--sidebar-primary: oklch(0.205 0 0);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.97 0 0);
+	--sidebar-accent-foreground: oklch(0.205 0 0);
+	--sidebar-border: oklch(0.922 0 0);
+	--sidebar-ring: oklch(0.708 0 0);
 }
 
 /* ROTRA CSS custom properties — dark mode */
 .dark {
 	/* shadcn/ui variable names */
-	--background: #0b0b0c;
-	--foreground: #f0f0f2;
-	--card: #1a1a1d;
-	--card-foreground: #f0f0f2;
-	--popover: #1a1a1d;
-	--popover-foreground: #f0f0f2;
-	--primary: #00ff88;
-	--primary-foreground: #0b0b0c;
-	--secondary: #2a2a2e;
-	--secondary-foreground: #f0f0f2;
-	--muted: #2a2a2e;
-	--muted-foreground: #9090a0;
-	--accent: #2a2a2e;
-	--accent-foreground: #f0f0f2;
-	--destructive: #ff4d4d;
+	--background: oklch(0.145 0 0);
+	--foreground: oklch(0.985 0 0);
+	--card: oklch(0.205 0 0);
+	--card-foreground: oklch(0.985 0 0);
+	--popover: oklch(0.205 0 0);
+	--popover-foreground: oklch(0.985 0 0);
+	--primary: oklch(0.922 0 0);
+	--primary-foreground: oklch(0.205 0 0);
+	--secondary: oklch(0.269 0 0);
+	--secondary-foreground: oklch(0.985 0 0);
+	--muted: oklch(0.269 0 0);
+	--muted-foreground: oklch(0.708 0 0);
+	--accent: oklch(0.269 0 0);
+	--accent-foreground: oklch(0.985 0 0);
+	--destructive: oklch(0.704 0.191 22.216);
 	--destructive-foreground: #f0f0f2;
-	--border: #2a2a2e;
-	--input: #2a2a2e;
-	--ring: #00ff88;
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 15%);
 
 	/* ROTRA semantic tokens */
 	--color-bg-base: #0b0b0c;
@@ -89,6 +106,20 @@
 	--color-warning: #ffb800;
 	--color-border: #2a2a2e;
 	--color-border-strong: #404048;
+	--ring: var(--color-accent);
+	--chart-1: oklch(0.87 0 0);
+	--chart-2: oklch(0.556 0 0);
+	--chart-3: oklch(0.439 0 0);
+	--chart-4: oklch(0.371 0 0);
+	--chart-5: oklch(0.269 0 0);
+	--sidebar: oklch(0.205 0 0);
+	--sidebar-foreground: oklch(0.985 0 0);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.269 0 0);
+	--sidebar-accent-foreground: oklch(0.985 0 0);
+	--sidebar-border: oklch(1 0 0 / 10%);
+	--sidebar-ring: oklch(0.556 0 0);
 }
 
 /* Row update pulse — applied when a real-time row changes (queue, score, status) */
@@ -119,4 +150,57 @@
 	font-weight: 300 900;
 	font-style: italic;
 	font-display: swap;
+}
+
+@theme inline {
+	--font-heading: var(--font-sans);
+	--font-sans: var(--font-sans);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-chart-5: var(--chart-5);
+	--color-chart-4: var(--chart-4);
+	--color-chart-3: var(--chart-3);
+	--color-chart-2: var(--chart-2);
+	--color-chart-1: var(--chart-1);
+	/* ROTRA tailwind theme uses --color-border / --color-accent from :root — do not remap here (shadcn init used to override brand tokens). */
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-destructive: var(--destructive);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--color-card-foreground: var(--card-foreground);
+	--color-card: var(--card);
+	--color-foreground: var(--foreground);
+	--color-background: var(--background);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-bg-base text-text-primary;
+	}
+	html {
+		@apply font-sans;
+	}
 }

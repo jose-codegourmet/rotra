@@ -5,6 +5,10 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import { ReduxProvider } from "@/providers/ReduxProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import "./globals.css";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const satoshi = localFont({
 	src: [
@@ -34,7 +38,11 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en" className={satoshi.variable} suppressHydrationWarning>
+		<html
+			lang="en"
+			className={cn("font-sans", geist.variable, satoshi.variable)}
+			suppressHydrationWarning
+		>
 			<body className="bg-bg-base text-text-primary antialiased font-sans">
 				<ReduxProvider>
 					<QueryProvider>
