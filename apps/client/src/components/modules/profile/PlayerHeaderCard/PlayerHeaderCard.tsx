@@ -1,5 +1,5 @@
-import { PlayerIdentity } from "@/components/rotra/PlayerIdentity/PlayerIdentity";
-import { TierStrip } from "@/components/rotra/TierStrip/TierStrip";
+import { PlayerIdentity } from "@/components/modules/profile/PlayerIdentity/PlayerIdentity";
+import { TierStrip } from "@/components/modules/profile/TierStrip/TierStrip";
 import type { TPlayerModel } from "@/types/player";
 
 interface PlayerHeaderCardProps {
