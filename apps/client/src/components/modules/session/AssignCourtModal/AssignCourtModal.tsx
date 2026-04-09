@@ -4,6 +4,14 @@ import { X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button/Button";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog/Dialog";
 import type { PlayerQueueCardData } from "@/constants/mock-session-ui";
 import { cn } from "@/lib/utils";
 
@@ -67,51 +75,36 @@ export function AssignCourtModal({
 		[activeSlot],
 	);
 
-	if (!open) return null;
-
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-			<button
-				type="button"
-				className="absolute inset-0 bg-bg-base/80 backdrop-blur-md"
-				aria-label="Close modal"
-				onClick={() => onOpenChange(false)}
-			/>
-			<div
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="assign-court-title"
-				className={cn(
-					"relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-xl bg-bg-surface shadow-modal border border-border",
-					className,
-				)}
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent
+				showCloseButton={false}
+				className={cn("max-h-[90vh] gap-0 overflow-y-auto p-0", className)}
 			>
-				<div className="flex items-start justify-between gap-4 p-5 border-b border-border">
-					<div>
-						<p
-							id="assign-court-title"
-							className="text-title font-black uppercase tracking-tight text-accent"
-						>
+				<DialogHeader className="flex flex-row items-start justify-between gap-4 border-b border-border p-5">
+					<div className="flex flex-col gap-1 text-left">
+						<DialogTitle className="text-title font-black uppercase tracking-tight text-accent">
 							{courtTitle}
-						</p>
-						<p className="text-micro text-text-disabled uppercase tracking-widest mt-1">
+						</DialogTitle>
+						<DialogDescription className="text-micro uppercase tracking-widest text-text-disabled">
 							{subtitle}
-						</p>
+						</DialogDescription>
 					</div>
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon"
-						className="shrink-0"
-						aria-label="Close"
-						onClick={() => onOpenChange(false)}
-					>
-						<X className="size-5" />
-					</Button>
-				</div>
+					<DialogClose asChild>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							className="shrink-0"
+							aria-label="Close"
+						>
+							<X data-icon="inline-start" />
+						</Button>
+					</DialogClose>
+				</DialogHeader>
 
-				<div className="p-5 flex flex-col gap-5">
-					<div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-stretch">
+				<div className="flex flex-col gap-5 p-5">
+					<div className="grid grid-cols-[1fr_auto_1fr] items-stretch gap-2">
 						<div className="flex flex-col gap-2">
 							<SlotCell
 								label={
@@ -133,7 +126,7 @@ export function AssignCourtModal({
 							/>
 						</div>
 						<div className="flex items-center justify-center px-1">
-							<span className="text-micro font-black text-text-disabled uppercase tracking-widest">
+							<span className="text-micro font-black uppercase tracking-widest text-text-disabled">
 								VS
 							</span>
 						</div>
@@ -165,7 +158,7 @@ export function AssignCourtModal({
 						onFilterClick={() => {}}
 					/>
 
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[240px] overflow-y-auto pr-1">
+					<div className="grid max-h-[240px] grid-cols-1 gap-2 overflow-y-auto pr-1 sm:grid-cols-2">
 						{filtered.map((p) => (
 							<PlayerQueueCard
 								key={p.id}
@@ -177,7 +170,7 @@ export function AssignCourtModal({
 
 					<Button
 						type="button"
-						className="w-full h-11 uppercase font-black tracking-widest text-bg-base bg-gradient-to-br from-[#f1ffef] to-accent shadow-accent"
+						className="h-11 w-full bg-gradient-to-br from-[#f1ffef] to-accent font-black uppercase tracking-widest text-bg-base shadow-accent"
 						onClick={() => {
 							onConfirm?.();
 							onOpenChange(false);
@@ -186,8 +179,8 @@ export function AssignCourtModal({
 						Confirm assignment
 					</Button>
 				</div>
-			</div>
-		</div>
+			</DialogContent>
+		</Dialog>
 	);
 }
 
@@ -207,12 +200,12 @@ function SlotCell({
 			type="button"
 			onClick={onClick}
 			className={cn(
-				"rounded-lg min-h-[64px] px-3 py-2 text-left transition-colors duration-default",
+				"min-h-[64px] rounded-lg px-3 py-2 text-left transition-colors duration-default",
 				"border",
 				active
 					? "border-accent bg-accent/10 ring-1 ring-accent"
 					: "border-border bg-bg-elevated",
-				filled && "text-text-primary font-semibold text-small",
+				filled && "text-small font-semibold text-text-primary",
 				!filled &&
 					"text-micro font-bold uppercase tracking-widest text-text-disabled",
 			)}
