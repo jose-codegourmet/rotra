@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
+import { QueryProvider } from "@/providers/QueryProvider";
 import { ReduxProvider } from "@/providers/ReduxProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import "./globals.css";
@@ -36,10 +37,12 @@ export default function RootLayout({
 		<html lang="en" className={satoshi.variable} suppressHydrationWarning>
 			<body className="bg-bg-base text-text-primary antialiased font-sans">
 				<ReduxProvider>
-					<ThemeProvider>
-						{children}
-						<Toaster position="top-center" duration={4000} />
-					</ThemeProvider>
+					<QueryProvider>
+						<ThemeProvider>
+							{children}
+							<Toaster position="top-center" duration={4000} />
+						</ThemeProvider>
+					</QueryProvider>
 				</ReduxProvider>
 			</body>
 		</html>
