@@ -1,8 +1,8 @@
 export const SKILL_DIMENSIONS = [
-	"Attack",
+	"Power",
+	"Speed",
+	"Technique",
+	"Stamina",
 	"Defense",
-	"Net & Touch",
-	"Precision & Control",
-	"Athleticism",
-	"Game Intelligence",
+	"Accuracy",
 ];
