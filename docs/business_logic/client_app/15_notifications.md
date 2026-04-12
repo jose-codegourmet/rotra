@@ -88,7 +88,7 @@ Sent when club-level events occur.
 | Que Master role assigned | Assigned player | "You've been made a Que Master for [club name]. You can now host sessions." |
 | Que Master role revoked | Player | "Your Que Master role for [club name] has been removed." |
 | Removed from club | Removed player | "You have been removed from [club name]." |
-| New session created | Club members | "[Que Master name] has created a new session at [venue] on [date]. Join now." |
+| New session created | Club members | "[Host name] has created a new session at [venue] on [date]. Join now." (host = player-organized creator, Que Master, or Club Owner) |
 
 ---
 

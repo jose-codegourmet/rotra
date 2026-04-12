@@ -9,6 +9,7 @@ Clubs are the **primary organizational unit** of the app. Every queue session, l
 ## 4.1 Core Concepts
 
 * All queue sessions are scoped to a club
+* **Competitive progression** (**EXP**, **MMR**, **ranked** match credit) is available **only** through **club queue** sessions created by a **Que Master** or **Club Owner**, and **only** when **Schedule type** is **MMR (competitive)** (`08_queue_session.md`, `14_gamification.md`). **Player-organized** sessions and **Fun Games** club schedules are social and recorded (standings, history, skill-dimension reviews) but do **not** award EXP or move MMR.
 * Que Masters are assigned per club and have no authority outside that club
 * Leaderboards and statistics are tracked at the club level (and eventually globally)
 * A player's club membership does not expire — it persists until they leave or are removed

@@ -12,7 +12,7 @@ All authenticated roles: **Player**, **Que Master**, **Club Owner**.
 ---
 
 ## Layout
-Full-screen scrollable page with header. Content: filter tabs at top, vertical list of session cards. Que Masters and Club Owners see a floating `+` button to create a new session.
+Full-screen scrollable page with header. Content: filter tabs at top, vertical list of session cards. **All club members** (including **Players**) see a floating `+` (or desktop **Create session**) to start a new session: **Players** create **player-organized** sessions; **Que Masters** and **Club Owners** create **club queue** sessions (MMR vs Fun Games). Session cards may show a compact badge for **Informal**, **Fun**, or **MMR** when useful for discovery.
 
 ```
 ┌──────────────────────────────────────┐
@@ -46,7 +46,7 @@ Full-screen scrollable page with header. Content: filter tabs at top, vertical l
 │                                      │
 └──────────────────────────────────────┘
 │  [Home] [Clubs] [Sessions] [Profile] [🔔] │
-│                           [＋]       │  ← FAB for QM/Owner
+│                           [＋]       │  ← FAB: create session (all members)
 ```
 
 ---
@@ -98,6 +98,7 @@ Full-screen scrollable page with header. Content: filter tabs at top, vertical l
 **Cost + format row:**
 - `₱[amount]/player · Doubles / Singles` — `text-small`, `color-text-secondary`
 - If cost not set: format only
+- Optional pill: **Informal** / **Fun** / **MMR** — `text-label`, muted or accent tint by type (MMR = competitive emphasis)
 
 **CTA (conditional — only on upcoming/open sessions, not active member):**
 - `REGISTER` — Primary button, 36px height, right-aligned
@@ -105,11 +106,11 @@ Full-screen scrollable page with header. Content: filter tabs at top, vertical l
 - If already registered: button hidden (status badge replaces it)
 - If QR join available: small `QR` icon button next to REGISTER
 
-### Floating Action Button (Que Master / Club Owner only)
+### Floating Action Button (all club members)
 - Circular FAB, 56×56px, `color-accent` background, `color-bg-base` `+` icon (24px)
 - `shadow-accent`
 - Fixed bottom-right, above bottom nav bar + `space-6` margin
-- Tap → navigates to `/sessions/new` (session setup)
+- Tap → session setup flow: **Player** → player-organized create (no Schedule type); **Que Master / Club Owner** → club queue create (Schedule type **MMR** vs **Fun Games**). Implementation may use one route with role-gated fields or separate paths (`business_logic/client_app/08_queue_session.md`).
 
 ---
 
@@ -117,7 +118,7 @@ Full-screen scrollable page with header. Content: filter tabs at top, vertical l
 
 ### No Sessions
 - Empty state text: `No sessions yet.` / `No upcoming sessions.` / `No completed sessions.` depending on active filter
-- For QM/Owner: `Create your first session using the + button.`
+- For any member: `Create your first session using the + button.`
 
 ### Loading
 - 3 skeleton cards at standard card height

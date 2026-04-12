@@ -1,13 +1,13 @@
 # View: Session Setup
 
 ## Purpose
-The form used by a Que Master (or Club Owner) to configure and create a new queue session. Fields cover venue logistics, court setup, cost structure, match format, and visibility. The session is saved as a Draft and can be opened when the QM is ready to accept players.
+The form used to configure and create a queue session. **Club queue** flows (this view, when opened by **Que Master** or **Club Owner**) require **Schedule type**: **MMR (competitive)** vs **Fun Games (no points)**. **Players** use the same or a sibling route for **player-organized** sessions — all shared fields except **Schedule type** (always informal / no EXP–MMR progression). Draft → open lifecycle is unchanged.
 
 ## Route
-`/sessions/new` (create) or `/sessions/:id/edit` (edit existing draft)
+`/sessions/new` (create) or `/sessions/:id/edit` (edit existing draft) — may include query or club context to distinguish player-organized vs club queue.
 
 ## Roles
-**Que Master** and **Club Owner** only.
+**Que Master** and **Club Owner** for **club queue** (full form including Schedule type). **Player** for **player-organized** subset (no Schedule type).
 
 ---
 
@@ -31,6 +31,13 @@ Full-screen scrollable form with a header bar and a sticky bottom save/publish b
 │                                      │
 │  Start Time *   End Time             │
 │  [ 8:00 AM  ]   [ 11:00 AM ]        │  ← Time pickers (side by side)
+│                                      │
+│  ── Schedule type (club queue only) ─│
+│  Session mode *                      │
+│  ◉ MMR (competitive)                 │  ← EXP/MMR/ranked eligible
+│  ○ Fun Games (no points)             │  ← No EXP/MMR; standings recorded
+│  Helper: Fun still records matches   │
+│  and session/club standings.         │
 │                                      │
 │  ── Courts & Players ──────────────  │
 │  Number of Courts *                  │

@@ -36,6 +36,7 @@ All users begin as **Players**. Elevated roles are granted additively — a Club
 * Registers via Facebook (1 account per user enforced at login level)
 * Can:
   * Join and leave clubs
+  * Create **player-organized** queue sessions under clubs they belong to
   * Register for queue sessions
   * Participate in matches
   * Submit reviews and ratings after matches
@@ -43,8 +44,8 @@ All users begin as **Players**. Elevated roles are granted additively — a Club
   * Share matches, profiles, and leaderboards
 
 * Cannot:
-  * Create sessions
-  * Modify the queue
+  * Create **club queue** sessions with **Schedule type** (MMR vs Fun Games) — Que Master or Club Owner only
+  * Modify the queue on sessions they do not host
   * Rate players mid-session (only post-match)
 
 ---
@@ -60,6 +61,7 @@ All users begin as **Players**. Elevated roles are granted additively — a Club
 * Inherits all Player capabilities within their own club
 * Additionally can:
   * Create, edit, and delete clubs they own
+  * Create **club queue** sessions under their clubs (set **Schedule type**: MMR vs Fun Games)
   * Configure membership settings (auto-approve, invite links)
   * Invite players directly or via link/QR
   * Approve or reject join requests
@@ -85,7 +87,7 @@ All users begin as **Players**. Elevated roles are granted additively — a Club
 * A player can be Que Master in multiple clubs simultaneously
 
 * Can (within assigned club's sessions):
-  * Create and host queue sessions
+  * Create and host **club queue** sessions (set **Schedule type**: MMR competitive vs Fun Games)
   * Manage the match queue (add, reorder, delete matches)
   * Drag-reorder upcoming matches via the Queue View
   * Set and update player statuses
@@ -133,6 +135,7 @@ All users begin as **Players**. Elevated roles are granted additively — a Club
 
 * Clubs are the **primary organizational unit** of the app
 * All queue sessions, leaderboards, and statistics are scoped under a club
+* **EXP**, **MMR**, and **ranked** progression apply only to **club queue** sessions with **Schedule type = MMR**; player-organized and **Fun Games** schedules are recorded but do not grant match-based EXP or MMR
 * A player can belong to multiple clubs simultaneously
 * Que Masters are assigned per club and have no cross-club authority
 
@@ -387,6 +390,8 @@ Available once enough match history is accumulated:
 
 ## 6. 📊 Skill Rating System
 
+**MMR** (competitive matchmaking rating) is separate from this **Skill Rating**: MMR changes only on **club MMR** schedules; these six dimensions still update from post-match reviews across **all** session types when matches complete.
+
 ---
 
 ### Skill Dimensions
@@ -541,7 +546,7 @@ A Que Master finalization overrides the review wait — useful when players leav
 5. Que Master finalizes (or waits for all reviews)
 6. System marks match as complete
 7. Leaderboard and stats update
-8. EXP is distributed to participants
+8. EXP and MMR apply only for **club queue — MMR (competitive)** sessions; player-organized and Fun Games record standings and skill reviews but grant no match-based EXP or MMR
 ```
 
 ---
@@ -559,14 +564,17 @@ A **Queue Session** is a bounded, time-limited badminton event hosted under a cl
 * A managed rotation queue of matches
 * Real-time match tracking and scoring
 
+**Session origin:** **Player-organized** (any Player in the club) vs **club queue** (Que Master or Club Owner). Only **club queue** with **Schedule type = MMR (competitive)** awards **EXP**, **MMR**, and **ranked** progression. **Fun Games** and **player-organized** sessions still record matches and standings; peer **skill dimension** ratings can still apply on completion. See `business_logic/client_app/08_queue_session.md` for the full matrix.
+
 ---
 
 ### 8.2 Session Setup
 
-Que Master configures the session before opening it to players:
+The **session host** (creating Player, or Que Master / Club Owner for club queue) configures the session before opening it to players:
 
 | Setting            | Description                                                       |
 |--------------------|-------------------------------------------------------------------|
+| Schedule type      | **Club queue only:** MMR (competitive) vs Fun Games (no EXP/MMR). Omitted for player-organized (always informal). |
 | Location           | Venue name and optional address                                   |
 | Date & Time        | Start time; optional end time                                     |
 | Number of courts   | How many courts are reserved                                      |
@@ -886,7 +894,7 @@ Session and Club leaderboards rank players by:
 2. **Win rate** (secondary — percentage of matches won)
 3. **Games played** (tertiary — more games = more data, used as tiebreaker)
 
-For club leaderboards, only matches that were fully completed (with score) are counted.
+For club leaderboards, only matches that were fully completed (with score) are counted. Session standings include **player-organized**, **Fun Games**, and **MMR** schedules. Club cumulative win/loss includes all three; an optional future **MMR-only** filter may be added later.
 
 ---
 
@@ -964,21 +972,27 @@ Sharing generates a preview card (Open Graph compatible for social media posting
 
 ---
 
+### 14.0 MMR & eligibility
+
+**MMR** is the competitive ladder rating; it moves only on **club queue — MMR (competitive)** matches. It is separate from **Skill Rating** (six peer-reviewed dimensions). **Player-organized** and **Fun Games** sessions: **no EXP**, **no MMR**; **MMR** sessions: EXP/MMR can go up or down (mixed-rank asymmetric rules — `business_logic/client_app/14_gamification.md` §14.3). Full tables and Admin-configurable parameters live in the client_app doc.
+
+---
+
 ### 14.1 EXP (Experience Points)
 
-EXP rewards participation and positive behavior.
+Match-linked EXP rewards participation and outcomes **only** in **MMR** club schedules (baseline amounts below; may scale with mixed-rank rules). **Completing profile** is one-time and not session-gated.
 
 | Action                              | EXP Earned         |
 |-------------------------------------|--------------------|
-| Playing a match                     | +10 EXP            |
-| Winning a match                     | +15 EXP            |
+| Playing a match                     | +10 EXP (baseline) |
+| Winning a match                     | +15 EXP (baseline) |
 | Submitting a review after a match   | +5 EXP             |
 | Being rated 4 or 5 by opponents     | +5 EXP bonus       |
 | Acting as umpire for a match        | +8 EXP             |
 | Completing profile (gear, bio, etc.)| +20 EXP (one-time) |
 | Attending a session                 | +5 EXP             |
 
-EXP is purely cosmetic at MVP — it contributes to the player's visible level badge and ranking tier. No in-app purchases or pay-to-win mechanics.
+EXP is purely cosmetic at MVP — it contributes to the player's visible level badge and ranking tier. No in-app purchases or pay-to-win mechanics. On **MMR** schedules, **losses can reduce EXP**; voided matches reverse EXP and MMR attributed to that match.
 
 ---
 
@@ -997,7 +1011,13 @@ Tier thresholds are configurable by Admin. Tier is displayed on player profile a
 
 ---
 
-### 14.3 Badges (Future)
+### 14.3 Asymmetric EXP / MMR (mixed ranks)
+
+On **MMR** club schedules only, when teammates span a large skill gap: **lower-rated** players gain **less** EXP/MMR on wins and lose **more** on losses when paired with a much **higher-rated** partner; **higher-rated** players gain **more** on wins and lose **less** on losses in that context. Details: `business_logic/client_app/14_gamification.md` §14.3.
+
+---
+
+### 14.4 Badges (Future)
 
 One-time achievement badges:
 
@@ -1172,6 +1192,12 @@ Goal: Expand beyond casual sessions into structured competition.
     - Per-session and aggregate financial summaries (spending + markup profit)
     - Blacklist management
 - Financial data in the statistics view is visible to Club Owner only
+
+- Any Player may create player-organized queue sessions under their club
+- Club queue sessions are created by Que Master or Club Owner with Schedule type: MMR (competitive) or Fun Games (no EXP/MMR)
+- Player-organized and Fun Games: no EXP, no MMR, not ranked; standings and history still recorded; skill dimension reviews may still apply
+- Club MMR schedules: EXP and MMR may increase or decrease; asymmetric mixed-rank rules per 14_gamification.md
+- Voided matches reverse EXP and MMR applied to that match
 ```
 
 ---

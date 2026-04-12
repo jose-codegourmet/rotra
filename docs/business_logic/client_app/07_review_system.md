@@ -174,7 +174,7 @@ AND one of the following:
       - Leaderboard (wins/losses recorded)
       - Player statistics (games played, win rate)
       - Skill ratings (ratings applied to rolling average)
-      - EXP distributed to all participants
+      - EXP and MMR applied **only** for **club queue — MMR (competitive)** sessions (`14_gamification.md`); no match-based EXP/MMR for player-organized or Fun Games
 9. Notification sent to all participants: "Match complete. Leaderboard updated."
 ```
 
@@ -188,7 +188,7 @@ AND one of the following:
 5. All players still receive their own review prompt in-app (unchanged)
 6. 24-hour review window opens for players and Que Master only
 7. Match completion logic proceeds normally (no umpire review expected)
-8. System updates as above
+8. System updates as in standard flow (leaderboard, stats, skill ratings; EXP/MMR only on MMR club schedules)
 ```
 
 ---
