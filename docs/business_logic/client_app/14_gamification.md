@@ -6,30 +6,53 @@ Gamification layers engagement and motivation on top of the core session system.
 
 ---
 
+## 14.0 Progression eligibility & MMR
+
+### Session types (see `08_queue_session.md`)
+
+| Session kind | EXP from matches / session attendance | MMR changes | Ranked progression |
+|--------------|--------------------------------------|-------------|-------------------|
+| **Player-organized** | No | No | No |
+| **Club queue — Fun Games** | No | No | No |
+| **Club queue — MMR (competitive)** | Yes (per rules below) | Yes | Yes |
+
+**MMR** (matchmaking / competitive ladder rating) is separate from **Skill Rating** (`06_skill_rating.md`). Skill dimensions still update from post-match reviews in **all** session types when matches complete; **MMR** and **match-based EXP** apply **only** in **club queue** sessions whose **Schedule type** is **MMR (competitive)**.
+
+### MMR behavior (qualitative)
+
+* MMR is updated only after **completed, scored** matches in **MMR** club schedules (never for Fun Games or player-organized).
+* Exact formulas, K-factors, and pairing rules are **Admin-configurable** (see Admin platform config).
+* On **MMR** schedules, **mixed-rank teams** use **asymmetric** EXP and MMR deltas (see §14.3).
+
+---
+
 ## 14.1 EXP (Experience Points)
 
-EXP is the primary gamification currency. It is earned through in-app actions and contributes to the player's **ranking tier** (see 14.2).
+EXP is the primary gamification currency. It contributes to the player's **ranking tier** (see 14.2).
+
+**Match- and session-attendance EXP** (everything in the table below except **Completing profile**) is awarded **only** when the activity occurs in a **club queue** session with **Schedule type = MMR (competitive)**. No match-related EXP is granted for **player-organized** or **Fun Games** sessions.
 
 ### EXP Earning Table
 
 | Action | EXP Earned | Notes |
 |--------|-----------|-------|
-| Playing a match | +10 EXP | Awarded on match completion |
-| Winning a match | +15 EXP | Awarded only for scored wins |
-| Submitting a review after a match | +5 EXP | Per review submitted (up to 3 per match in doubles) |
-| Being rated 4 or 5 by an opponent | +5 EXP bonus | Per opponent who rates you 4 or 5 |
-| Acting as umpire for a match | +8 EXP | Awarded when umpire submits final score |
-| Attending a session (marked "I Am In") | +5 EXP | Once per session |
-| Completing profile (all sections filled) | +20 EXP | One-time; includes level, play style, and at least 1 gear item |
-| First match played (ever) | +25 EXP | One-time milestone |
-| Winning first match | +25 EXP | One-time milestone |
+| Playing a match | +10 EXP (baseline; may be scaled — see §14.3) | MMR club schedule only; match completed and scored |
+| Winning a match | +15 EXP (baseline; may be scaled — see §14.3) | MMR club schedule only; scored wins |
+| Submitting a review after a match | +5 EXP | MMR club schedule only; per review submitted (up to 3 per match in doubles) |
+| Being rated 4 or 5 by an opponent | +5 EXP bonus | MMR club schedule only; per opponent who rates you 4 or 5 |
+| Acting as umpire for a match | +8 EXP | MMR club schedule only; when umpire submits final score |
+| Attending a session (marked "I Am In") | +5 EXP | MMR club schedule only; once per session |
+| Completing profile (all sections filled) | +20 EXP | One-time; not tied to session type |
+| First match played (ever) | +25 EXP | One-time; triggers only when the first completed match is in an **MMR** club schedule |
+| Winning first match | +25 EXP | One-time; triggers only on first win in an **MMR** club schedule |
 
 ### EXP Rules
 
 * EXP is global — it accumulates across all clubs and sessions
-* EXP is only awarded for completed, scored matches (except the "attending" and "review" bonuses)
-* If a match is voided by the Que Master, all EXP from that match is retroactively reversed
-* EXP cannot be lost through gameplay — only through voided matches or account penalties
+* **Match-linked EXP** is only awarded for completed, scored matches in **MMR** club schedules (and related bonuses in that context). **Profile** one-time EXP ignores session type.
+* On **MMR** schedules, **EXP can decrease** on match loss (see §14.3); amounts are Admin-configurable.
+* If a match is voided by the session host, all EXP **and MMR changes** attributed to that match are retroactively reversed
+* For sessions where match EXP does not apply, **no EXP gain or loss** occurs for those matches — aside from void/account penalties
 
 ---
 
@@ -85,7 +108,25 @@ Once a player meets the Titan 5 EXP threshold, their Apex tier position is deter
 
 ---
 
-## 14.3 Badges (Future — Phase 3)
+## 14.3 Asymmetric EXP / MMR (mixed ranks)
+
+Applies **only** to **club queue — MMR (competitive)** matches when teammates (or the pairing context) span a large skill gap — e.g. **beginner / low MMR** with **high MMR** partner. Exact thresholds and multipliers are **Admin-configurable**.
+
+### Lower-rated / beginner (relative to partner)
+
+* **Win** (especially when “carried” by a much higher-rated teammate): **small** EXP and MMR gain — discourages farming progression by pairing only with stronger players.
+* **Loss**: **larger** EXP loss and MMR loss than a balanced match — losing despite a strong partner is penalized more heavily.
+
+### Higher-rated player
+
+* **Win** with a much lower-rated partner: **larger** EXP and MMR gain — rewarded for securing a result the pairing was expected to win.
+* **Loss** with that partner: **smaller** EXP loss and MMR loss than losing in an evenly matched game — the upset is attributed partly to the difficult handicap context.
+
+Doubles team MMR/EXP attribution (split vs pooled) is an implementation detail; the **economic intent** above is fixed in product.
+
+---
+
+## 14.4 Badges (Future — Phase 3)
 
 One-time achievement badges earned for specific milestones. Displayed as a collection on the player's profile.
 
@@ -114,7 +155,7 @@ One-time achievement badges earned for specific milestones. Displayed as a colle
 
 ---
 
-## 14.4 EXP & Tier on the Queue Pool
+## 14.5 EXP & Tier on the Queue Pool
 
 In the Add Match interface, the Que Master sees each player's:
 
@@ -125,20 +166,21 @@ This helps the Que Master understand relative engagement levels when building ba
 
 ---
 
-## 14.5 Gamification Principles
+## 14.6 Gamification Principles
 
 | Principle | Implementation |
 |-----------|---------------|
-| Participation over winning | EXP is earned for attending and playing, not just winning |
-| Sportsmanship rewarded | Bonus EXP for receiving high ratings from opponents |
-| No shortcuts | All EXP must be earned through real matches; no shortcuts |
-| No pay-to-win | EXP, tiers, and badges have zero gameplay or queue impact |
-| Retroactive integrity | Voided matches result in EXP reversal |
-| Transparent | Players can see exactly how each EXP was earned in a transaction log |
+| Participation over winning | On **MMR** schedules, EXP reflects play and outcomes; attending still bonuses when eligible |
+| Sportsmanship rewarded | Bonus EXP for receiving high ratings from opponents (**MMR** sessions only) |
+| Competitive fairness | Mixed-rank outcomes use asymmetric deltas (§14.3); no progression from informal or Fun Games |
+| No shortcuts | Match EXP/MMR require **MMR** club schedules; no purchases |
+| No pay-to-win | EXP, tiers, and badges have zero queue priority impact |
+| Retroactive integrity | Voided matches reverse EXP and MMR attributed to that match |
+| Transparent | Players can see how each EXP change was earned in the transaction log |
 
 ---
 
-## 14.6 EXP Transaction Log
+## 14.7 EXP Transaction Log
 
 Each player can view their full EXP history:
 

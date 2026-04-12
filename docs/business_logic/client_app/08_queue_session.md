@@ -2,7 +2,9 @@
 
 ## Overview
 
-A **Queue Session** is the core operational unit of the app. It is a bounded, time-limited badminton event hosted under a club, managed by a Que Master, and participated in by a roster of admitted players.
+A **Queue Session** is the core operational unit of the app. It is a bounded, time-limited badminton event **scoped to a club**, with a roster of admitted players and the same core mechanics (courts, queue, scoring, real-time sync).
+
+Sessions differ by **who creates them** and whether the schedule is **competitive** for platform progression (EXP / MMR / ranked). See **Session origin & competitive scope** below.
 
 A session handles:
 
@@ -11,6 +13,42 @@ A session handles:
 * Match queue management
 * Live scoring via umpires
 * Real-time sync across all participants
+
+---
+
+## Session origin & competitive scope
+
+### Two ways a session is created
+
+| Origin | Who creates it | Schedule type | Competitive progression |
+|--------|----------------|----------------|-------------------------|
+| **Player-organized** | Any registered **Player** (member of the club) | Fixed as **informal** — no MMR/Fun toggle | **No** — not ranked; **no EXP**; **no MMR** changes |
+| **Club queue** | **Que Master** or **Club Owner** for that club | **Required** choice: **MMR (competitive)** or **Fun Games (no points)** | **MMR** schedule only: ranked-eligible; **EXP** and **MMR** can change. **Fun Games**: **no EXP / no MMR**; matches and standings still recorded |
+
+Only **club queue** sessions can grant **EXP**, **MMR** movement, or **ranked** match credit. **Player-organized** sessions are for casual organization and history; they never count toward competitive progression.
+
+### What still applies by session type
+
+| Outcome / system | Player-organized | Club — Fun Games | Club — MMR (competitive) |
+|------------------|------------------|------------------|---------------------------|
+| Match record & score | Yes | Yes | Yes |
+| Session standings (wins/losses) | Yes | Yes | Yes |
+| Club match history & cumulative stats | Yes (within club) | Yes | Yes |
+| Post-match **skill dimension** ratings (peer / QM / umpire) | Yes | Yes | Yes |
+| **EXP** | No | No | Yes (see `14_gamification.md`) |
+| **MMR** (competitive ladder rating) | No | No | Yes (see `14_gamification.md`) |
+| Treated as **ranked** for progression | No | No | Yes |
+
+**MMR** is the competitive ladder / matchmaking rating used for ranked club play. It is separate from **Skill Rating** (the six-dimension peer-assessed score in `06_skill_rating.md`).
+
+### Host responsibilities
+
+* **Player-organized**: the creating player is the **session host** for draft → open → active flow (queue management, payments, finalization) unless the product later allows transfer.
+* **Club queue**: **Que Master** or **Club Owner** is the host; **Schedule type** is set at setup and defines Fun vs MMR for the whole schedule.
+
+### Terminology note
+
+In §8.3 onward, **Que Master** refers to the **session host** unless context says otherwise: **Que Master** or **Club Owner** on **club queue** sessions, or the creating **Player** on **player-organized** sessions. **Multi-Que Master** collaboration applies when multiple Que Masters co-manage the same **club queue** session.
 
 ---
 
@@ -30,20 +68,21 @@ Completed (all matches finalized)
 
 | State | Who Can Act | Player Can Join |
 |-------|------------|----------------|
-| Draft | Que Master only | No |
-| Open | Que Master + Players | Yes |
-| Active | Que Master + Players + Umpires | Yes (waitlisted) |
-| Closed | Que Master only | No |
+| Draft | Session host only (player-organized: creator; club queue: Que Master or Club Owner) | No |
+| Open | Session host + Players | Yes |
+| Active | Session host + Players + Umpires | Yes (waitlisted) |
+| Closed | Session host only | No |
 | Completed | Read-only | No |
 
 ---
 
 ## 8.2 Session Setup
 
-The Que Master configures the session before opening it.
+The **session host** configures the session before opening it (Que Master or Club Owner for **club queue**; creating **Player** for **player-organized**).
 
 | Setting | Type | Required | Notes |
 |---------|------|----------|-------|
+| **Schedule type** | Select | **Yes for club queue only** | **MMR (competitive)** — EXP/MMR/ranked eligible; **Fun Games (no points)** — no EXP/MMR; matches and standings still recorded. Omitted / N/A for **player-organized** (always informal). |
 | Location / Venue | Text | Yes | Venue name + optional address |
 | Date | Date | Yes | |
 | Start time | Time | Yes | |

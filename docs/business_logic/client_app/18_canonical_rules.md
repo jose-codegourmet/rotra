@@ -118,6 +118,29 @@ RULE-053: Financial data in the statistics view is visible only to the Club Owne
 
 ---
 
+## Sessions & competitive progression
+
+```
+RULE-064: Any Player may create a player-organized queue session under a club they belong to.
+          Que Master or Club Owner creates club queue sessions and must set Schedule type:
+          MMR (competitive) or Fun Games (no points).
+
+RULE-065: Player-organized sessions: matches are not ranked for progression; no EXP; no MMR change.
+          Session standings and match history still record wins/losses when scored.
+          Post-match skill dimension ratings still apply when reviews are submitted (Skill Ratings section).
+
+RULE-066: Club queue — Fun Games: no EXP; no MMR change; matches and standings are recorded.
+
+RULE-067: Club queue — MMR (competitive): EXP and MMR may increase or decrease per match outcome;
+          matches count as ranked for progression. Asymmetric deltas for mixed-rank pairings
+          are defined in product docs and are Admin-configurable (see 14_gamification.md §14.3).
+
+RULE-068: MMR is distinct from Skill Rating (six-dimension peer assessment).
+          MMR updates only per RULE-067; Skill Rating updates from reviews per Skill Ratings section.
+```
+
+---
+
 ## Queue Sessions & Slots
 
 ```
@@ -173,8 +196,9 @@ RULE-024: Umpire scores are final once submitted and cannot be edited by the ump
           Only the Que Master can override or void a score via the dispute flow.
 
 RULE-025: A Voided match is excluded from all leaderboard rankings, statistics,
-          skill rating calculations, and EXP distributions.
-          EXP already awarded for a voided match is reversed.
+          skill rating calculations, and any EXP / MMR changes that would have applied.
+          EXP and MMR already applied for that match are reversed.
+          (Non-voided matches in ineligible session types never received EXP/MMR — nothing to reverse.)
 ```
 
 ---
@@ -280,10 +304,11 @@ RULE-039: Umpire-submitted scores take precedence over Que Master-submitted scor
 RULE-040: EXP is cosmetic only. It does not affect queue priority, match eligibility,
           or any functional aspect of the session system.
 
-RULE-041: EXP awarded for a voided match is retroactively reversed.
+RULE-041: EXP (and MMR) awarded for a voided match is retroactively reversed.
 
 RULE-042: Ranking tiers never decrease below the tier already achieved.
           EXP reversal from voided matches does not cause tier regression.
+          (Losses on MMR schedules may reduce EXP without lowering tier until below thresholds — tier floor still applies per product rules.)
 ```
 
 ---

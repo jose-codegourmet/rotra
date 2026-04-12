@@ -36,6 +36,7 @@ Only **scored matches** count — matches without a submitted score (Unscored) a
 
 * Shows rankings for the current or completed session
 * Updates in real-time as each match is completed and scored
+* Applies to **all** session types: **player-organized**, **club Fun Games**, and **club MMR** — wins and losses count toward **session standings** whenever the match is scored and not voided
 * All accepted players appear (even those with 0 games played — shown at the bottom)
 * Filtered to the current session only — cross-session history is on the Club leaderboard
 
@@ -56,6 +57,8 @@ Only **scored matches** count — matches without a submitted score (Unscored) a
 
 * Cumulative across all completed sessions under the club
 * Only completed and scored matches count
+* **Player-organized**, **Fun Games**, and **MMR** club schedules all contribute to club win/loss / games-played columns — all are “recorded” for standings and history (`08_queue_session.md`)
+* A future **MMR-only** (or “competitive-only”) filter for club stats is optional and not required for MVP
 * Updates every time a session is finalized
 
 ### Club Leaderboard Columns

@@ -120,7 +120,7 @@ Full-screen scrollable page with persistent bottom navigation bar and a top head
   - Slot fill: `12/16 slots` — `text-small`, `color-text-secondary`
   - Tap → navigates to session detail
 
-### Quick Actions (Que Master / Club Owner only — role-gated)
+### Quick Actions (role-gated)
 - 2-column grid of action tiles
 - Each tile:
   - Background: `color-bg-surface`
@@ -129,8 +129,9 @@ Full-screen scrollable page with persistent bottom navigation bar and a top head
   - Padding: `space-4`
   - Icon (24px stroke) + label (`text-small`, `color-text-primary`)
 - Tiles shown per role:
-  - **Que Master**: `+ Create Session`, `Manage Queue`
-  - **Club Owner**: `+ Create Session`, `Pending Requests` (with badge count if > 0), `Club Stats`
+  - **Player** (when member of at least one club): `+ Create session` (player-organized under chosen club)
+  - **Que Master**: `+ Create Session` (club queue: MMR or Fun), `Manage Queue`
+  - **Club Owner**: `+ Create Session` (club queue), `Pending Requests` (with badge count if > 0), `Club Stats`
 
 ### Your Stats Strip
 - Single horizontal strip, no card

@@ -35,6 +35,7 @@ The base role. Every registered user is a Player.
 | Join clubs | Yes |
 | Leave clubs | Yes |
 | Register for queue sessions | Yes |
+| Create **player-organized** queue sessions (under a club they belong to) | Yes |
 | Participate in matches | Yes |
 | Submit post-match reviews and ratings | Yes |
 | View own stats and profile | Yes |
@@ -45,8 +46,8 @@ The base role. Every registered user is a Player.
 
 | Action | Blocked |
 |--------|---------|
-| Create queue sessions | No — Que Master only |
-| Modify the queue or match order | No — Que Master only |
+| Create **club queue** sessions with **Schedule type** (MMR vs Fun Games) | Yes — Que Master or Club Owner only (`08_queue_session.md`) |
+| Modify the queue or match order on sessions they do not host | Yes — session host only |
 | Rate players during a session (not post-match) | No — post-match window only |
 | Access payment or cost data | No — Que Master only |
 | Approve or reject club join requests | No — Club Owner only |
@@ -132,7 +133,7 @@ A session-level operator role, scoped strictly to the club they are assigned in.
 
 | Action | Details |
 |--------|---------|
-| Create and host queue sessions | Full session setup |
+| Create and host **club queue** sessions | Full session setup including **Schedule type** (MMR vs Fun Games) |
 | Manage the match queue | Add, reorder, and delete queued matches |
 | Drag-reorder upcoming matches | Via the Queue View slider |
 | Set and update player statuses | All statuses except Exited (requires payment confirmation) |
@@ -218,7 +219,8 @@ A platform-level role with global authority. No club affiliation required.
 | Submit post-match reviews | ✓ | ✓ | ✓ | — | ✓ | — |
 | Score an assigned match (Umpire View) | — | — | — | ✓ | ✓ | — |
 | Rate players after umpiring | — | — | — | — | ✓ | — |
-| Create sessions | — | ✓ | ✓ | — | — | — |
+| Create player-organized sessions | ✓ | ✓ | ✓ | — | — | — |
+| Create club queue sessions + set MMR / Fun schedule | — | ✓ | ✓ | — | — | — |
 | Manage queue | — | ✓ | ✓ | — | — | — |
 | Rate players (session) | — | ✓ | ✓ | — | — | — |
 | Track payments | — | ✓ | ✓ | — | — | — |
