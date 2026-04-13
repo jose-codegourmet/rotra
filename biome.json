@@ -32,7 +32,8 @@
       "!**/node_modules/**",
       "!**/.next/**",
       "!**/dist/**",
-      "!**/.turbo/**"
+      "!**/.turbo/**",
+      "!**/storybook-static/**"
     ]
   }
 }
