@@ -1,24 +1,8 @@
 import type { Preview } from "@storybook/react";
 import "../src/app/globals.css";
+import { SATOSHI_FONT_STACK } from "./satoshi-font-stack";
 
 const preview: Preview = {
-	globalTypes: {
-		theme: {
-			description: "Color theme",
-			toolbar: {
-				title: "Theme",
-				icon: "circlehollow",
-				items: [
-					{ value: "light", icon: "sun", title: "Light" },
-					{ value: "dark", icon: "moon", title: "Dark" },
-				],
-				dynamicTitle: true,
-			},
-		},
-	},
-	initialGlobals: {
-		theme: "dark",
-	},
 	parameters: {
 		backgrounds: { disable: true },
 		actions: { argTypesRegex: "^on[A-Z].*" },
@@ -30,11 +14,13 @@ const preview: Preview = {
 		},
 	},
 	decorators: [
-		(Story, context) => {
-			const theme = (context.globals.theme as string) ?? "dark";
-			document.documentElement.classList.toggle("dark", theme === "dark");
-			document.documentElement.style.backgroundColor =
-				theme === "dark" ? "#0b0b0c" : "#ffffff";
+		(Story) => {
+			document.documentElement.style.setProperty(
+				"--font-satoshi",
+				SATOSHI_FONT_STACK,
+			);
+			document.documentElement.classList.add("dark");
+			document.documentElement.style.backgroundColor = "#0b0b0c";
 			return Story();
 		},
 	],

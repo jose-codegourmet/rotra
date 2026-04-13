@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { cn } from "@/lib/utils";
 import "./globals.css";
 
 const satoshi = localFont({
@@ -33,7 +34,11 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en" className={satoshi.variable} suppressHydrationWarning>
+		<html
+			lang="en"
+			className={cn("dark", satoshi.variable)}
+			suppressHydrationWarning
+		>
 			<body className="bg-bg-base text-text-primary antialiased font-sans">
 				<QueryProvider>
 					<ThemeProvider>{children}</ThemeProvider>
