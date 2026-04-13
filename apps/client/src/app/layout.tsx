@@ -1,31 +1,11 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { ReduxProvider } from "@/providers/ReduxProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import "./globals.css";
-import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
-
-const satoshi = localFont({
-	src: [
-		{
-			path: "../../public/fonts/Satoshi-Variable.woff2",
-			weight: "300 900",
-			style: "normal",
-		},
-		{
-			path: "../../public/fonts/Satoshi-VariableItalic.woff2",
-			weight: "300 900",
-			style: "italic",
-		},
-	],
-	variable: "--font-satoshi",
-	display: "swap",
-});
+import { satoshi } from "./fonts";
 
 export const metadata: Metadata = {
 	title: "ROTRA",
@@ -40,7 +20,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang="en"
-			className={cn("font-sans", geist.variable, satoshi.variable)}
+			className={cn("font-sans", satoshi.variable)}
 			suppressHydrationWarning
 		>
 			<body className="bg-bg-base text-text-primary antialiased font-sans">
