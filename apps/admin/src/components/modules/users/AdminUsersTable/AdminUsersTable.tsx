@@ -8,7 +8,18 @@ import {
 	getFilteredRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 import * as React from "react";
+
+import { Button } from "@/components/ui/button/Button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu/DropdownMenu";
+import { adminUserDetailPath } from "@/constants/admin";
 import type { AdminUserRow } from "@/constants/mock-admin-users";
 import { cn } from "@/lib/utils";
 
@@ -68,6 +79,46 @@ function buildColumns() {
 			cell: (info) => (
 				<span className="text-text-secondary">{info.getValue()}</span>
 			),
+		}),
+		columnHelper.display({
+			id: "actions",
+			header: () => (
+				<span className="sr-only text-micro font-bold uppercase tracking-widest text-text-secondary">
+					Actions
+				</span>
+			),
+			cell: ({ row }) => {
+				const user = row.original;
+				return (
+					<div className="flex justify-end">
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon"
+									className="h-8 w-8 shrink-0"
+									aria-label="Row actions"
+								>
+									<MoreHorizontal className="size-4" strokeWidth={1.5} />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem asChild>
+									<Link href={adminUserDetailPath(user.id)}>View details</Link>
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => {
+										void navigator.clipboard.writeText(user.email);
+									}}
+								>
+									Copy email
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+				);
+			},
 		}),
 	];
 }

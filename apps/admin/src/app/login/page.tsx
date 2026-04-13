@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { AdminLoginCard } from "@/components/rotra/AdminLoginCard/AdminLoginCard";
+import { AdminLoginCard } from "@/components/modules/login/AdminLoginCard/AdminLoginCard";
 import { Logo } from "@/components/ui/logo/Logo";
 import { ADMIN_APP_TAGLINE, ROUTES } from "@/constants/admin";
 

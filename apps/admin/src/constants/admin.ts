@@ -1,11 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import {
 	BarChart3,
-	Globe,
+	EyeOff,
 	LayoutDashboard,
-	Settings2,
 	ShieldAlert,
-	ToggleLeft,
+	SlidersHorizontal,
 	UserCheck,
 	Users,
 } from "lucide-react";
@@ -29,6 +28,10 @@ export const ROUTES = {
 	ANALYTICS: "/analytics",
 } as const;
 
+export function adminUserDetailPath(id: string): string {
+	return `${ROUTES.USERS}/${id}`;
+}
+
 /** Header title per pathname (App Router paths). */
 export const ADMIN_PAGE_TITLES: Record<string, string> = {
 	[ROUTES.DASHBOARD]: "Dashboard",
@@ -40,6 +43,13 @@ export const ADMIN_PAGE_TITLES: Record<string, string> = {
 	[ROUTES.PLATFORM_CONFIG]: "Platform config",
 	[ROUTES.ANALYTICS]: "Analytics",
 };
+
+export function getAdminShellPageTitle(pathname: string): string {
+	const titled = ADMIN_PAGE_TITLES[pathname];
+	if (titled) return titled;
+	if (/^\/users\/[^/]+$/.test(pathname)) return "User details";
+	return "Admin";
+}
 
 export type AdminNavItem = {
 	label: string;
@@ -61,12 +71,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 	{
 		label: "Kill switches",
 		href: ROUTES.KILL_SWITCHES,
-		icon: ToggleLeft,
-	},
-	{
-		label: "Environments",
-		href: ROUTES.ENVIRONMENTS,
-		icon: Globe,
+		icon: EyeOff,
 	},
 	{
 		label: "Approvals",
@@ -81,7 +86,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 	{
 		label: "Platform config",
 		href: ROUTES.PLATFORM_CONFIG,
-		icon: Settings2,
+		icon: SlidersHorizontal,
 	},
 	{
 		label: "Analytics",

@@ -8,7 +8,7 @@ import { Logo } from "@/components/ui/logo/Logo";
 import {
 	ADMIN_APP_DISPLAY_NAME,
 	ADMIN_NAV_ITEMS,
-	ADMIN_PAGE_TITLES,
+	getAdminShellPageTitle,
 	ROUTES,
 } from "@/constants/admin";
 import { cn } from "@/lib/utils";
@@ -50,7 +50,7 @@ export function AdminShell({
 	pageTitle: pageTitleOverride,
 }: AdminShellProps) {
 	const pathname = usePathname();
-	const derivedTitle = ADMIN_PAGE_TITLES[pathname] ?? "Admin";
+	const derivedTitle = getAdminShellPageTitle(pathname);
 	const pageTitle = pageTitleOverride ?? derivedTitle;
 
 	return (
@@ -81,7 +81,11 @@ export function AdminShell({
 							href={href}
 							label={label}
 							Icon={Icon}
-							active={pathname === href}
+							active={
+								href === ROUTES.USERS
+									? pathname === href || pathname.startsWith(`${ROUTES.USERS}/`)
+									: pathname === href
+							}
 						/>
 					))}
 				</nav>

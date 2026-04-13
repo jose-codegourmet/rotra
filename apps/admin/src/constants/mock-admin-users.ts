@@ -58,4 +58,32 @@ export const MOCK_ADMIN_USERS: AdminUserRow[] = [
 		status: "active",
 		lastActive: "2026-04-09",
 	},
+	{
+		id: "7",
+		name: "Grace Okafor",
+		email: "grace.okafor@example.com",
+		role: "Admin",
+		status: "inactive",
+		lastActive: "2026-01-20",
+	},
+	{
+		id: "8",
+		name: "Hugo Martins",
+		email: "hugo.martins@example.com",
+		role: "Super admin",
+		status: "active",
+		lastActive: "2026-04-12",
+	},
+	{
+		id: "9",
+		name: "Iris Nakamura",
+		email: "iris.n@example.com",
+		role: "Admin",
+		status: "active",
+		lastActive: "2026-04-07",
+	},
 ];
+
+export function getMockAdminUserById(id: string): AdminUserRow | undefined {
+	return MOCK_ADMIN_USERS.find((u) => u.id === id);
+}

@@ -1,14 +1,28 @@
+import { PageSection } from "@/components/admin-ui/PageSection/PageSection";
+import { KillSwitchesPanel } from "@/components/modules/kill-switches/KillSwitchesPanel/KillSwitchesPanel";
+import { MOCK_KILL_SWITCHES } from "@/constants/mock-admin-pages";
+
 export default function KillSwitchesPage() {
 	return (
-		<div className="mx-auto max-w-3xl space-y-3">
-			<p className="text-body text-text-secondary">
-				Toggle platform features without a deploy. No backend wired — layout
-				placeholder only.
-			</p>
-			<ul className="list-inside list-disc text-body text-text-secondary">
-				<li>Feature flags table (placeholder)</li>
-				<li>Kill switch rows (placeholder)</li>
-			</ul>
+		<div className="mx-auto max-w-6xl space-y-8">
+			<PageSection
+				title="Kill switches"
+				description="Turn entire features off without a deploy. Toggles below only change local UI state — they are not persisted."
+			>
+				<KillSwitchesPanel rows={MOCK_KILL_SWITCHES} />
+			</PageSection>
+
+			<PageSection
+				title="Rollout notes"
+				description="When wiring the backend, log every toggle with admin id, timestamp, and previous value."
+			>
+				<div className="rounded-lg border border-border bg-bg-surface p-4 text-body text-text-secondary">
+					<p>
+						Recommended: require a confirmation modal for switches that affect
+						payments or auth. Use read-only mode for non–super-admins if needed.
+					</p>
+				</div>
+			</PageSection>
 		</div>
 	);
 }
