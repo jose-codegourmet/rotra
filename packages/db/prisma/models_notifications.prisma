@@ -1,0 +1,23 @@
+model Notification {
+  id           String @id @default(uuid()) @db.Uuid
+  recipientId  String @map("recipient_id") @db.Uuid
+  type         NotificationType
+  title        String
+  body         String
+  isRead       Boolean   @default(false) @map("is_read")
+  readAt       DateTime? @map("read_at") @db.Timestamptz(6)
+  relatedEntityType String? @map("related_entity_type")
+  relatedEntityId   String? @map("related_entity_id") @db.Uuid
+  scheduledAt  DateTime? @map("scheduled_at") @db.Timestamptz(6)
+  sentAt       DateTime? @map("sent_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  recipient Profile @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId], map: "idx_notifications_recipient_id")
+  @@index([recipientId, isRead], map: "idx_notifications_is_read")
+  @@index([scheduledAt], map: "idx_notifications_scheduled_at")
+  @@index([type], map: "idx_notifications_type")
+  @@index([createdAt(sort: Desc)], map: "idx_notifications_created_at")
+  @@map("notifications")
+}

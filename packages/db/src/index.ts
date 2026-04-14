@@ -12,4 +12,6 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = db
 }
 
+export { Prisma } from '@prisma/client'
 export type { PrismaClient } from '@prisma/client'
+export type { Database, Json } from './supabase-database.types'

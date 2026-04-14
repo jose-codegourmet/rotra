@@ -1,0 +1,138 @@
+model Profile {
+  id        String  @id @db.Uuid
+  facebookId String @unique @map("facebook_id")
+  name      String
+  avatarUrl String? @map("avatar_url")
+  phone     String?
+
+  playingLevel     PlayingLevel?     @map("playing_level")
+  formatPreference FormatPreference? @map("format_preference")
+  courtPosition    CourtPosition?    @map("court_position")
+  playMode         PlayMode?         @map("play_mode")
+
+  expTotal                    Int     @default(0) @map("exp_total")
+  mmr                         Int     @default(1000)
+  profileCompletedBonusClaimed Boolean @default(false) @map("profile_completed_bonus_claimed")
+  onboardingCompleted         Boolean @default(false) @map("onboarding_completed")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  ownedClubs                  Club[]                      @relation("ClubOwner")
+  clubMemberships             ClubMember[]
+  clubJoinRequests            ClubJoinRequest[]
+  blacklistEntries            ClubBlacklist[]             @relation("BlacklistPlayer")
+  blacklistsCreated           ClubBlacklist[]             @relation("BlacklistCreatedBy")
+  auditLogsAsPlayer           ClubMembershipAuditLog[]    @relation("AuditPlayer")
+  auditLogsPerformed          ClubMembershipAuditLog[]    @relation("AuditPerformedBy")
+  hostedSessions              QueueSession[]
+  sessionRegistrations        SessionRegistration[]
+  matchesAsUmpire             Match[]                     @relation("MatchUmpire")
+  matchesScoreSubmitted       Match[]                     @relation("MatchScoreSubmittedBy")
+  matchesFinalized            Match[]                     @relation("MatchFinalizedBy")
+  matchesVoided               Match[]                     @relation("MatchVoidedBy")
+  matchPlayers                MatchPlayer[]
+  reviewsWritten              MatchReview[]               @relation("ReviewReviewer")
+  reviewsReceived             MatchReview[]               @relation("ReviewReviewee")
+  skillRatings                PlayerSkillRating[]
+  selfAssessments             PlayerSelfAssessment[]
+  gearItems                   GearItem[]
+  expTransactions             ExpTransaction[]
+  mmrTransactions             MmrTransaction[]
+  rankingTierConfigsUpdated   RankingTierConfig[]         @relation("RankingTierUpdatedBy")
+  sandbaggingFlags            SandbaggingFlag[]           @relation("SandbaggingPlayer")
+  sandbaggingFlagsResolved    SandbaggingFlag[]           @relation("SandbaggingResolvedBy")
+  notifications               Notification[]
+  clubOwnerApplications       ClubOwnerApplication[]      @relation("ClubAppPlayer")
+  clubOwnerApplicationsReviewed ClubOwnerApplication[]    @relation("ClubAppReviewedBy")
+  killSwitchesUpdated         KillSwitch[]                @relation("KillSwitchUpdatedBy")
+  platformConfigsUpdated      PlatformConfig[]            @relation("PlatformConfigUpdatedBy")
+  moderationFlagsReported     ModerationFlag[]            @relation("ModerationReporter")
+  moderationFlagsReviewed     ModerationFlag[]            @relation("ModerationReviewedBy")
+
+  @@index([facebookId], map: "idx_profiles_facebook_id")
+  @@map("profiles")
+}
+
+model GearItem {
+  id       String @id @default(uuid()) @db.Uuid
+  playerId String @map("player_id") @db.Uuid
+  category GearCategory
+
+  title       String
+  description String?
+  brand       String?
+  model       String?
+
+  balanceType   RacketBalance? @map("balance_type")
+  stringBrand   String?        @map("string_brand")
+  stringModel   String?        @map("string_model")
+  stringTension Decimal?       @map("string_tension") @db.Decimal(5, 2)
+  grip          String?
+
+  shoeSize Decimal?  @map("shoe_size") @db.Decimal(4, 1)
+  fitType  ShoeFit? @map("fit_type")
+
+  capacity String?
+
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  player Profile         @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  links  GearItemLink[]
+
+  @@index([playerId], map: "idx_gear_items_player_id")
+  @@index([category], map: "idx_gear_items_category")
+  @@map("gear_items")
+}
+
+model GearItemLink {
+  id         String @id @default(uuid()) @db.Uuid
+  gearItemId String @map("gear_item_id") @db.Uuid
+  label      String?
+  url        String
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  gearItem GearItem @relation(fields: [gearItemId], references: [id], onDelete: Cascade)
+
+  @@index([gearItemId], map: "idx_gear_item_links_gear_item_id")
+  @@map("gear_item_links")
+}
+
+model SkillDimension {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @unique
+  label       String
+  description String?
+  subSkills   Json    @default("[]") @map("sub_skills")
+  weight      Decimal @default(1.0) @db.Decimal(4, 2)
+  isActive    Boolean @default(true) @map("is_active")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  selfAssessments     PlayerSelfAssessment[]
+  matchReviewRatings  MatchReviewRating[]
+  playerSkillRatings  PlayerSkillRating[]
+
+  @@index([isActive], map: "idx_skill_dimensions_active")
+  @@map("skill_dimensions")
+}
+
+model PlayerSelfAssessment {
+  id                   String @id @default(uuid()) @db.Uuid
+  playerId             String @map("player_id") @db.Uuid
+  dimensionId          String @map("dimension_id") @db.Uuid
+  score                Int
+  externalRatingsCount Int    @default(0) @map("external_ratings_count")
+  updatedAt            DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  player    Profile        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  dimension SkillDimension @relation(fields: [dimensionId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, dimensionId])
+  @@index([playerId], map: "idx_self_assessments_player_id")
+  @@index([dimensionId], map: "idx_self_assessments_dimension_id")
+  @@map("player_self_assessments")
+}
