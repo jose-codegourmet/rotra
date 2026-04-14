@@ -1,0 +1,75 @@
+model ClubOwnerApplication {
+  id           String @id @default(uuid()) @db.Uuid
+  playerId     String @map("player_id") @db.Uuid
+  clubName     String @map("club_name")
+  intent       String
+  status       ApplicationStatus @default(pending)
+  reviewedById String? @map("reviewed_by") @db.Uuid
+  reviewNote   String? @map("review_note")
+  reviewedAt   DateTime? @map("reviewed_at") @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  player    Profile @relation("ClubAppPlayer", fields: [playerId], references: [id], onDelete: Cascade)
+  reviewedBy Profile? @relation("ClubAppReviewedBy", fields: [reviewedById], references: [id])
+
+  @@index([playerId], map: "idx_club_apps_player_id")
+  @@index([status], map: "idx_club_apps_status")
+  @@index([createdAt(sort: Desc)], map: "idx_club_apps_created")
+  @@map("club_owner_applications")
+}
+
+model KillSwitch {
+  id          String @id @default(uuid()) @db.Uuid
+  key         String
+  environment Environment
+  label       String
+  description String?
+  isEnabled   Boolean @default(true) @map("is_enabled")
+  updatedById String? @map("updated_by") @db.Uuid
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  updatedBy Profile? @relation("KillSwitchUpdatedBy", fields: [updatedById], references: [id])
+
+  @@unique([key, environment])
+  @@index([key, environment], map: "idx_kill_switches_key_env")
+  @@index([isEnabled], map: "idx_kill_switches_enabled")
+  @@map("kill_switches")
+}
+
+model PlatformConfig {
+  id          String @id @default(uuid()) @db.Uuid
+  key         String @unique
+  description String?
+  value       Json
+  updatedById String? @map("updated_by") @db.Uuid
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  updatedBy Profile? @relation("PlatformConfigUpdatedBy", fields: [updatedById], references: [id])
+
+  @@index([key], map: "idx_platform_config_key")
+  @@map("platform_config")
+}
+
+model ModerationFlag {
+  id          String @id @default(uuid()) @db.Uuid
+  reporterId  String? @map("reporter_id") @db.Uuid
+  entityType  ModerationEntity @map("entity_type")
+  entityId    String @map("entity_id") @db.Uuid
+  reason      String
+  status      ModerationStatus @default(pending)
+  reviewedById String? @map("reviewed_by") @db.Uuid
+  reviewNote   String? @map("review_note")
+  reviewedAt   DateTime? @map("reviewed_at") @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  reporter   Profile? @relation("ModerationReporter", fields: [reporterId], references: [id], onDelete: SetNull)
+  reviewedBy Profile? @relation("ModerationReviewedBy", fields: [reviewedById], references: [id])
+
+  @@index([entityType, entityId], map: "idx_moderation_entity")
+  @@index([status], map: "idx_moderation_status")
+  @@index([reporterId], map: "idx_moderation_reporter")
+  @@index([createdAt(sort: Desc)], map: "idx_moderation_created")
+  @@map("moderation_flags")
+}
