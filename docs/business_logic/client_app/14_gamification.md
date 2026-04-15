@@ -23,6 +23,7 @@ Gamification layers engagement and motivation on top of the core session system.
 * MMR is updated only after **completed, scored** matches in **MMR** club schedules (never for Fun Games or player-organized).
 * Exact formulas, K-factors, and pairing rules are **Admin-configurable** (see Admin platform config).
 * On **MMR** schedules, **mixed-rank teams** use **asymmetric** EXP and MMR deltas (see §14.3).
+* **Calibration**: A player's first N competitive matches (default 10) apply an **amplified MMR multiplier** so ratings converge faster toward the player's true level. The calibration multiplier stacks multiplicatively with the asymmetric multiplier. See `21_mmr_calibration.md` for full specification.
 
 ---
 

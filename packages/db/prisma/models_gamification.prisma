@@ -20,14 +20,15 @@ model ExpTransaction {
 }
 
 model MmrTransaction {
-  id        String @id @default(uuid()) @db.Uuid
-  playerId  String @map("player_id") @db.Uuid
-  amount    Int
-  reason    MmrReason
-  matchId   String @map("match_id") @db.Uuid
-  preMmr    Int    @map("pre_mmr")
-  postMmr   Int    @map("post_mmr")
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  id            String @id @default(uuid()) @db.Uuid
+  playerId      String @map("player_id") @db.Uuid
+  amount        Int
+  reason        MmrReason
+  matchId       String @map("match_id") @db.Uuid
+  preMmr        Int    @map("pre_mmr")
+  postMmr       Int    @map("post_mmr")
+  isCalibration Boolean @default(false) @map("is_calibration")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   player Profile @relation(fields: [playerId], references: [id], onDelete: Cascade)
   match  Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)

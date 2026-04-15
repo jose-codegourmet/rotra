@@ -9,25 +9,51 @@ Platform configuration covers global constants and parameters that control how t
 ## Gamification Config
 
 Reference: `[../client_app/14_gamification.md](../client_app/14_gamification.md)`
+Canonical model: `[../../database/06_gamification.md](../../database/06_gamification.md)`
 
 ### EXP Rates
 
-Admins can adjust the EXP awarded for each action:
+Admins can adjust EXP awarded for match-related actions only:
 
 
 | Action Key              | Description                             | Default |
 | ----------------------- | --------------------------------------- | ------- |
-| `exp.match_played`      | EXP per match played                    | 10      |
-| `exp.match_won`         | Bonus EXP for winning a match           | 15      |
-| `exp.review_submitted`  | EXP for submitting a post-match review  | 5       |
-| `exp.session_attended`  | EXP for attending a session             | 5       |
-| `exp.profile_completed` | One-time EXP for completing profile     | 50      |
-| `exp.gear_added`        | EXP per gear item added (up to 3 items) | 10      |
-| `exp.first_match`       | One-time EXP for first match played     | 25      |
-| `exp.club_joined`       | EXP for joining a club                  | 10      |
+| `exp.match_played`      | EXP per qualifying match played                              | 10      |
+| `exp.match_won`         | Bonus EXP for winning a qualifying match                     | 15      |
+| `exp.match_voided_reversal` | System-generated compensating EXP on match voiding      | `-(original amount)` |
 
 
 Changes to EXP rates apply to **future actions only**. Historical EXP is not recalculated.
+Eligibility: competitive `club_queue` sessions with `schedule_type = mmr`.
+
+### MMR Asymmetry Config
+
+Admins can adjust MMR asymmetry values under `mmr_asymmetry_config`:
+
+| Config Key | Description |
+| ---------- | ----------- |
+| `mmr_gap_threshold` | MMR gap that enables mixed-rank asymmetry behavior |
+| `lower_rated_win_multiplier` | Win multiplier for lower-rated teammate when threshold is met |
+| `lower_rated_loss_multiplier` | Loss multiplier for lower-rated teammate when threshold is met |
+| `higher_rated_win_multiplier` | Win multiplier for higher-rated teammate when threshold is met |
+| `higher_rated_loss_multiplier` | Loss multiplier for higher-rated teammate when threshold is met |
+
+Reference operational rules: `[07_mmr_and_skills_management.md](./07_mmr_and_skills_management.md)`.
+
+---
+
+### MMR Calibration Config
+
+Admins can adjust calibration parameters that control the amplified MMR period for new competitive players:
+
+| Config Key | Description | Default |
+| ---------- | ----------- | ------- |
+| `calibration.required_matches` | Number of completed MMR matches required to finish calibration | 10 |
+| `calibration.mmr_multiplier` | Multiplier applied to MMR deltas during calibration | 2.0 |
+
+Changes apply to **future transactions only**. A player mid-calibration uses the config values active at the time each match completes. Raising the threshold does **not** re-open calibration for players who have already completed it.
+
+Reference: `[../client_app/21_mmr_calibration.md](../client_app/21_mmr_calibration.md)`
 
 ---
 
@@ -161,4 +187,5 @@ These are global defaults that Club Owners and Que Masters can override per club
 - Each change produces an audit log entry (see `[01_admin_overview.md](./01_admin_overview.md)`)
 - Config changes in `staging` do not affect `production` (environments are isolated)
 - If a change would violate a canonical rule (e.g. tier threshold demotion), the system blocks the save and explains the conflict
+- MMR and match EXP settings are governed by `[07_mmr_and_skills_management.md](./07_mmr_and_skills_management.md)` and the canonical DB model in `[../../database/06_gamification.md](../../database/06_gamification.md)`
 

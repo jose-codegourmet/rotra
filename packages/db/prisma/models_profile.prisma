@@ -12,6 +12,8 @@ model Profile {
 
   expTotal                    Int     @default(0) @map("exp_total")
   mmr                         Int     @default(1000)
+  mmrMatchesPlayed            Int     @default(0) @map("mmr_matches_played")
+  calibrationCompletedAt      DateTime? @map("calibration_completed_at") @db.Timestamptz(6)
   profileCompletedBonusClaimed Boolean @default(false) @map("profile_completed_bonus_claimed")
   onboardingCompleted         Boolean @default(false) @map("onboarding_completed")
 

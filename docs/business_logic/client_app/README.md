@@ -39,6 +39,8 @@ The Client App is the primary user-facing product. It serves three types of user
 | [17_risks.md](./17_risks.md) | 17 | Risk registry with impact levels and mitigations |
 | [18_canonical_rules.md](./18_canonical_rules.md) | 18 | Canonical rules including session types, EXP/MMR eligibility, void handling |
 | [19_player_comparison.md](./19_player_comparison.md) | 19 | Side-by-side player comparison — H2H record, skill radar, performance stats |
+| [20_onboarding.md](./20_onboarding.md) | 20 | Player onboarding wizard — name, age, playing since, court position, tournament wins |
+| [21_mmr_calibration.md](./21_mmr_calibration.md) | 21 | MMR calibration period — amplified deltas for first 10 competitive matches |
 
 ---
 
