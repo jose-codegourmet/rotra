@@ -2,11 +2,15 @@
 
 ## Overview
 
-Authentication is handled entirely by **Supabase Auth** with Facebook as the OAuth provider. The `profiles` table extends the built-in `auth.users` table with all ROTRA-specific player data. All other tables reference `profiles.id`.
+Authentication is handled entirely by **Supabase Auth** using Facebook as the primary OAuth provider. An email invitation path also exists: an invite token is emailed to a recipient who then connects their Facebook account, after which Supabase verifies the linked email address.
+
+The `profiles` table extends `auth.users` with all ROTRA-specific player data. All other tables reference `profiles.id`.
+
+Account verification is a **three-condition composite** stored as a generated column (`is_verified`). New accounts are unverified by default. See `03_authentication.md` for the full verification model.
 
 Gear items are modeled as independent rows (not JSONB) to allow querying, filtering, and clean relational joins. Each gear item can have multiple "where to buy" links via `gear_item_links`.
 
-`player_self_assessments` holds the player's own skill dimension scores, set during onboarding and editable later. These are used as a baseline in the weighted skill rating until at least 5 external ratings accumulate per dimension.
+`player_self_assessments` holds the player's own skill dimension scores, set during profile setup and editable later. These are used as a baseline in the weighted skill rating until at least 5 external ratings accumulate per dimension.
 
 ---
 
@@ -26,38 +30,71 @@ CREATE TYPE gear_category_enum AS ENUM ('racket', 'shoes', 'bag');
 CREATE TYPE racket_balance_enum AS ENUM ('head_heavy', 'head_light', 'even_balanced');
 
 CREATE TYPE shoe_fit_enum AS ENUM ('wide', 'narrow', 'standard');
+
+CREATE TYPE invitation_status_enum AS ENUM ('pending', 'accepted', 'expired', 'revoked');
 ```
 
 ---
 
 ## Table: `profiles`
 
-Extends `auth.users`. Created automatically via a Supabase Auth trigger on new user signup.
+Extends `auth.users`. Created automatically via a Supabase Auth trigger on new user signup (both Facebook login and email invitation paths).
 
 ```sql
 CREATE TABLE profiles (
   id                              uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+
+  -- Identity
   facebook_id                     text UNIQUE NOT NULL,
   name                            text NOT NULL,
   avatar_url                      text,
   phone                           text,
 
+  -- Email (from invitation path or manually added)
+  email                           text,
+  email_verified                  bool NOT NULL DEFAULT false,
+  email_verified_at               timestamptz,
+
+  -- Composite verification flag (all three conditions must be true)
+  -- Condition 1: facebook_id IS NOT NULL (always true after OAuth)
+  -- Condition 2: email_verified = true
+  -- Condition 3: onboarding_completed = true
+  is_verified                     bool GENERATED ALWAYS AS (
+                                    facebook_id IS NOT NULL
+                                    AND email_verified
+                                    AND onboarding_completed
+                                  ) STORED,
+
   -- Self-declared level (separate from computed skill rating)
   playing_level                   playing_level_enum,
 
-  -- Play style preferences (informational only; no queue priority effect)
+  -- Play style preferences
   format_preference               format_preference_enum,
   court_position                  court_position_enum,
   play_mode                       play_mode_enum,
 
-  -- Gamification totals (derived from exp_transactions; cached here for fast reads)
+  -- Age (private, for analytics only)
+  age                             int,
+
+  -- Playing history
+  playing_since                   int,                  -- year, e.g. 2015
+  playing_since_less_than_one_year bool NOT NULL DEFAULT false,
+
+  -- Tournament track record (self-reported snapshot)
+  tournament_wins_last_year       text CHECK (
+                                    tournament_wins_last_year IN ('none', '1_to_3', '4_plus')
+                                  ),
+
+  -- Gamification totals (cached from exp_transactions / mmr_transactions)
   exp_total                       int NOT NULL DEFAULT 0,
   mmr                             int NOT NULL DEFAULT 1000,
+  mmr_matches_played              int NOT NULL DEFAULT 0,
+  calibration_completed_at        timestamptz,
 
   -- One-time EXP bonus flag
   profile_completed_bonus_claimed bool NOT NULL DEFAULT false,
 
-  -- Onboarding completion (phone collection step)
+  -- Onboarding completion gate
   onboarding_completed            bool NOT NULL DEFAULT false,
 
   created_at                      timestamptz NOT NULL DEFAULT now(),
@@ -65,12 +102,20 @@ CREATE TABLE profiles (
 );
 ```
 
-### Notes
+### Column Notes
 
-- `exp_total` and `mmr` are **cached aggregates**. The authoritative records are `exp_transactions` and `mmr_transactions`. These caches are updated by a Postgres trigger or server-side function whenever a transaction row is inserted — never written directly by the client.
-- `facebook_id` maps to the `sub` claim from Supabase's Facebook OAuth provider; stored for server-side deduplication.
-- `playing_level` is self-declared and distinct from the computed skill rating in `player_skill_ratings`.
-- `onboarding_completed` gates access — users who have not completed phone collection are redirected away from the main app.
+| Column | Notes |
+|---|---|
+| `facebook_id` | Maps to the `sub` claim from Supabase's Facebook OAuth; stored for server-side deduplication. Always set; cannot be null on any real profile row. |
+| `email` | Nullable. Populated from `auth.users.email` when the invitation path is used, or when the player links an email manually from settings. |
+| `email_verified` | Set to `true` only after Supabase sends and the user clicks a verification email. Linking an email alone does not set this field. |
+| `is_verified` | Generated column; never written directly. Clients must not cache or recompute this. |
+| `age` | Private — must never appear on the public profile, leaderboard, or comparison views. |
+| `playing_since` | Year the player started badminton. Null when `playing_since_less_than_one_year = true`. |
+| `playing_since_less_than_one_year` | When `true`, `playing_since` must be null. Both are set together. |
+| `tournament_wins_last_year` | Self-reported snapshot at registration. Not auto-recalculated. |
+| `exp_total` and `mmr` | Cached aggregates from `exp_transactions` / `mmr_transactions`. Updated by trigger only; never written directly by the client. |
+| `onboarding_completed` | Gates access. Any authenticated user with this `false` is redirected to `/onboarding` on every app open. |
 
 ### Trigger: auto-create profile on signup
 
@@ -78,12 +123,13 @@ CREATE TABLE profiles (
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO profiles (id, facebook_id, name, avatar_url)
+  INSERT INTO profiles (id, facebook_id, name, avatar_url, email)
   VALUES (
     NEW.id,
     NEW.raw_user_meta_data->>'provider_id',
     NEW.raw_user_meta_data->>'full_name',
-    NEW.raw_user_meta_data->>'avatar_url'
+    NEW.raw_user_meta_data->>'avatar_url',
+    NEW.email   -- populated on email invitation path; NULL on direct Facebook login
   );
   RETURN NEW;
 END;
@@ -98,6 +144,60 @@ CREATE TRIGGER on_auth_user_created
 
 ```sql
 CREATE INDEX idx_profiles_facebook_id ON profiles(facebook_id);
+CREATE INDEX idx_profiles_email       ON profiles(email);
+CREATE INDEX idx_profiles_is_verified ON profiles(is_verified);
+```
+
+---
+
+## Table: `email_invitations`
+
+Tracks tokenized email invitations sent by admins or club owners. Each row represents a single invitation to a single email address. The token is single-use: once `status = 'accepted'`, it cannot be reused.
+
+```sql
+CREATE TABLE email_invitations (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email         text NOT NULL,
+  token         text UNIQUE NOT NULL,
+  invited_by    uuid REFERENCES profiles(id) ON DELETE SET NULL,
+
+  status        invitation_status_enum NOT NULL DEFAULT 'pending',
+
+  -- Token expires 7 days after creation
+  expires_at    timestamptz NOT NULL DEFAULT now() + interval '7 days',
+
+  -- Set when the invitation is accepted
+  accepted_by   uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  accepted_at   timestamptz,
+
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+```
+
+### Status Transitions
+
+```
+pending → accepted  (recipient clicks link, completes Facebook login)
+pending → expired   (TTL exceeded; a scheduled job or check-on-read marks this)
+pending → revoked   (inviter or admin manually revokes before acceptance)
+```
+
+### Notes
+
+- `invited_by` is nullable (SET NULL on profile delete) for audit preservation.
+- `accepted_by` links to the `profiles` row created or updated when the invitation was accepted.
+- When `status = 'accepted'`, the corresponding `profiles.email` is set to the invitation email and `profiles.email_verified` transitions to `true` once the Supabase verification link is clicked.
+- A single email address may have multiple invitation rows (e.g. if an invite expired and a new one was issued), but only one `pending` invitation per email address is permitted at a time (enforced via a partial unique index).
+
+```sql
+-- Only one pending invite per email at a time
+CREATE UNIQUE INDEX idx_email_invitations_pending_email
+  ON email_invitations(email)
+  WHERE status = 'pending';
+
+CREATE INDEX idx_email_invitations_token  ON email_invitations(token);
+CREATE INDEX idx_email_invitations_email  ON email_invitations(email);
+CREATE INDEX idx_email_invitations_status ON email_invitations(status);
 ```
 
 ---
@@ -199,7 +299,7 @@ CREATE TABLE player_self_assessments (
 
 ### Notes
 
-- `external_ratings_count` is incremented server-side when a new `match_review_ratings` row targeting this player and dimension is accepted within the 24-hour window.
+- `external_ratings_count` is incremented server-side when a new `match_review_ratings` row targeting this player and dimension is accepted within the 24-hour review window.
 - Once `external_ratings_count >= 5`, the self-assessment weight drops from `×1` to `×0` in the weighted skill calculation (see `05_reviews_and_ratings.md`).
 
 ### Indexes
@@ -218,20 +318,37 @@ auth.users (Supabase managed)
     └── profiles (1:1 via FK)
             ├── gear_items (1:many)
             │       └── gear_item_links (1:many)
-            └── player_self_assessments (1:many, one per dimension)
-                    └── skill_dimensions (many:1)
+            ├── player_self_assessments (1:many, one per dimension)
+            │       └── skill_dimensions (many:1)
+            ├── email_invitations as invited_by (1:many)
+            └── email_invitations as accepted_by (1:1 per accepted invite)
 ```
 
 ---
 
 ## Player Profile Completeness
 
-The `profile_completed_bonus_claimed` flag is set to `true` (and a `+20 EXP` transaction is inserted) when all of the following are present:
+The `profile_completed_bonus_claimed` flag is set to `true` (and a `+20 EXP` transaction is inserted) when all of the following are present and `profile_completed_bonus_claimed = false`:
 
 | Requirement | Column / Table |
 |---|---|
 | Name set | `profiles.name` |
+| Phone set | `profiles.phone` |
 | Playing level set | `profiles.playing_level` |
-| Play style set | `profiles.format_preference`, `court_position`, `play_mode` |
-| At least one gear item | `gear_items` count ≥ 1 |
-| Phone collected | `profiles.phone` |
+| Format preference set | `profiles.format_preference` |
+| Court position set | `profiles.court_position` |
+| Play mode set | `profiles.play_mode` |
+| Onboarding completed | `profiles.onboarding_completed = true` |
+
+All of these fields are now collected during the onboarding wizard, so the bonus is awarded immediately on wizard completion for accounts created after the wizard ships.
+
+---
+
+## Account Verification Summary
+
+| Condition | Column | Set by |
+|---|---|---|
+| Facebook linked | `profiles.facebook_id IS NOT NULL` | `handle_new_user()` trigger on OAuth signup |
+| Email verified | `profiles.email_verified = true` | Supabase email verification callback |
+| Onboarding complete | `profiles.onboarding_completed = true` | Server on wizard payload receipt |
+| **Verified (composite)** | `profiles.is_verified` (generated) | Automatically when all three conditions are true |

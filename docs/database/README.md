@@ -10,7 +10,8 @@ The schema is designed for **Supabase** as the backend (PostgreSQL), with Prisma
 
 | Principle | Decision |
 |---|---|
-| Auth | `profiles` extends `auth.users`; Supabase handles Facebook OAuth |
+| Auth | `profiles` extends `auth.users`; Supabase handles Facebook OAuth and email verification; two registration paths: Facebook login and email invitation |
+| Verification | `profiles.is_verified` is a generated column — true only when Facebook linked + email verified + onboarding completed |
 | Club ownership | `clubs.owner_id` is authoritative for ownership; owner is also inserted into `club_members` with `role = 'owner'` so membership queries are unified |
 | Primary keys | `uuid` via `gen_random_uuid()` on all tables |
 | Timestamps | `timestamptz` throughout — never `timestamp` |
@@ -26,7 +27,7 @@ The schema is designed for **Supabase** as the backend (PostgreSQL), with Prisma
 
 | File | Tables |
 |---|---|
-| [01_users_and_profiles.md](01_users_and_profiles.md) | `profiles`, `gear_items`, `gear_item_links`, `player_self_assessments` |
+| [01_users_and_profiles.md](01_users_and_profiles.md) | `profiles`, `email_invitations`, `gear_items`, `gear_item_links`, `player_self_assessments` |
 | [02_clubs.md](02_clubs.md) | `clubs`, `club_members`, `club_join_requests`, `club_blacklist`, `club_membership_audit_log` |
 | [03_queue_sessions.md](03_queue_sessions.md) | `queue_sessions`, `session_registrations` |
 | [04_matches.md](04_matches.md) | `matches`, `match_players` |
@@ -46,13 +47,34 @@ erDiagram
         text name
         text avatar_url
         text phone
+        text email
+        bool email_verified
+        timestamptz email_verified_at
+        bool is_verified
         playing_level_enum playing_level
         format_preference_enum format_preference
         court_position_enum court_position
         play_mode_enum play_mode
+        int age
+        int playing_since
+        bool playing_since_less_than_one_year
+        text tournament_wins_last_year
         int exp_total
         int mmr
+        bool onboarding_completed
         bool profile_completed_bonus_claimed
+        timestamptz created_at
+    }
+
+    email_invitations {
+        uuid id PK
+        text email
+        text token
+        uuid invited_by FK
+        invitation_status_enum status
+        timestamptz expires_at
+        uuid accepted_by FK
+        timestamptz accepted_at
         timestamptz created_at
     }
 
@@ -324,6 +346,9 @@ erDiagram
     profiles ||--o{ player_self_assessments : "sets"
     skill_dimensions ||--o{ player_self_assessments : "assessed_on"
 
+    profiles ||--o{ email_invitations : "sends"
+    profiles ||--o{ email_invitations : "accepts"
+
     profiles ||--o{ club_members : "is"
     clubs ||--o{ club_members : "has"
     profiles ||--|| clubs : "owns"
@@ -373,7 +398,8 @@ supabase/
 │   ├── 0007_gamification.sql
 │   ├── 0008_notifications.sql
 │   ├── 0009_admin.sql
-│   └── 0010_rls_policies.sql
+│   ├── 0010_rls_policies.sql
+│   └── 0011_email_invitations.sql
 └── seed.sql
 ```
 
@@ -382,7 +408,7 @@ supabase/
 Not all tables need to be built at once. The MVP is phased as follows:
 
 ### Phase 1 — Core Queue System
-`profiles`, `gear_items`, `gear_item_links`, `clubs`, `club_members`, `club_join_requests`, `club_blacklist`, `club_membership_audit_log`, `queue_sessions`, `session_registrations`, `matches`, `match_players`, `notifications`
+`profiles`, `email_invitations`, `gear_items`, `gear_item_links`, `clubs`, `club_members`, `club_join_requests`, `club_blacklist`, `club_membership_audit_log`, `queue_sessions`, `session_registrations`, `matches`, `match_players`, `notifications`
 
 ### Phase 2 — Ratings & Gamification
 `skill_dimensions`, `match_reviews`, `match_review_ratings`, `player_skill_ratings`, `player_self_assessments`, `exp_transactions`, `mmr_transactions`, `ranking_tier_config`, `sandbagging_flags`
