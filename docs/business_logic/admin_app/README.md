@@ -23,6 +23,7 @@ Admin accounts are created manually at the system level — there is no self-reg
 | Club Owner approvals | Review and approve or reject Club Owner applications |
 | Platform moderation | Handle flagged reviews, account suspensions, content removal |
 | Platform configuration | Manage gamification parameters, skill dimensions, system constants |
+| MMR & skills management | Configure MMR asymmetry, match EXP awarding behavior, and MMR calibration parameters for competitive sessions |
 | Platform analytics | Monitor active clubs, session volume, player retention, and health metrics |
 
 ---
@@ -37,6 +38,7 @@ Admin accounts are created manually at the system level — there is no self-reg
 | [04_approvals_and_moderation.md](./04_approvals_and_moderation.md) | Club Owner approval workflow, review moderation, account actions |
 | [05_platform_config.md](./05_platform_config.md) | Global constants — EXP rates, tier thresholds, skill dimensions |
 | [06_platform_analytics.md](./06_platform_analytics.md) | Platform health dashboard and metrics |
+| [07_mmr_and_skills_management.md](./07_mmr_and_skills_management.md) | MMR and match EXP governance, guardrails, and operational workflows |
 
 ---
 

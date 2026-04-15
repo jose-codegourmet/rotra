@@ -137,6 +137,28 @@ RULE-067: Club queue — MMR (competitive): EXP and MMR may increase or decrease
 
 RULE-068: MMR is distinct from Skill Rating (six-dimension peer assessment).
           MMR updates only per RULE-067; Skill Rating updates from reviews per Skill Ratings section.
+
+RULE-069: A player with fewer than calibration.required_matches completed MMR matches
+          is in calibration status. Calibration status is determined by comparing
+          profiles.mmr_matches_played against the current platform_config threshold.
+
+RULE-070: During calibration, all MMR deltas are multiplied by calibration.mmr_multiplier
+          before being applied. The multiplied amount is recorded in mmr_transactions.amount.
+
+RULE-071: Voided calibration matches decrement profiles.mmr_matches_played by 1.
+          If the decrement drops the counter below calibration.required_matches and
+          calibration_completed_at was set by the voided match, the player re-enters
+          calibration (calibration_completed_at is reset to NULL).
+
+RULE-072: The calibration multiplier and the asymmetry multiplier (mmr_asymmetry_config)
+          stack multiplicatively. Both are evaluated independently per transaction.
+
+RULE-073: The "Calibrating" indicator is visible to Que Masters, Club Owners, and the
+          player themselves. It appears in the Add Match player pool, on the player's
+          own profile, and on the public profile.
+
+RULE-074: Calibration status does not affect queue priority, session eligibility,
+          or any functional behavior outside of MMR delta calculation and display indicators.
 ```
 
 ---

@@ -1,8 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import {
 	BarChart3,
+	Brain,
 	EyeOff,
 	LayoutDashboard,
+	Medal,
 	ShieldAlert,
 	SlidersHorizontal,
 	UserCheck,
@@ -25,6 +27,8 @@ export const ROUTES = {
 	APPROVALS: "/approvals",
 	MODERATION: "/moderation",
 	PLATFORM_CONFIG: "/platform-config",
+	MMR_MANAGEMENT: "/mmr-management",
+	SKILLS_MANAGEMENT: "/skills-management",
 	ANALYTICS: "/analytics",
 } as const;
 
@@ -41,6 +45,8 @@ export const ADMIN_PAGE_TITLES: Record<string, string> = {
 	[ROUTES.APPROVALS]: "Approvals",
 	[ROUTES.MODERATION]: "Moderation",
 	[ROUTES.PLATFORM_CONFIG]: "Platform config",
+	[ROUTES.MMR_MANAGEMENT]: "MMR management",
+	[ROUTES.SKILLS_MANAGEMENT]: "Skills management",
 	[ROUTES.ANALYTICS]: "Analytics",
 };
 
@@ -87,6 +93,16 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 		label: "Platform config",
 		href: ROUTES.PLATFORM_CONFIG,
 		icon: SlidersHorizontal,
+	},
+	{
+		label: "MMR management",
+		href: ROUTES.MMR_MANAGEMENT,
+		icon: Medal,
+	},
+	{
+		label: "Skills management",
+		href: ROUTES.SKILLS_MANAGEMENT,
+		icon: Brain,
 	},
 	{
 		label: "Analytics",
