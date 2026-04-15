@@ -1,14 +1,28 @@
 model Profile {
-  id        String  @id @db.Uuid
-  facebookId String @unique @map("facebook_id")
-  name      String
-  avatarUrl String? @map("avatar_url")
-  phone     String?
+  id         String  @id @db.Uuid
+  facebookId String  @unique @map("facebook_id")
+  name       String
+  avatarUrl  String? @map("avatar_url")
+  phone      String?
+
+  // Email (from invitation path or manually linked)
+  email           String?
+  emailVerified   Boolean   @default(false) @map("email_verified")
+  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz(6)
+  // is_verified is a GENERATED ALWAYS column in Postgres; Prisma reads it as a regular field.
+  // Never write this field directly — it is computed from facebook_id + email_verified + onboarding_completed.
+  isVerified Boolean @default(false) @map("is_verified")
 
   playingLevel     PlayingLevel?     @map("playing_level")
   formatPreference FormatPreference? @map("format_preference")
   courtPosition    CourtPosition?    @map("court_position")
   playMode         PlayMode?         @map("play_mode")
+
+  // Collected during onboarding wizard
+  age                        Int?
+  playingSince               Int?     @map("playing_since")
+  playingSinceLessThanOneYear Boolean @default(false) @map("playing_since_less_than_one_year")
+  tournamentWinsLastYear     String?  @map("tournament_wins_last_year")
 
   expTotal                    Int     @default(0) @map("exp_total")
   mmr                         Int     @default(1000)
@@ -51,9 +65,33 @@ model Profile {
   platformConfigsUpdated      PlatformConfig[]            @relation("PlatformConfigUpdatedBy")
   moderationFlagsReported     ModerationFlag[]            @relation("ModerationReporter")
   moderationFlagsReviewed     ModerationFlag[]            @relation("ModerationReviewedBy")
+  emailInvitationsCreated     EmailInvitation[]           @relation("InvitedBy")
+  emailInvitationsAccepted    EmailInvitation[]           @relation("AcceptedBy")
 
   @@index([facebookId], map: "idx_profiles_facebook_id")
+  @@index([email], map: "idx_profiles_email")
+  @@index([isVerified], map: "idx_profiles_is_verified")
   @@map("profiles")
+}
+
+model EmailInvitation {
+  id           String           @id @default(uuid()) @db.Uuid
+  email        String
+  token        String           @unique
+  invitedById  String?          @map("invited_by") @db.Uuid
+  status       InvitationStatus @default(pending)
+  expiresAt    DateTime         @map("expires_at") @db.Timestamptz(6)
+  acceptedById String?          @map("accepted_by") @db.Uuid
+  acceptedAt   DateTime?        @map("accepted_at") @db.Timestamptz(6)
+  createdAt    DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  invitedBy  Profile? @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+  acceptedBy Profile? @relation("AcceptedBy", fields: [acceptedById], references: [id], onDelete: SetNull)
+
+  @@index([token], map: "idx_email_invitations_token")
+  @@index([email], map: "idx_email_invitations_email")
+  @@index([status], map: "idx_email_invitations_status")
+  @@map("email_invitations")
 }
 
 model GearItem {
