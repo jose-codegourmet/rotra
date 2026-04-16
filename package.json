@@ -5,6 +5,13 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "db:generate": "pnpm --filter @rotra/db db:generate",
+    "db:push": "pnpm --filter @rotra/db db:push",
+    "db:migrate": "pnpm --filter @rotra/db db:migrate",
+    "db:migrate:deploy": "pnpm --filter @rotra/db db:migrate:deploy",
+    "db:migrate:reset": "pnpm --filter @rotra/db db:migrate:reset",
+    "db:studio": "pnpm --filter @rotra/db db:studio",
+    "db:seed": "pnpm --filter @rotra/db db:seed",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",

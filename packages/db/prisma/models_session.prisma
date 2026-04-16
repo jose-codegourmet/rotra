@@ -16,8 +16,9 @@ model QueueSession {
 
   numCourts         Int @map("num_courts")
   playersPerCourt   Int @map("players_per_court")
-  // GENERATED ALWAYS AS (num_courts * players_per_court) STORED — enforce in SQL; Prisma reads only.
-  totalSlots        Int     @default(dbgenerated("(num_courts * players_per_court)")) @map("total_slots")
+  // Postgres rejects DEFAULT expressions that reference other columns. Set in app: numCourts * playersPerCourt.
+  // Optional later: GENERATED ALWAYS AS (...) STORED via raw SQL migration if you want DB-enforced parity.
+  totalSlots        Int @map("total_slots")
 
   matchFormat                 MatchFormat @default(best_of_1) @map("match_format")
   scoreLimit                  Int         @default(21) @map("score_limit")

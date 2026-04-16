@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "prisma": {
-    "schema": "./prisma"
+    "schema": "./prisma",
+    "seed": "node --import tsx prisma/seed.ts"
   },
   "exports": {
     ".": "./src/index.ts"
@@ -13,7 +14,10 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
+    "db:seed": "prisma db seed",
     "db:types:supabase": "echo \"Run: supabase gen types typescript --project-id <id> > packages/db/src/supabase-database.types.ts\"",
     "type-check": "tsc --noEmit"
   },
@@ -23,6 +27,7 @@
   "devDependencies": {
     "@types/node": "^22.10.0",
     "prisma": "^6.5.0",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3",
     "@rotra/config": "workspace:*"
   }
