@@ -36,6 +36,7 @@ The schema is designed for **Supabase** as the backend (PostgreSQL), with Prisma
 | [07_notifications.md](07_notifications.md) | `notifications` |
 | [08_admin.md](08_admin.md) | `club_owner_applications`, `kill_switches`, `platform_config`, `moderation_flags` |
 | [09_rls_and_realtime.md](09_rls_and_realtime.md) | RLS policies, Realtime subscriptions, Storage buckets |
+| [10_prisma_supabase_migrations.md](10_prisma_supabase_migrations.md) | Prisma migrations, Supabase connection strings, deploy workflow |
 
 ## Entity Relationship Diagram
 

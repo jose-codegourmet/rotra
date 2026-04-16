@@ -77,8 +77,8 @@ CREATE TABLE queue_sessions (
   -- Court configuration
   num_courts       int NOT NULL CHECK (num_courts > 0),
   players_per_court int NOT NULL CHECK (players_per_court > 0),
-  -- Computed and stored for fast slot capacity checks
-  total_slots      int NOT NULL GENERATED ALWAYS AS (num_courts * players_per_court) STORED,
+  -- Capacity: either a plain column (Prisma migrations) or GENERATED ... STORED (optional Supabase-only DDL)
+  total_slots      int NOT NULL,
 
   -- Match format
   match_format  match_format_enum NOT NULL DEFAULT 'best_of_1',
@@ -111,7 +111,7 @@ CREATE TABLE queue_sessions (
 
 ### Notes
 
-- `total_slots` is a **generated column** — it is always `num_courts × players_per_court` and cannot be written directly.
+- `total_slots` must always equal `num_courts × players_per_court`. Prisma uses a plain `int` column (Postgres rejects `DEFAULT` expressions that reference other columns). The app sets it on write; you may later add `GENERATED ALWAYS AS (...) STORED` in a SQL-only migration on Supabase if you want the database to enforce it.
 - `status` transitions follow a strict state machine (see diagram below).
 - `shuttles_used` is updated by the Que Master during the session as tubes are consumed; it feeds the cost calculation.
 - `smart_monitor_threshold` is configurable per session by the Que Master (default 90%).
