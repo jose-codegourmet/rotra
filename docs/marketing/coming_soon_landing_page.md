@@ -143,7 +143,40 @@ The exported page shows: **fixed glass nav** (mark + wordmark + header CTA), **f
 
 ### Motion (branding §9)
 
-- **No decorative animation.** Only meaningful transitions: toast, focus, submit loading state. If any hero treatment animates, cap at **`motion-default` (~200ms)** and keep it subordinate to text readability.
+- **No decorative animation** for chrome, lists, and primary flows. Meaningful transitions only: toast, focus, submit loading state. If any hero treatment animates, cap at **`motion-default` (~200ms)** and keep it subordinate to text readability.
+- **Marketing-only exception (this landing page):** subtle ambient layers in the hero (see **Atmospheric layers** below) are allowed. Continuous motion **must** respect **`prefers-reduced-motion`** — degrade to a static scrim or omit the ambient layer when reduced motion is requested.
+
+### Atmospheric layers (implementation)
+
+This section supplements §3 “Hero” (photo + scrim) with an optional **depth stack** and a **readability fade** at the hero base. It remains **spec guidance** for whichever implementation the client app ships.
+
+**Layer order (back → front)**
+
+1. **Hero media** — static `next/image` (or illustration) filling the hero; no generated logos in-image (branding §10).  
+2. **Optional WebGL “dark veil”** (e.g. a canvas-based atmospheric layer such as [`DarkVeil`](../../apps/client/src/components/ui/dark-veil/DarkVeil.tsx) if adopted) — full-bleed, `position: absolute; inset: 0`, **below** the scrim. Use restrained parameters (`noiseIntensity`, `scanlineIntensity`, `warpAmount` at or near **0**) so the read is **tonal depth**, not retro scanlines.  
+3. **Gradient scrim** — use Tailwind/theme tokens (`bg-base`, `bg-surface`, opacity steps); avoid ad-hoc hex in JSX ([coding design system](../techstack/05_coding_design_system.md) §4.3).  
+4. **Typography + hero CTAs** — badge, headline, subcopy; relative `z-index` above the veil.  
+5. **Gradual bottom blur** — implement via [React Bits — GradualBlur](https://reactbits.dev/animations/gradual-blur) (or equivalent stacked `backdrop-filter` masks). Typical props: `target="parent"`, `position="bottom"` on the **hero `<section>`** so the bottom edge softly blurs into the next band (e.g. waitlist). Optional second instance: `position="top"` for a fixed glass nav over scrolling content. Suggested defaults: `curve="bezier"`, `exponential={true}`, `divCount={5}`, `strength={2}`, `height="6rem"` (tune per art direction). The upstream sample uses `mathjs` for `pow`/`round`; a production port can use **native `Math` only** to avoid an extra dependency.
+
+**`backdrop-filter` / Safari**
+
+- Keep the hero wrapper `position: relative` and clipping intentional: parent `overflow` interacts with blurred edges. Prefer `isolation: isolate` on the blur stack; verify in Safari that headline type stays sharp and the blur reads as a **vignette**, not muddy type.
+
+**Storybook**
+
+- When building these pieces, add colocated `*.stories.tsx` per [file naming / Storybook conventions](../techstack/06_file_naming_conventions.md). A composed “hero stack” story (media + veil + scrim + copy + gradual blur) is useful for design review before wiring a public route.
+
+**Engineering checklist**
+
+| Step | Action |
+|------|--------|
+| 1 | Hero `<section>`: `position: relative`, explicit `min-height`, inner content column as in branding §4. |
+| 2 | Optional atmospheric canvas + scrim + copy; gradual blur as the last visual layer inside the same section (preserve stacking order). |
+| 3 | Centralize hero copy fixtures for Storybook + page in app `constants/` per [naming conventions](../techstack/06_file_naming_conventions.md) (pure data, no inline blobs in stories). |
+| 4 | If porting React Bits `GradualBlur` verbatim, note the sample’s `mathjs` dependency — a slim port can use **`Math.pow` / rounding** only. |
+| 5 | Lint + typecheck; verify stories for each new UI primitive and any composed hero. |
+
+**Route note:** swapping this stack into the client home route is a separate product decision; a dev placeholder shell can remain until launch.
 
 ### Logo (branding §10)
 
