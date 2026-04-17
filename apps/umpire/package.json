@@ -27,6 +27,7 @@
 		"@rotra/config": "workspace:*",
 		"@storybook/addon-links": "^10.3.4",
 		"@storybook/nextjs": "^10.3.4",
+		"@storybook/react": "^10.3.4",
 		"@tailwindcss/postcss": "latest",
 		"@types/node": "^22.14.0",
 		"@types/react": "^19.1.0",

@@ -195,7 +195,7 @@ The Client App does **not** use TanStack Table — player-facing lists (leaderbo
 |------|---------|
 | **pnpm** | Package manager (workspaces) |
 | **Turborepo** | Monorepo build orchestration |
-| **Vercel** | Deployment (all three Next.js apps deployed as separate Vercel projects) |
+| **Vercel** | Deployment (each Next.js app — landing, client, admin, umpire — as its own Vercel project when applicable) |
 | **Supabase** | Hosted Postgres + Realtime + Storage (player photos) |
 | **Prettier** | Code formatting (shared config in `packages/config`) |
 | **Biome** | Linting (configured at workspace root via `biome.json`) |

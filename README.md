@@ -1,6 +1,6 @@
 # ROTRA
 
-The badminton session platform. Turborepo monorepo with three Next.js 15 apps and three shared packages.
+The badminton session platform. Turborepo monorepo with four Next.js 15 apps and shared packages (`@rotra/db`, `@rotra/config`). Public marketing / waitlist lives in **`apps/landing`** (port **3003**); the player app is **`apps/client`** (port **3000**).
 
 ---
 
@@ -43,6 +43,7 @@ pnpm dev
 
 | App | URL | Description |
 |-----|-----|-------------|
+| `apps/landing` | http://localhost:3003 | Public coming soon / waitlist |
 | `apps/client` | http://localhost:3000 | Player-facing app |
 | `apps/admin` | http://localhost:3001 | Internal dashboard |
 | `apps/umpire` | http://localhost:3002 | Live scoring PWA |
@@ -50,6 +51,8 @@ pnpm dev
 ### Single app
 
 ```bash
+pnpm dev:landing              # marketing site only (@rotra/landing)
+pnpm --filter @rotra/landing dev
 pnpm --filter @rotra/client dev
 pnpm --filter @rotra/admin  dev
 pnpm --filter @rotra/umpire dev
@@ -90,6 +93,7 @@ pnpm --filter @rotra/umpire storybook   # umpire stories  → http://localhost:6
 ```
 rotra/
 ├── apps/
+│   ├── landing/    # Public coming soon / waitlist (Next.js 15, static-first)
 │   ├── client/     # Player-facing app (Next.js 15, SSR-first, Facebook OAuth)
 │   ├── admin/      # Internal dashboard (Next.js 15, SSR-first, email + MFA)
 │   └── umpire/     # Live scoring PWA  (Next.js 15, CSR, one-time token auth)

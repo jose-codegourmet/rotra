@@ -14,9 +14,9 @@ The page exists to **capture waitlist signups first**, then **explain what ROTRA
 
 **Primary audience (same as product vision):**
 
-- Casual to semi-competitive players who attend club sessions  
-- Que masters who run rotation manually today  
-- Club owners who want structure and records without heavy admin  
+- Casual to semi-competitive players who attend club sessions
+- Que masters who run rotation manually today
+- Club owners who want structure and records without heavy admin
 
 Tone: **utility-first** — this is infrastructure for sessions, not a social network pitch.
 
@@ -43,8 +43,8 @@ The exported page shows: **fixed glass nav** (mark + wordmark + header CTA), **f
 
 ### Creative north star (from `DESIGN.md`, summarized)
 
-- **Kinetic precision** — editorial, “flight instrument” density for power users; status-first hierarchy.  
-- **Tonal surfaces** — depth from **background shifts** and soft value steps; Stitch’s **“No-Line”** rule discourages hard 1px section borders (differs from [branding](../branding.md) card borders — see compliance below).  
+- **Kinetic precision** — editorial, “flight instrument” density for power users; status-first hierarchy.
+- **Tonal surfaces** — depth from **background shifts** and soft value steps; Stitch’s **“No-Line”** rule discourages hard 1px section borders (differs from [branding](../branding.md) card borders — see compliance below).
 - **Accent as signal** — neon green for action / life; optional **inner glow / gradient** on primary CTAs in the Stitch system (differs from branding’s **flat** accent fill — see compliance).
 
 ### Stitch regions → this document
@@ -75,9 +75,9 @@ The exported page shows: **fixed glass nav** (mark + wordmark + header CTA), **f
 
 ### Brand identity (branding §1)
 
-- **Name in UI:** ROTRA (all caps).  
-- **Tagline:** Run the game.  
-- **Positioning line:** The operating system for badminton sessions — queue management, skill tracking, and match flow in one place.  
+- **Name in UI:** ROTRA (all caps).
+- **Tagline:** Run the game.
+- **Positioning line:** The operating system for badminton sessions — queue management, skill tracking, and match flow in one place.
 - **Personality:** Precise · Fast · Neutral · Reliable — calm, confident, no gimmicky marketing noise.
 
 ### Color and surfaces (branding §2)
@@ -94,28 +94,28 @@ The exported page shows: **fixed glass nav** (mark + wordmark + header CTA), **f
 
 ### Typography (branding §3)
 
-- **Font:** Satoshi, fallback Inter / system-ui / sans-serif.  
-- **Mapping:** Hero headline → `text-display` (28px / 700). Section titles → `text-title` or `text-heading`. Body → `text-body`. Microcopy / legal → `text-small`.  
+- **Font:** Satoshi, fallback Inter / system-ui / sans-serif.
+- **Mapping:** Hero headline → `text-display` (28px / 700). Section titles → `text-title` or `text-heading`. Body → `text-body`. Microcopy / legal → `text-small`.
 - **All caps:** Only on `text-label` and `text-micro` (e.g. button label **JOIN THE WAITLIST**, tiny “COMING SOON” badge) — **not** on long headlines.
 
 ### Layout (branding §4)
 
-- **Spacing:** 4px base; generous **vertical rhythm** between sections (`space-8` / `space-10`).  
-- **Horizontal padding:** 16px mobile, 24px tablet.  
+- **Spacing:** 4px base; generous **vertical rhythm** between sections (`space-8` / `space-10`).
+- **Horizontal padding:** 16px mobile, 24px tablet.
 - **Max content width:** **480px** centered — matches app density; waitlist stays the visual anchor.
 
 ### Elevation (branding §6)
 
-- Waitlist panel + overview cards: **`shadow-card`**.  
+- Waitlist panel + overview cards: **`shadow-card`**.
 - Primary submit control: **`shadow-accent`**.
 
 ### Components (branding §7) — implement literally
 
 **Primary button — “Join the waitlist”**
 
-- Background `color-accent`; text `#0B0B0C`; typography `text-label`, **uppercase**.  
-- Height **48px**; horizontal padding **24px**; border radius **`radius-md` (10px)**.  
-- Box shadow: **`shadow-accent`**.  
+- Background `color-accent`; text `#0B0B0C`; typography `text-label`, **uppercase**.
+- Height **48px**; horizontal padding **24px**; border radius **`radius-md` (10px)**.
+- Box shadow: **`shadow-accent`**.
 - Pressed: background **`color-accent-dim`**, scale **0.97**.
 
 **Secondary actions** (e.g. scroll to story, external social)
@@ -124,17 +124,17 @@ The exported page shows: **fixed glass nav** (mark + wordmark + header CTA), **f
 
 **Inputs**
 
-- Height **48px**; `color-bg-elevated`; **1.5px** solid `color-border`; `radius-md`; inner padding 0 `space-4`.  
+- Height **48px**; `color-bg-elevated`; **1.5px** solid `color-border`; `radius-md`; inner padding 0 `space-4`.
 - Placeholder `color-text-secondary`; focus border **`color-accent`**; validation errors → **`color-error`**.
 
 **Overview “pillars”**
 
-- Use **card** spec: `color-bg-surface`, **1px** `color-border`, **`radius-lg`**, padding **`space-6`**, `shadow-card`.  
+- Use **card** spec: `color-bg-surface`, **1px** `color-border`, **`radius-lg`**, padding **`space-6`**, `shadow-card`.
 - Optionally highlight **one** pillar with **active card** cues (e.g. **1px** border `color-accent-dim` and/or **3px** left stripe `color-accent`) — use once so the page does not look noisy.
 
 **Success after submit**
 
-- Prefer **toast** spec: background `color-bg-overlay`, `radius-lg`, padding 12px 16px, max width 320px, slide down + fade **200ms** ease-out (branding §7).  
+- Prefer **toast** spec: background `color-bg-overlay`, `radius-lg`, padding 12px 16px, max width 320px, slide down + fade **200ms** ease-out (branding §7).
 - Example success copy: **“You’re in.”** or **“Thanks — we’ll email you.”** — short, on-brand, not a queue notification parody.
 
 ### Iconography (branding §8)
@@ -152,10 +152,10 @@ This section supplements §3 “Hero” (photo + scrim) with an optional **depth
 
 **Layer order (back → front)**
 
-1. **Hero media** — static `next/image` (or illustration) filling the hero; no generated logos in-image (branding §10).  
-2. **Optional WebGL “dark veil”** (e.g. a canvas-based atmospheric layer such as [`DarkVeil`](../../apps/client/src/components/ui/dark-veil/DarkVeil.tsx) if adopted) — full-bleed, `position: absolute; inset: 0`, **below** the scrim. Use restrained parameters (`noiseIntensity`, `scanlineIntensity`, `warpAmount` at or near **0**) so the read is **tonal depth**, not retro scanlines.  
-3. **Gradient scrim** — use Tailwind/theme tokens (`bg-base`, `bg-surface`, opacity steps); avoid ad-hoc hex in JSX ([coding design system](../techstack/05_coding_design_system.md) §4.3).  
-4. **Typography + hero CTAs** — badge, headline, subcopy; relative `z-index` above the veil.  
+1. **Hero media** — static `next/image` (or illustration) filling the hero; no generated logos in-image (branding §10).
+2. **Optional WebGL “dark veil”** (e.g. a canvas-based atmospheric layer such as [`DarkVeil`](../../apps/landing/src/components/ui/dark-veil/DarkVeil.tsx) if adopted) — full-bleed, `position: absolute; inset: 0`, **below** the scrim. Use restrained parameters (`noiseIntensity`, `scanlineIntensity`, `warpAmount` at or near **0**) so the read is **tonal depth**, not retro scanlines.
+3. **Gradient scrim** — use Tailwind/theme tokens (`bg-base`, `bg-surface`, opacity steps); avoid ad-hoc hex in JSX ([coding design system](../techstack/05_coding_design_system.md) §4.3).
+4. **Typography + hero CTAs** — badge, headline, subcopy; relative `z-index` above the veil.
 5. **Gradual bottom blur** — implement via [React Bits — GradualBlur](https://reactbits.dev/animations/gradual-blur) (or equivalent stacked `backdrop-filter` masks). Typical props: `target="parent"`, `position="bottom"` on the **hero `<section>`** so the bottom edge softly blurs into the next band (e.g. waitlist). Optional second instance: `position="top"` for a fixed glass nav over scrolling content. Suggested defaults: `curve="bezier"`, `exponential={true}`, `divCount={5}`, `strength={2}`, `height="6rem"` (tune per art direction). The upstream sample uses `mathjs` for `pow`/`round`; a production port can use **native `Math` only** to avoid an extra dependency.
 
 **`backdrop-filter` / Safari**
@@ -180,8 +180,8 @@ This section supplements §3 “Hero” (photo + scrim) with an optional **depth
 
 ### Logo (branding §10)
 
-- Wordmark **ROTRA**: Satoshi **700**, tracking **-1px to -2px**; on dark backgrounds use **`color-text-primary`**.  
-- Respect **minimum wordmark size** and clear space in the header/footer.  
+- Wordmark **ROTRA**: Satoshi **700**, tracking **-1px to -2px**; on dark backgrounds use **`color-text-primary`**.
+- Respect **minimum wordmark size** and clear space in the header/footer.
 - **Do not** rely on AI-generated hero art for the official logo — ship the real wordmark in layout.
 
 ### One primary green CTA (branding §11, adapted)
@@ -190,13 +190,13 @@ Branding: **one primary action per screen** (single green filled button).
 
 **Recommended pattern for this long page:**
 
-- **Single waitlist block** with id **`waitlist`** (e.g. `<section id="waitlist">`) containing the **only** filled **`color-accent`** submit for the whole scroll experience **OR** ensure **at most one** filled accent primary is visible in the viewport at once (harder to guarantee).  
+- **Single waitlist block** with id **`waitlist`** (e.g. `<section id="waitlist">`) containing the **only** filled **`color-accent`** submit for the whole scroll experience **OR** ensure **at most one** filled accent primary is visible in the viewport at once (harder to guarantee).
 - **Secondary CTA zone** (after the story): **outline** button **“Join the waitlist”** that **scrolls to `#waitlist`** and focuses the email field — **no second green filled button**. This avoids two competing primaries and keeps implementation honest to the design system.
 
 ### Accessibility (branding §12)
 
-- Contrast: WCAG **AA** for body text on `bg-base` / `bg-surface`; large text **3:1** where applicable.  
-- Touch targets **≥ 44×44px**.  
+- Contrast: WCAG **AA** for body text on `bg-base` / `bg-surface`; large text **3:1** where applicable.
+- Touch targets **≥ 44×44px**.
 - Focus: **2px** solid `color-accent` outline, **2px** offset.
 
 ---
@@ -240,7 +240,7 @@ flowchart TB
 
 **Headline options** (pick one for ship):
 
-1. **The badminton session platform**  
+1. **The badminton session platform**
 2. **Queue. Play. Track.** (Stitch default — accent or gradient on **Track.** only if desired)
 
 **Subcopy (product-honest — replaces “elite competitive / biometric” language from the HTML prototype):**
@@ -265,12 +265,12 @@ flowchart TB
 
 **Architecture band eyebrow / title (Stitch-style labels, editable):**
 
-- Eyebrow: **Core architecture** (or **What ROTRA does**)  
+- Eyebrow: **Core architecture** (or **What ROTRA does**)
 - Title: **High-efficiency session stack** (or keep **High-efficiency protocol** if brand approves the tone)
 
 **Optional community band:**
 
-- Eyebrow: **Stay in the loop** (friendlier than “Protocol access” unless you want that voice)  
+- Eyebrow: **Stay in the loop** (friendlier than “Protocol access” unless you want that voice)
 - Title: **Join the waitlist community** — short paragraph: updates on launch, clubs, and how sessions work in ROTRA.
 
 **Six vision-accurate modules** (replace Stitch `code.html` bodies — aligned to [product vision](../business_logic/client_app/01_product_vision.md); scoring wording informed by [umpire scoring interface](../business_logic/umpire_app/03_scoring_interface.md), without claiming unsupported “AI validation”):
@@ -491,9 +491,9 @@ Use **`21:9`** below as the closest standard ratio to a thin strip; **crop cente
 
 ## 5. Conversion and implementation notes
 
-- **Above the fold:** On common phone heights, the **email field + primary button** should be visible without scrolling, or within one short scroll — hero must stay **compact**.  
-- **Submit:** Disable primary and show loading state while the request is in flight; re-enable on failure.  
-- **Errors:** Inline message under the field and/or `color-error` border; keep copy short (“Check your email address.”).  
+- **Above the fold:** On common phone heights, the **email field + primary button** should be visible without scrolling, or within one short scroll — hero must stay **compact**.
+- **Submit:** Disable primary and show loading state while the request is in flight; re-enable on failure.
+- **Errors:** Inline message under the field and/or `color-error` border; keep copy short (“Check your email address.”).
 - **Double-submit:** Guard with disabled button or request idempotency on the backend (out of scope for this doc).
 
 All contrast, focus, and touch-target rules remain as in [branding §12](../branding.md).
@@ -502,8 +502,8 @@ All contrast, focus, and touch-target rules remain as in [branding §12](../bran
 
 ## 6. Related documents
 
-- [Branding / design system](../branding.md)  
-- [Product vision](../business_logic/client_app/01_product_vision.md)  
+- [Branding / design system](../branding.md)
+- [Product vision](../business_logic/client_app/01_product_vision.md)
 
 ---
 
@@ -514,8 +514,8 @@ This section records the **intended technical stack** and **performance posture*
 ### Stack
 
 - **Next.js** and **React** for the landing route(s) and any small interactive pieces (e.g. waitlist form).
-- **Tailwind CSS** using the **same configuration pattern as the client app**: extend the shared preset from `@rotra/config/tailwind`, as in [`apps/client/tailwind.config.ts`](../../apps/client/tailwind.config.ts) (`import baseConfig from "@rotra/config/tailwind"`, spread `...baseConfig`, and set `content` so Tailwind sees every file that uses utility classes). If the route lives under `apps/client`, keep one `tailwind.config.ts` and only widen `content` globs when new folders hold landing components.
-- Prefer reusing shared UI from **`@rotra/ui`** (the workspace package transpiled alongside `@rotra/db` in each app’s `next.config`) when primitives already match the design system, so styling and behavior stay consistent with the rest of the app.
+- **Tailwind CSS** using the **same configuration pattern** as other Next apps: extend the shared preset from `@rotra/config/tailwind`, as in [`apps/landing/tailwind.config.ts`](../../apps/landing/tailwind.config.ts) (`import baseConfig from "@rotra/config/tailwind"`, spread `...baseConfig`, and set `content` so Tailwind sees every file that uses utility classes). Widen `content` globs only when new folders hold landing components.
+- Prefer reusing shared UI from **`@rotra/ui`** (when present in the workspace and wired in the app’s `next.config`) when primitives already match the design system, so styling and behavior stay consistent with the rest of the product.
 
 ### Static-first and cost
 

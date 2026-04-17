@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" role="img" aria-label="">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#0B0B0C"/>
+      <stop offset="0.55" stop-color="#121214"/>
+      <stop offset="1" stop-color="#1A1A1D"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="55%" cy="62%" r="45%">
+      <stop offset="0%" stop-color="#00FF88" stop-opacity="0.14"/>
+      <stop offset="55%" stop-color="#00FF88" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#00FF88" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="floor" x1="960" y1="420" x2="960" y2="1020" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B0B0C" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#151518" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#0B0B0C"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <rect width="1920" height="1080" fill="url(#glow)"/>
+  <g opacity="0.22" stroke="#2A2A2E" stroke-width="1.25">
+    <line x1="0" y1="360" x2="1920" y2="360"/>
+    <line x1="0" y1="540" x2="1920" y2="540"/>
+    <line x1="0" y1="720" x2="1920" y2="720"/>
+    <line x1="480" y1="280" x2="480" y2="920"/>
+    <line x1="960" y1="280" x2="960" y2="920"/>
+    <line x1="1440" y1="280" x2="1440" y2="920"/>
+  </g>
+  <ellipse cx="1020" cy="620" rx="280" ry="120" stroke="#00FF88" stroke-opacity="0.12" stroke-width="2" fill="none"/>
+  <circle cx="1180" cy="560" r="6" fill="#00FF88" fill-opacity="0.55"/>
+  <rect width="1920" height="1080" fill="url(#floor)"/>
+</svg>
