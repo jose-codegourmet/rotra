@@ -1,20 +1,24 @@
-.PHONY: dev dev-client dev-admin dev-umpire build lint check-fix type-check install format storybook storybook-client storybook-admin storybook-umpire build-storybook
+.PHONY: dev dev-landing dev-client dev-admin dev-umpire build lint check-fix type-check install format storybook storybook-client storybook-admin storybook-umpire build-storybook
 
 # Load nvm and run all apps in parallel via Turborepo
 dev:
 	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm dev
 
+# Run dev server for the marketing / landing app only (port 3003)
+dev-landing:
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter @rotra/landing dev
+
 # Run dev server for the client app only
 dev-client:
-	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter client dev
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter @rotra/client dev
 
 # Run dev server for the admin app only
 dev-admin:
-	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter admin dev
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter @rotra/admin dev
 
 # Run dev server for the umpire app only
 dev-umpire:
-	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter umpire dev
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter @rotra/umpire dev
 
 # Install all workspace dependencies
 install:
@@ -30,7 +34,7 @@ lint:
 
 # Auto-fix safe lint/format issues across all apps via Biome
 check-fix:
-	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter client check:fix && pnpm --filter admin check:fix && pnpm --filter umpire check:fix
+	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter @rotra/landing check:fix && pnpm --filter @rotra/client check:fix && pnpm --filter @rotra/admin check:fix && pnpm --filter @rotra/umpire check:fix
 
 # Format and auto-fix all files in apps/ via Biome
 format:
