@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import { comingSoonMeta } from "@/app/constants/coming-soon";
+import { Button } from "@/components/ui/button/Button";
 import { cn } from "@/lib/utils";
 import {
 	submitWaitlistEmail,
@@ -59,13 +60,13 @@ export function WaitlistForm({
 					aria-describedby={showError ? "waitlist-error" : "waitlist-helper"}
 					className="h-12 min-h-12 flex-1 rounded-md border-0 bg-bg-elevated/90 px-4 text-body text-text-primary placeholder:text-text-secondary outline-none focus-visible:ring-2 focus-visible:ring-accent"
 				/>
-				<button
+				<Button
 					type="submit"
 					disabled={isPending}
-					className="inline-flex h-12 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-md bg-accent px-6 text-label font-medium uppercase tracking-wide text-bg-base shadow-accent transition-colors hover:bg-accent-dim disabled:pointer-events-none disabled:opacity-50"
+					className="h-12 min-h-[44px] min-w-[44px] shrink-0 px-6 text-label uppercase tracking-wide shadow-accent"
 				>
 					{isPending ? "Sending..." : comingSoonMeta.waitlistSubmit}
-				</button>
+				</Button>
 			</div>
 			{showError ? (
 				<p id="waitlist-error" className="text-small text-error" role="alert">

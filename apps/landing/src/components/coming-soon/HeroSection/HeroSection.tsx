@@ -5,7 +5,7 @@ import { HeroVeil } from "@/components/coming-soon/HeroVeil/HeroVeil";
 
 export function HeroSection() {
 	return (
-		<div className="relative min-h-[min(100dvh,920px)] overflow-hidden">
+		<div className="relative min-h-[min(100dvh,920px)] overflow-hidden flex items-center justify-center">
 			<div className="absolute inset-0 z-0">
 				<Image
 					src={heroImage.src}

@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-
+import { Button } from "@/components/ui/button/Button";
 import { cn } from "@/lib/utils";
 
 type GoToWaitlistProps = {
@@ -11,9 +11,10 @@ type GoToWaitlistProps = {
 
 export function GoToWaitlist({ children, className }: GoToWaitlistProps) {
 	return (
-		<button
-			type="button"
+		<Button
+			variant="default"
 			className={cn("min-h-[44px] min-w-[44px]", className)}
+			size="lg"
 			onClick={() => {
 				document.getElementById("waitlist")?.scrollIntoView({
 					behavior: "smooth",
@@ -25,6 +26,6 @@ export function GoToWaitlist({ children, className }: GoToWaitlistProps) {
 			}}
 		>
 			{children}
-		</button>
+		</Button>
 	);
 }
