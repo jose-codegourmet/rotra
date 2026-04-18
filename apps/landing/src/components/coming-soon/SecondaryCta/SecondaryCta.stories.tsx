@@ -6,7 +6,7 @@ const meta = {
 	title: "ComingSoon/SecondaryCta",
 	component: SecondaryCta,
 	parameters: {
-		layout: "centered",
+		layout: "fullscreen",
 	},
 	tags: ["autodocs"],
 } satisfies Meta<typeof SecondaryCta>;

@@ -16,3 +16,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+/** Bottom CTA strip + full-width logo — verify below md breakpoint */
+export const MobileViewport: Story = {
+	parameters: {
+		viewport: {
+			defaultViewport: "mobile1",
+		},
+	},
+};

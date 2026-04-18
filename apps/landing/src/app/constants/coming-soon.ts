@@ -80,6 +80,12 @@ export const communitySection = {
 	],
 } as const;
 
+export const secondaryCtaSection = {
+	eyebrow: "Before you go",
+	title: "Get notified when ROTRA opens.",
+	body: comingSoonMeta.waitlistHelper,
+} as const;
+
 export const socialPlaceholders = [
 	{ name: "Facebook", href: "#" },
 	{ name: "Instagram", href: "#" },
