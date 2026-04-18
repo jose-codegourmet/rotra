@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { comingSoonMeta } from "@/app/constants/coming-soon";
 import { GoToWaitlist } from "@/components/coming-soon/GoToWaitlist/GoToWaitlist";
-import { Button } from "@/components/ui/button/Button";
 import { Logo } from "@/components/ui/logo/Logo";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +14,7 @@ export function LandingNav() {
 					className="inline-flex items-center h-full py-2"
 					aria-label="ROTRA home"
 				>
-					<Logo variant="dark" className="h-full w-[200px]" />
+					<Logo variant="dark" className="h-[50px] w-[100px] md:w-[250px]" />
 				</Link>
 				<GoToWaitlist
 					className={cn(

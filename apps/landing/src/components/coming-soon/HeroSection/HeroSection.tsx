@@ -2,10 +2,25 @@ import Image from "next/image";
 
 import { comingSoonMeta, heroImage } from "@/app/constants/coming-soon";
 import { HeroVeil } from "@/components/coming-soon/HeroVeil/HeroVeil";
+import {
+	WaitlistForm,
+	type WaitlistFormAction,
+} from "@/components/coming-soon/WaitlistForm/WaitlistForm";
 
-export function HeroSection() {
+type HeroSectionProps = {
+	waitlistAction?: WaitlistFormAction;
+};
+
+export function HeroSection({ waitlistAction }: HeroSectionProps) {
 	return (
-		<div className="relative min-h-[min(100dvh,920px)] overflow-hidden flex items-center justify-center">
+		<section
+			id="waitlist"
+			aria-labelledby="waitlist-heading"
+			className="relative flex min-h-[min(100dvh,920px)] items-center justify-center overflow-hidden"
+		>
+			<h2 id="waitlist-heading" className="sr-only">
+				Join the waitlist
+			</h2>
 			<div className="absolute inset-0 z-0">
 				<Image
 					src={heroImage.src}
@@ -38,7 +53,15 @@ export function HeroSection() {
 				<p className="mt-3 text-small font-medium text-text-primary">
 					{comingSoonMeta.tagline}
 				</p>
+				<div className="mt-10 flex w-full flex-col items-center">
+					<WaitlistForm
+						{...(waitlistAction ? { action: waitlistAction } : {})}
+					/>
+					<p className="mt-4 max-w-xl text-center text-micro uppercase tracking-widest text-text-secondary">
+						{comingSoonMeta.waitlistFinePrint}
+					</p>
+				</div>
 			</div>
-		</div>
+		</section>
 	);
 }

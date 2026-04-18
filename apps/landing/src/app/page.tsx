@@ -4,7 +4,6 @@ import { HeroSection } from "@/components/coming-soon/HeroSection/HeroSection";
 import { LandingFooter } from "@/components/coming-soon/LandingFooter/LandingFooter";
 import { LandingNav } from "@/components/coming-soon/LandingNav/LandingNav";
 import { SecondaryCta } from "@/components/coming-soon/SecondaryCta/SecondaryCta";
-import { WaitlistSection } from "@/components/coming-soon/WaitlistSection/WaitlistSection";
 
 export default function LandingPage() {
 	return (
@@ -12,7 +11,6 @@ export default function LandingPage() {
 			<LandingNav />
 			<main>
 				<HeroSection />
-				<WaitlistSection />
 				<ArchitectureGrid />
 				<CommunityBand />
 				<SecondaryCta />
