@@ -5,6 +5,7 @@ import {
 	communitySection,
 	socialPlaceholders,
 } from "@/app/constants/coming-soon";
+import { BlurRevealText } from "@/components/coming-soon/BlurRevealText/BlurRevealText";
 import { cn } from "@/lib/utils";
 
 const socialIcons = [AtSign, MessageCircle, MessagesSquare] as const;
@@ -17,16 +18,28 @@ export function CommunityBand() {
 		>
 			<div className="mx-auto max-w-[720px] text-center">
 				<p className="text-label uppercase tracking-widest text-accent">
-					{communitySection.eyebrow}
+					<BlurRevealText
+						display="inline"
+						className="text-label uppercase tracking-widest"
+					>
+						{communitySection.eyebrow}
+					</BlurRevealText>
 				</p>
 				<h2
 					id="community-title"
 					className="mt-3 text-title text-2xl font-semibold tracking-tight text-text-primary md:text-3xl"
 				>
-					{communitySection.title}
+					<BlurRevealText display="inline" className="text-title font-semibold">
+						{communitySection.title}
+					</BlurRevealText>
 				</h2>
 				<p className="mt-4 text-body text-text-secondary">
-					{communitySection.body}
+					<BlurRevealText
+						display="block"
+						className="text-body text-text-secondary"
+					>
+						{communitySection.body}
+					</BlurRevealText>
 				</p>
 				<div className="mt-8 flex justify-center gap-4">
 					{socialPlaceholders.map((s, i) => {

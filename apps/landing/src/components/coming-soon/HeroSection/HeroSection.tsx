@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { comingSoonMeta, heroImage } from "@/app/constants/coming-soon";
+import { BlurRevealText } from "@/components/coming-soon/BlurRevealText/BlurRevealText";
 import { HeroVeil } from "@/components/coming-soon/HeroVeil/HeroVeil";
 import {
 	WaitlistForm,
@@ -40,18 +41,28 @@ export function HeroSection({ waitlistAction }: HeroSectionProps) {
 				<div className="mb-6 inline-flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-full border-[1.5px] border-border-strong/40 bg-bg-surface/50 px-3 py-1">
 					<span className="size-2 rounded-full bg-accent" aria-hidden />
 					<span className="text-micro uppercase tracking-widest text-accent">
-						{comingSoonMeta.badge}
+						<BlurRevealText display="inline">
+							{comingSoonMeta.badge}
+						</BlurRevealText>
 					</span>
 				</div>
 				<h1 className="max-w-4xl text-balance font-bold text-4xl leading-[1.1] tracking-tight text-text-primary md:text-6xl lg:text-7xl">
-					<span>{comingSoonMeta.headlineLead}</span>{" "}
-					<span className="text-accent">{comingSoonMeta.headlineAccent}</span>
+					<BlurRevealText
+						segments={[
+							{ text: comingSoonMeta.headlineLead },
+							{ text: comingSoonMeta.headlineAccent, className: "text-accent" },
+						]}
+					/>
 				</h1>
 				<p className="mt-6 max-w-xl text-body text-text-secondary md:text-lg">
-					{comingSoonMeta.subcopy}
+					<BlurRevealText display="block" className="text-body md:text-lg">
+						{comingSoonMeta.subcopy}
+					</BlurRevealText>
 				</p>
 				<p className="mt-3 text-small font-medium text-text-primary">
-					{comingSoonMeta.tagline}
+					<BlurRevealText display="inline" className="text-small font-medium">
+						{comingSoonMeta.tagline}
+					</BlurRevealText>
 				</p>
 				<div className="mt-10 flex w-full flex-col items-center">
 					<WaitlistForm
