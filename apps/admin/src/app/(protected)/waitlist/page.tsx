@@ -3,7 +3,7 @@ import {
 	HydrationBoundary,
 	QueryClient,
 } from "@tanstack/react-query";
-import { WaitlistView } from "@/components/modules/waitlist/WaitlistView";
+import { WaitlistView } from "@/components/modules/waitlist/WaitlistView/WaitlistView";
 import {
 	loadWaitlistPage,
 	loadWaitlistStats,

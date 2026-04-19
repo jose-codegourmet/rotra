@@ -1,22 +1,17 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import {
 	createColumnHelper,
 	flexRender,
 	getCoreRowModel,
+	type OnChangeFn,
 	type PaginationState,
 	useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
 import { Button } from "@/components/ui/button/Button";
 import { cn } from "@/lib/utils";
-import {
-	WAITLIST_INITIAL_PAGE_INDEX,
-	WAITLIST_INITIAL_PAGE_SIZE,
-	type WaitlistApiResponse,
-	waitlistQueryKeys,
-} from "@/lib/waitlist-admin";
+import type { WaitlistApiResponse } from "@/lib/waitlist-admin";
 
 type WaitlistRow = WaitlistApiResponse["rows"][number];
 
@@ -50,38 +45,27 @@ function buildColumns() {
 	];
 }
 
-async function fetchWaitlistPage(
-	pageIndex: number,
-	pageSize: number,
-): Promise<WaitlistApiResponse> {
-	const page = pageIndex + 1;
-	const params = new URLSearchParams({
-		page: String(page),
-		pageSize: String(pageSize),
-	});
-	const res = await fetch(`/api/waitlist?${params.toString()}`);
-	if (!res.ok) {
-		const err = (await res.json().catch(() => null)) as {
-			error?: string;
-		} | null;
-		throw new Error(err?.error ?? "Failed to load waitlist.");
-	}
-	return res.json() as Promise<WaitlistApiResponse>;
-}
+export type AdminWaitlistTableProps = {
+	rows: WaitlistRow[];
+	total: number;
+	pagination: PaginationState;
+	onPaginationChange: OnChangeFn<PaginationState>;
+	isLoading: boolean;
+	isFetching: boolean;
+	isError: boolean;
+	error?: Error | null;
+};
 
-export function AdminWaitlistTable() {
-	const [pagination, setPagination] = React.useState<PaginationState>({
-		pageIndex: WAITLIST_INITIAL_PAGE_INDEX,
-		pageSize: WAITLIST_INITIAL_PAGE_SIZE,
-	});
-
-	const query = useQuery({
-		queryKey: waitlistQueryKeys.page(pagination.pageIndex, pagination.pageSize),
-		queryFn: () => fetchWaitlistPage(pagination.pageIndex, pagination.pageSize),
-	});
-
-	const rows = query.data?.rows ?? [];
-	const total = query.data?.total ?? 0;
+export function AdminWaitlistTable({
+	rows,
+	total,
+	pagination,
+	onPaginationChange,
+	isLoading,
+	isFetching,
+	isError,
+	error = null,
+}: AdminWaitlistTableProps) {
 	const pageCount = Math.max(1, Math.ceil(total / pagination.pageSize));
 
 	const columns = React.useMemo(() => buildColumns(), []);
@@ -91,18 +75,16 @@ export function AdminWaitlistTable() {
 		columns,
 		pageCount,
 		state: { pagination },
-		onPaginationChange: setPagination,
+		onPaginationChange,
 		manualPagination: true,
 		getCoreRowModel: getCoreRowModel(),
 	});
 
 	return (
 		<div className="space-y-4">
-			{query.isError ? (
+			{isError ? (
 				<p className="text-body text-error" role="alert">
-					{query.error instanceof Error
-						? query.error.message
-						: "Something went wrong."}
+					{error instanceof Error ? error.message : "Something went wrong."}
 				</p>
 			) : null}
 
@@ -125,7 +107,7 @@ export function AdminWaitlistTable() {
 						))}
 					</thead>
 					<tbody>
-						{query.isLoading ? (
+						{isLoading ? (
 							<tr>
 								<td
 									colSpan={columns.length}
@@ -166,7 +148,7 @@ export function AdminWaitlistTable() {
 
 			<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
 				<p className="text-small text-text-secondary">
-					{query.isSuccess ? (
+					{!isLoading && !isError ? (
 						<>
 							Showing{" "}
 							<span className="text-text-primary">
@@ -191,13 +173,13 @@ export function AdminWaitlistTable() {
 						<span className="text-label uppercase">Rows</span>
 						<select
 							className={cn(
-								"h-10 rounded-md border border-border bg-bg-elevated px-2 text-body text-text-primary",
+								"h-12 min-h-[44px] rounded-md border border-border bg-bg-elevated px-2 text-body text-text-primary",
 								"focus:outline-none focus:ring-1 focus:ring-accent",
 							)}
 							value={pagination.pageSize}
 							onChange={(e) => {
 								const next = Number.parseInt(e.target.value, 10);
-								setPagination({ pageIndex: 0, pageSize: next });
+								onPaginationChange({ pageIndex: 0, pageSize: next });
 							}}
 						>
 							{[10, 20, 50].map((n) => (
@@ -211,9 +193,10 @@ export function AdminWaitlistTable() {
 						type="button"
 						variant="outline"
 						size="sm"
-						disabled={pagination.pageIndex <= 0 || query.isFetching}
+						className="min-h-[44px] min-w-[44px] shrink-0"
+						disabled={pagination.pageIndex <= 0 || isFetching}
 						onClick={() =>
-							setPagination((p) => ({
+							onPaginationChange((p) => ({
 								...p,
 								pageIndex: Math.max(0, p.pageIndex - 1),
 							}))
@@ -228,13 +211,12 @@ export function AdminWaitlistTable() {
 						type="button"
 						variant="outline"
 						size="sm"
+						className="min-h-[44px] min-w-[44px] shrink-0"
 						disabled={
-							pagination.pageIndex >= pageCount - 1 ||
-							query.isFetching ||
-							total === 0
+							pagination.pageIndex >= pageCount - 1 || isFetching || total === 0
 						}
 						onClick={() =>
-							setPagination((p) => ({
+							onPaginationChange((p) => ({
 								...p,
 								pageIndex: Math.min(pageCount - 1, p.pageIndex + 1),
 							}))

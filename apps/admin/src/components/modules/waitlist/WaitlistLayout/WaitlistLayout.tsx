@@ -1,20 +1,24 @@
-"use client";
+import type { ReactNode } from "react";
 
 import { PageSection } from "@/components/admin-ui/PageSection/PageSection";
 
-import { AdminWaitlistTable } from "./AdminWaitlistTable";
-import { WaitlistStats } from "./WaitlistStats";
+export type WaitlistLayoutProps = {
+	stats: ReactNode;
+	table: ReactNode;
+};
 
-export function WaitlistView() {
+export function WaitlistLayout({ stats, table }: WaitlistLayoutProps) {
 	return (
 		<div className="mx-auto max-w-6xl space-y-8">
-			<WaitlistStats />
+			{stats}
 			<PageSection
 				title="Landing waitlist"
 				description="Email addresses submitted from the public coming-soon page. Protect this route with admin auth in production."
 			>
-				<AdminWaitlistTable />
+				{table}
 			</PageSection>
 		</div>
 	);
 }
+
+WaitlistLayout.displayName = "WaitlistLayout";
