@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
 		"/*": prismaTracingGlobs,
 	},
 	serverExternalPackages: ["@prisma/client"],
-	transpilePackages: ["@rotra/ui", "@rotra/db"],
+	transpilePackages: ["@rotra/ui", "@rotra/db", "@rotra/legal-content"],
 	images: {
 		remotePatterns: [{ hostname: "i.pravatar.cc" }],
 	},

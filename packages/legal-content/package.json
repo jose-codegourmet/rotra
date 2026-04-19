@@ -1,0 +1,20 @@
+{
+	"name": "@rotra/legal-content",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"type-check": "tsc --noEmit"
+	},
+	"peerDependencies": {
+		"react": "^19.0.0"
+	},
+	"devDependencies": {
+		"@rotra/config": "workspace:*",
+		"@types/react": "^19.1.0",
+		"typescript": "^5.8.3"
+	}
+}

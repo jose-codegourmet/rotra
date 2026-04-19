@@ -97,8 +97,8 @@ export const socialPlaceholders = [
 export const footerContent = {
 	copyright: "ROTRA. All rights reserved.",
 	links: [
-		{ label: "Privacy", href: "#privacy" },
-		{ label: "Terms", href: "#terms" },
+		{ label: "Privacy", href: "/privacy" },
+		{ label: "Terms", href: "/terms" },
 		{ label: "Changelog", href: "#footer-docs" },
 		{ label: "Join the waitlist", href: "#waitlist" },
 		{ label: "Support", href: "#footer-support" },

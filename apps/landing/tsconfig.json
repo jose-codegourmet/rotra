@@ -2,7 +2,10 @@
 	"extends": "@rotra/config/tsconfig",
 	"compilerOptions": {
 		"plugins": [{ "name": "next" }],
-		"paths": { "@/*": ["./src/*"] },
+		"paths": {
+			"@/*": ["./src/*"],
+			"@rotra/legal-content": ["../../packages/legal-content/src/index.ts"]
+		},
 		"allowJs": true,
 		"noEmit": true
 	},

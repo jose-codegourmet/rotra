@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
 		"/*": prismaTracingGlobs,
 	},
 	serverExternalPackages: ["@prisma/client"],
+	transpilePackages: ["@rotra/legal-content"],
 };
 
 export default nextConfig;
