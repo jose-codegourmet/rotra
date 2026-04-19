@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "sonner";
 
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
@@ -41,7 +42,7 @@ export default function RootLayout({
 			suppressHydrationWarning
 		>
 			<body className="bg-bg-base text-text-primary antialiased font-sans">
-				{children}
+				<QueryProvider>{children}</QueryProvider>
 				<Toaster position="top-center" duration={4000} />
 			</body>
 		</html>

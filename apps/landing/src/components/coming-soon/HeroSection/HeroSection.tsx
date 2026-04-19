@@ -3,16 +3,9 @@ import Image from "next/image";
 import { comingSoonMeta, heroImage } from "@/app/constants/coming-soon";
 import { BlurRevealText } from "@/components/coming-soon/BlurRevealText/BlurRevealText";
 import { HeroVeil } from "@/components/coming-soon/HeroVeil/HeroVeil";
-import {
-	WaitlistForm,
-	type WaitlistFormAction,
-} from "@/components/coming-soon/WaitlistForm/WaitlistForm";
+import { WaitlistForm } from "@/components/coming-soon/WaitlistForm/WaitlistForm";
 
-type HeroSectionProps = {
-	waitlistAction?: WaitlistFormAction;
-};
-
-export function HeroSection({ waitlistAction }: HeroSectionProps) {
+export function HeroSection() {
 	return (
 		<section
 			id="waitlist"
@@ -65,9 +58,7 @@ export function HeroSection({ waitlistAction }: HeroSectionProps) {
 					</BlurRevealText>
 				</p>
 				<div className="mt-10 flex w-full flex-col items-center">
-					<WaitlistForm
-						{...(waitlistAction ? { action: waitlistAction } : {})}
-					/>
+					<WaitlistForm />
 					<p className="mt-4 max-w-xl text-center text-micro uppercase tracking-widest text-text-secondary">
 						{comingSoonMeta.waitlistFinePrint}
 					</p>

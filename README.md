@@ -113,7 +113,7 @@ rotra/
 Create `packages/db/.env` for database credentials:
 
 ```env
-DATABASE_URL="postgresql://..."   # Supabase connection pooler URL (for queries)
+DATABASE_URL="postgresql://..."   # Supabase tx pooler (often :6543); @rotra/db adds pgbouncer=true when needed
 DIRECT_URL="postgresql://..."     # Supabase direct URL (for migrations)
 ```
 

@@ -4,6 +4,8 @@
 
 The Admin app (`apps/admin`) manages platform-level operations. These four tables back the core admin features: Club Owner application approvals, feature kill switches, platform-wide configuration, and content moderation flags.
 
+Marketing **waitlist** signups (`waitlist_signups`) are documented separately in [`11_waitlist_signups.md`](11_waitlist_signups.md); the Admin app lists them on the Waitlist screen.
+
 All rows in these tables are readable and writable only by users with the Admin role (enforced via RLS — see `09_rls_and_realtime.md`).
 
 ---

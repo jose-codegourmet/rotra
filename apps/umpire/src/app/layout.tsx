@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import "./globals.css";
 
@@ -34,7 +35,9 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={satoshi.variable} suppressHydrationWarning>
 			<body className="bg-bg-base text-text-primary antialiased font-sans">
-				<ThemeProvider>{children}</ThemeProvider>
+				<QueryProvider>
+					<ThemeProvider>{children}</ThemeProvider>
+				</QueryProvider>
 			</body>
 		</html>
 	);
