@@ -7,7 +7,7 @@ type WelcomeStepProps = {
 
 export function WelcomeStep({ heading, subtitle }: WelcomeStepProps) {
 	return (
-		<div className="flex flex-col gap-4 text-center md:text-left">
+		<div className="flex flex-col gap-4 text-center md:text-center">
 			<h1 className="text-2xl font-semibold tracking-tight text-text-primary md:text-3xl">
 				{heading}
 			</h1>

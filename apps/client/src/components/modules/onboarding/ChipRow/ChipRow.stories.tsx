@@ -13,7 +13,7 @@ const meta = {
 	title: "Modules/Onboarding/ChipRow",
 	component: ChipRow,
 	parameters: { layout: "centered" },
-} satisfies Meta<typeof ChipRow<string>>;
+} satisfies Meta<typeof ChipRow>;
 
 export default meta;
 
