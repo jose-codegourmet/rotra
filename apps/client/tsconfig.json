@@ -7,7 +7,8 @@
 			}
 		],
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@rotra/legal-content": ["../../packages/legal-content/src/index.ts"]
 		},
 		"allowJs": true,
 		"noEmit": true
