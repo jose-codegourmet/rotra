@@ -6,8 +6,8 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const monorepoRoot = path.join(dirname, "..", "..");
 
 const prismaTracingGlobs = [
-	"../../node_modules/.pnpm/**/node_modules/.prisma/client/**",
-	"../../node_modules/.pnpm/**/node_modules/@prisma/client/**",
+	"../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/**",
+	"../../node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client/**",
 ];
 
 const nextConfig: NextConfig = {
