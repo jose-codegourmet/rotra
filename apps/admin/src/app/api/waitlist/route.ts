@@ -1,23 +1,14 @@
-import { db } from "@rotra/db";
 import { NextResponse } from "next/server";
+import {
+	DEFAULT_PAGE_SIZE,
+	loadWaitlistPage,
+	MAX_PAGE_SIZE,
+	type WaitlistApiResponse,
+} from "@/lib/waitlist-admin";
 
 export const runtime = "nodejs";
 
-const MAX_PAGE_SIZE = 100;
-const DEFAULT_PAGE_SIZE = 20;
-
-export type WaitlistApiRow = {
-	id: string;
-	email: string;
-	createdAt: string;
-};
-
-export type WaitlistApiResponse = {
-	rows: WaitlistApiRow[];
-	total: number;
-	page: number;
-	pageSize: number;
-};
+export type { WaitlistApiResponse, WaitlistApiRow } from "@/lib/waitlist-admin";
 
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
@@ -34,30 +25,13 @@ export async function GET(request: Request) {
 		Math.max(1, Number.isFinite(rawSize) ? rawSize : DEFAULT_PAGE_SIZE),
 	);
 
-	const skip = (page - 1) * pageSize;
+	const pageIndex = page - 1;
 
 	try {
-		const [rows, total] = await Promise.all([
-			db.waitlistSignup.findMany({
-				skip,
-				take: pageSize,
-				orderBy: { createdAt: "desc" },
-				select: { id: true, email: true, createdAt: true },
-			}),
-			db.waitlistSignup.count(),
-		]);
-
-		const body: WaitlistApiResponse = {
-			rows: rows.map((r) => ({
-				id: r.id,
-				email: r.email,
-				createdAt: r.createdAt.toISOString(),
-			})),
-			total,
-			page,
+		const body: WaitlistApiResponse = await loadWaitlistPage(
+			pageIndex,
 			pageSize,
-		};
-
+		);
 		return NextResponse.json(body);
 	} catch (e) {
 		console.error("[admin waitlist GET]", e);

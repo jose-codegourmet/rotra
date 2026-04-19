@@ -9,9 +9,14 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import * as React from "react";
-import type { WaitlistApiResponse } from "@/app/api/waitlist/route";
 import { Button } from "@/components/ui/button/Button";
 import { cn } from "@/lib/utils";
+import {
+	WAITLIST_INITIAL_PAGE_INDEX,
+	WAITLIST_INITIAL_PAGE_SIZE,
+	type WaitlistApiResponse,
+	waitlistQueryKeys,
+} from "@/lib/waitlist-admin";
 
 type WaitlistRow = WaitlistApiResponse["rows"][number];
 
@@ -66,12 +71,12 @@ async function fetchWaitlistPage(
 
 export function AdminWaitlistTable() {
 	const [pagination, setPagination] = React.useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 20,
+		pageIndex: WAITLIST_INITIAL_PAGE_INDEX,
+		pageSize: WAITLIST_INITIAL_PAGE_SIZE,
 	});
 
 	const query = useQuery({
-		queryKey: ["admin", "waitlist", pagination.pageIndex, pagination.pageSize],
+		queryKey: waitlistQueryKeys.page(pagination.pageIndex, pagination.pageSize),
 		queryFn: () => fetchWaitlistPage(pagination.pageIndex, pagination.pageSize),
 	});
 

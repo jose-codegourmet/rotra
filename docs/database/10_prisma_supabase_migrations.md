@@ -6,7 +6,7 @@ This guide describes how ROTRA applies **Prisma** schema changes to **Supabase P
 
 - A Supabase project (dev/staging/prod as needed).
 - [`packages/db/.env`](../../packages/db/.env) (not committed) with:
-  - **`DATABASE_URL`** — connection string Supabase recommends for **Prisma** with the **pooler** (transaction mode / PgBouncer), usually port **6543**, including query parameters Prisma expects (see [Prisma: Supabase](https://www.prisma.io/docs/orm/overview/databases/supabase)).
+  - **`DATABASE_URL`** — connection string for **Prisma Client** via Supabase’s **transaction pooler** (PgBouncer), usually port **6543**. Prisma requires **`pgbouncer=true`** on that URL so prepared statements do not collide on the pooler (Postgres **`08P01`** bind/prepared-statement errors). **`@rotra/db` appends this automatically** when the URL looks like the tx pooler (port `6543` or `*.pooler.supabase.com`); you can also add it explicitly (see [Prisma: PgBouncer](https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections/pgbouncer), [Prisma: Supabase](https://www.prisma.io/docs/orm/overview/databases/supabase)).
   - **`DIRECT_URL`** — **direct** Postgres connection (port **5432**) for migrations and introspection. Prisma uses this via `directUrl` in [`packages/db/prisma/schema.prisma`](../../packages/db/prisma/schema.prisma).
 
 Copy values from Supabase **Project Settings → Database** (connection strings / URI).
