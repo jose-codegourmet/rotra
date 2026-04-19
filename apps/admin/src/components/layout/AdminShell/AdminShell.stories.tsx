@@ -7,6 +7,12 @@ const meta: Meta<typeof AdminShell> = {
 	tags: ["autodocs"],
 	parameters: {
 		layout: "fullscreen",
+		docs: {
+			description: {
+				component:
+					"Below the `md` breakpoint the shell uses a fixed top bar and slide-out drawer for navigation; from `md` up the sidebar is an icon rail until `lg`, then full labels. Resize the canvas or pick a narrow viewport in Storybook to exercise the mobile layout.",
+			},
+		},
 		nextjs: {
 			appDirectory: true,
 			navigation: {

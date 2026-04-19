@@ -1,5 +1,5 @@
 import { PageSection } from "@/components/admin-ui/PageSection/PageSection";
-import { MmrAsymmetryConfigTable } from "@/components/modules/mmr-management/MmrAsymmetryConfigTable";
+import { MmrAsymmetryConfigTable } from "@/components/modules/mmr-management/MmrAsymmetryConfigTable/MmrAsymmetryConfigTable";
 
 export default function MmrManagementPage() {
 	return (

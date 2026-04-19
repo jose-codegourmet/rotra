@@ -77,6 +77,7 @@ export function MmrAsymmetryConfigTable() {
 						type="button"
 						variant="ghost"
 						size="sm"
+						className="min-h-[44px] min-w-[44px] px-3"
 						onClick={() => setEditingRow(row.original)}
 					>
 						Edit

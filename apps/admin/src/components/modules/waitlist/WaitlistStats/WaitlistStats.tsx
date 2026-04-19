@@ -1,22 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
-import {
-	type WaitlistStatsResponse,
-	waitlistQueryKeys,
-} from "@/lib/waitlist-admin";
-
-async function fetchWaitlistStats(): Promise<WaitlistStatsResponse> {
-	const res = await fetch("/api/waitlist/stats");
-	if (!res.ok) {
-		const err = (await res.json().catch(() => null)) as {
-			error?: string;
-		} | null;
-		throw new Error(err?.error ?? "Failed to load statistics.");
-	}
-	return res.json() as Promise<WaitlistStatsResponse>;
-}
+import type { WaitlistStatsResponse } from "@/lib/waitlist-admin";
 
 const numberFmt = new Intl.NumberFormat(undefined, {
 	maximumFractionDigits: 0,
@@ -53,24 +38,29 @@ function StatCard({
 	);
 }
 
-export function WaitlistStats() {
-	const query = useQuery({
-		queryKey: waitlistQueryKeys.stats(),
-		queryFn: fetchWaitlistStats,
-	});
+export type WaitlistStatsProps = {
+	stats: WaitlistStatsResponse | null;
+	isLoading?: boolean;
+	isError?: boolean;
+	error?: Error | null;
+};
 
-	const v = query.data ?? null;
+export function WaitlistStats({
+	stats,
+	isLoading = false,
+	isError = false,
+	error = null,
+}: WaitlistStatsProps) {
+	const v = stats;
 	const num = (n: number | undefined) =>
-		query.isSuccess && n !== undefined ? n : null;
+		!isLoading && !isError && v && n !== undefined ? n : null;
 
 	return (
 		<div className="space-y-2">
 			<h3 className="text-small font-semibold text-text-primary">Overview</h3>
-			{query.isError ? (
+			{isError ? (
 				<p className="text-body text-error" role="alert">
-					{query.error instanceof Error
-						? query.error.message
-						: "Something went wrong."}
+					{error instanceof Error ? error.message : "Something went wrong."}
 				</p>
 			) : null}
 			<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
