@@ -13,6 +13,9 @@ type OnboardingFooterProps = {
 	onFinish: () => void;
 };
 
+const primaryCtaClass =
+	"md:text-xs md:font-semibold md:uppercase md:tracking-widest";
+
 export function OnboardingFooter({
 	step,
 	isCurrentStepValid,
@@ -23,8 +26,13 @@ export function OnboardingFooter({
 	onFinish,
 }: OnboardingFooterProps) {
 	return (
-		<footer className="mt-auto border-t border-border bg-bg-base px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:px-8">
-			<div className="mx-auto flex max-w-lg gap-3">
+		<footer
+			className={cn(
+				"mt-auto border-t border-border bg-bg-base px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:px-8",
+				"md:border-border/50 md:bg-bg-base/80 md:backdrop-blur-xl",
+			)}
+		>
+			<div className="mx-auto flex max-w-lg gap-3 md:max-w-2xl md:px-2">
 				{step >= 2 && (
 					<Button
 						type="button"
@@ -36,14 +44,18 @@ export function OnboardingFooter({
 					</Button>
 				)}
 				{step === 0 && (
-					<Button type="button" className="w-full" onClick={onStart}>
+					<Button
+						type="button"
+						className={cn("w-full", primaryCtaClass)}
+						onClick={onStart}
+					>
 						Let&apos;s go
 					</Button>
 				)}
 				{step >= 1 && step < 8 && (
 					<Button
 						type="button"
-						className="flex-1"
+						className={cn("flex-1", primaryCtaClass)}
 						disabled={!isCurrentStepValid}
 						onClick={onNext}
 					>
@@ -53,7 +65,7 @@ export function OnboardingFooter({
 				{step === 8 && (
 					<Button
 						type="button"
-						className={cn(step >= 2 ? "flex-1" : "w-full")}
+						className={cn(step >= 2 ? "flex-1" : "w-full", primaryCtaClass)}
 						disabled={!isCurrentStepValid || submitting}
 						onClick={onFinish}
 					>

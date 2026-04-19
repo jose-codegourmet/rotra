@@ -1,5 +1,6 @@
 "use client";
 
+import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { useFormContext } from "react-hook-form";
 
@@ -22,6 +23,7 @@ type ChoiceStepProps<F extends ChoiceField> = {
 	options: {
 		v: Exclude<OnboardingFormValues[F], "">;
 		label: string;
+		icon?: LucideIcon;
 	}[];
 	helperText?: ReactNode;
 };
@@ -44,7 +46,7 @@ export function ChoiceStep<F extends ChoiceField>({
 	const fieldError = errors[field];
 
 	return (
-		<StepBlock kicker={kicker} title={title} subtitle={subtitle}>
+		<StepBlock align="center" kicker={kicker} title={title} subtitle={subtitle}>
 			<ChipRow
 				value={value === "" ? "" : String(value)}
 				onChange={(v) =>
@@ -56,7 +58,9 @@ export function ChoiceStep<F extends ChoiceField>({
 				options={options}
 			/>
 			{helperText ? (
-				<p className="mt-3 text-small text-text-secondary">{helperText}</p>
+				<p className="mt-3 text-center text-small text-text-secondary">
+					{helperText}
+				</p>
 			) : null}
 			<FieldError errors={[fieldError]} />
 		</StepBlock>
