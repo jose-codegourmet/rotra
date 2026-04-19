@@ -1,15 +1,14 @@
 "use client";
 
+import { useFormContext } from "react-hook-form";
+
 import { StepBlock } from "@/components/modules/onboarding/StepBlock/StepBlock";
+import { FieldError } from "@/components/ui/field";
+import type { OnboardingFormValues } from "@/lib/onboarding/onboarding-form-schema";
 import type { OnboardingPayload } from "@/lib/onboarding/validate-payload";
 import { cn } from "@/lib/utils";
 
 type LevelValue = OnboardingPayload["playing_level"];
-
-type LevelStepProps = {
-	playingLevel: LevelValue | "";
-	onPlayingLevelChange: (value: LevelValue) => void;
-};
 
 const LEVEL_OPTIONS: { v: LevelValue; label: string }[] = [
 	{ v: "beginner", label: "Beginner" },
@@ -17,10 +16,15 @@ const LEVEL_OPTIONS: { v: LevelValue; label: string }[] = [
 	{ v: "advanced", label: "Advanced" },
 ];
 
-export function LevelStep({
-	playingLevel,
-	onPlayingLevelChange,
-}: LevelStepProps) {
+export function LevelStep() {
+	const {
+		setValue,
+		watch,
+		formState: { errors },
+	} = useFormContext<OnboardingFormValues>();
+
+	const playingLevel = watch("playing_level");
+
 	return (
 		<StepBlock
 			kicker="Step 4 of 8"
@@ -32,7 +36,12 @@ export function LevelStep({
 					<button
 						key={opt.v}
 						type="button"
-						onClick={() => onPlayingLevelChange(opt.v)}
+						onClick={() =>
+							setValue("playing_level", opt.v, {
+								shouldValidate: true,
+								shouldDirty: true,
+							})
+						}
 						className={cn(
 							"min-h-[44px] w-full rounded-xl border p-4 text-left text-body transition-colors",
 							playingLevel === opt.v
@@ -44,6 +53,7 @@ export function LevelStep({
 					</button>
 				))}
 			</div>
+			<FieldError errors={[errors.playing_level]} />
 		</StepBlock>
 	);
 }

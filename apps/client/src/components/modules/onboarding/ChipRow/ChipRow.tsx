@@ -2,22 +2,18 @@
 
 import { cn } from "@/lib/utils";
 
-type ChipOption<T extends string> = {
-	v: T;
+export type ChipOption = {
+	v: string;
 	label: string;
 };
 
-type ChipRowProps<T extends string> = {
-	value: T | "";
-	onChange: (value: T) => void;
-	options: ChipOption<T>[];
+type ChipRowProps = {
+	value: string;
+	onChange: (value: string) => void;
+	options: ChipOption[];
 };
 
-export function ChipRow<T extends string>({
-	value,
-	onChange,
-	options,
-}: ChipRowProps<T>) {
+export function ChipRow({ value, onChange, options }: ChipRowProps) {
 	return (
 		<div className="flex flex-col gap-3">
 			{options.map((opt) => (
