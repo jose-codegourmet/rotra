@@ -14,6 +14,7 @@
 	},
 	"dependencies": {
 		"@rotra/db": "workspace:*",
+		"@rotra/legal-content": "workspace:*",
 		"@tanstack/react-query": "^5.96.2",
 		"@base-ui/react": "^1.3.0",
 		"@radix-ui/react-slot": "latest",

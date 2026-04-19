@@ -145,6 +145,9 @@ importers:
       '@rotra/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@rotra/legal-content':
+        specifier: workspace:*
+        version: link:../../packages/legal-content
       '@supabase/ssr':
         specifier: ^0.10.2
         version: 0.10.2(@supabase/supabase-js@2.103.2)
@@ -263,6 +266,9 @@ importers:
       '@rotra/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@rotra/legal-content':
+        specifier: workspace:*
+        version: link:../../packages/legal-content
       '@tanstack/react-query':
         specifier: ^5.96.2
         version: 5.96.2(react@19.2.4)
@@ -434,6 +440,22 @@ importers:
       tsx:
         specifier: ^4.19.4
         version: 4.21.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+
+  packages/legal-content:
+    dependencies:
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+    devDependencies:
+      '@rotra/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: ^19.1.0
+        version: 19.2.14
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
