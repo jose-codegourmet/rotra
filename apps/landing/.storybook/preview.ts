@@ -1,6 +1,8 @@
 import type { Preview } from "@storybook/react";
+import { createElement } from "react";
 
 import "../src/app/globals.css";
+import { QueryProvider } from "../src/components/providers/QueryProvider";
 import { SATOSHI_FONT_STACK } from "./satoshi-font-stack";
 
 const preview: Preview = {
@@ -29,6 +31,7 @@ const preview: Preview = {
 		},
 	},
 	decorators: [
+		(Story) => createElement(QueryProvider, null, createElement(Story)),
 		(Story) => {
 			document.documentElement.style.setProperty(
 				"--font-satoshi",

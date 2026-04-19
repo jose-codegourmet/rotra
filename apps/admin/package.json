@@ -34,6 +34,7 @@
 		"@storybook/nextjs": "^10.3.4",
 		"@storybook/react": "^10.3.4",
 		"@tailwindcss/postcss": "latest",
+		"@tanstack/react-query-devtools": "5.96.2",
 		"@types/node": "^22.14.0",
 		"@types/react": "^19.1.0",
 		"@types/react-dom": "^19.1.0",

@@ -4,6 +4,7 @@ import {
 	Brain,
 	EyeOff,
 	LayoutDashboard,
+	Mail,
 	Medal,
 	ShieldAlert,
 	SlidersHorizontal,
@@ -30,6 +31,7 @@ export const ROUTES = {
 	MMR_MANAGEMENT: "/mmr-management",
 	SKILLS_MANAGEMENT: "/skills-management",
 	ANALYTICS: "/analytics",
+	WAITLIST: "/waitlist",
 } as const;
 
 export function adminUserDetailPath(id: string): string {
@@ -48,6 +50,7 @@ export const ADMIN_PAGE_TITLES: Record<string, string> = {
 	[ROUTES.MMR_MANAGEMENT]: "MMR management",
 	[ROUTES.SKILLS_MANAGEMENT]: "Skills management",
 	[ROUTES.ANALYTICS]: "Analytics",
+	[ROUTES.WAITLIST]: "Waitlist",
 };
 
 export function getAdminShellPageTitle(pathname: string): string {
@@ -73,6 +76,11 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 		label: "Users",
 		href: ROUTES.USERS,
 		icon: Users,
+	},
+	{
+		label: "Waitlist",
+		href: ROUTES.WAITLIST,
+		icon: Mail,
 	},
 	{
 		label: "Kill switches",

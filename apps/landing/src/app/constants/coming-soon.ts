@@ -13,6 +13,8 @@ export const comingSoonMeta = {
 		"Technical enrollment phase 01 — limited early access while we ship.",
 	navCta: "Get early access",
 	waitlistSubmit: "Join the waitlist",
+	waitlistThankYou:
+		"Thanks for your interest in ROTRA. We'll email you when the app is ready to use.",
 	secondaryCta: "Join the waitlist",
 } as const;
 

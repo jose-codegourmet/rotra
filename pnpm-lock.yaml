@@ -94,6 +94,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: latest
         version: 4.2.2
+      '@tanstack/react-query-devtools':
+        specifier: 5.96.2
+        version: 5.96.2(@tanstack/react-query@5.96.2(react@19.2.4))(react@19.2.4)
       '@types/node':
         specifier: ^22.14.0
         version: 22.19.17
@@ -212,6 +215,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: latest
         version: 4.2.2
+      '@tanstack/react-query-devtools':
+        specifier: 5.96.2
+        version: 5.96.2(@tanstack/react-query@5.96.2(react@19.2.4))(react@19.2.4)
       '@types/node':
         specifier: ^22.14.0
         version: 22.19.17
@@ -239,6 +245,12 @@ importers:
       '@radix-ui/react-slot':
         specifier: latest
         version: 1.2.4(@types/react@19.2.14)(react@19.2.4)
+      '@rotra/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@tanstack/react-query':
+        specifier: ^5.96.2
+        version: 5.96.2(react@19.2.4)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -263,6 +275,9 @@ importers:
       react-dom:
         specifier: ^19.1.0
         version: 19.2.4(react@19.2.4)
+      react-hook-form:
+        specifier: ^7.56.1
+        version: 7.72.1(react@19.2.4)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -285,6 +300,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: latest
         version: 4.2.2
+      '@tanstack/react-query-devtools':
+        specifier: 5.96.2
+        version: 5.96.2(@tanstack/react-query@5.96.2(react@19.2.4))(react@19.2.4)
       '@types/node':
         specifier: ^22.14.0
         version: 22.19.17
@@ -312,6 +330,9 @@ importers:
       '@rotra/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@tanstack/react-query':
+        specifier: ^5.96.2
+        version: 5.96.2(react@19.2.4)
       class-variance-authority:
         specifier: latest
         version: 0.7.1
@@ -349,6 +370,9 @@ importers:
       '@tailwindcss/postcss':
         specifier: latest
         version: 4.2.2
+      '@tanstack/react-query-devtools':
+        specifier: 5.96.2
+        version: 5.96.2(@tanstack/react-query@5.96.2(react@19.2.4))(react@19.2.4)
       '@types/node':
         specifier: ^22.14.0
         version: 22.19.17
@@ -2372,6 +2396,15 @@ packages:
 
   '@tanstack/query-core@5.96.2':
     resolution: {integrity: sha512-hzI6cTVh4KNRk8UtoIBS7Lv9g6BnJPXvBKsvYH1aGWvv0347jT3BnSvztOE+kD76XGvZnRC/t6qdW1CaIfwCeA==}
+
+  '@tanstack/query-devtools@5.96.2':
+    resolution: {integrity: sha512-vBTB1Qhbm3nHSbEUtQwks/EdcAtFfEapr1WyBW4w2ExYKuXVi3jIxUIHf5MlSltiHuL7zNyUuanqT/7sI2sb6g==}
+
+  '@tanstack/react-query-devtools@5.96.2':
+    resolution: {integrity: sha512-nTFKLGuTOFvmFRvcyZ3ArWC/DnMNPoBh6h/2yD6rsf7TCTJCQt+oUWOp2uKPTIuEPtF/vN9Kw5tl5mD1Kbposw==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.96.2
+      react: ^18 || ^19
 
   '@tanstack/react-query@5.96.2':
     resolution: {integrity: sha512-sYyzzJT4G0g02azzJ8o55VFFV31XvFpdUpG+unxS0vSaYsJnSPKGoI6WdPwUucJL1wpgGfwfmntNX/Ub1uOViA==}
@@ -4724,6 +4757,12 @@ packages:
     resolution: {integrity: sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==}
     peerDependencies:
       react: ^19.2.4
+
+  react-hook-form@7.72.1:
+    resolution: {integrity: sha512-RhwBoy2ygeVZje+C+bwJ8g0NjTdBmDlJvAUHTxRjTmSUKPYsKfMphkS2sgEMotsY03bP358yEYlnUeZy//D9Ig==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
 
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
@@ -7540,6 +7579,14 @@ snapshots:
 
   '@tanstack/query-core@5.96.2': {}
 
+  '@tanstack/query-devtools@5.96.2': {}
+
+  '@tanstack/react-query-devtools@5.96.2(@tanstack/react-query@5.96.2(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      '@tanstack/query-devtools': 5.96.2
+      '@tanstack/react-query': 5.96.2(react@19.2.4)
+      react: 19.2.4
+
   '@tanstack/react-query@5.96.2(react@19.2.4)':
     dependencies:
       '@tanstack/query-core': 5.96.2
@@ -9938,6 +9985,10 @@ snapshots:
     dependencies:
       react: 19.2.4
       scheduler: 0.27.0
+
+  react-hook-form@7.72.1(react@19.2.4):
+    dependencies:
+      react: 19.2.4
 
   react-is@17.0.2: {}
 
