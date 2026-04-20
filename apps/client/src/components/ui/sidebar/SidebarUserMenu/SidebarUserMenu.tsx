@@ -12,39 +12,12 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
+import {
+	avatarUrlFromAuthUser,
+	displayNameFromAuthUser,
+} from "@/lib/auth/supabase-user-display";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
-
-function displayNameFromUser(user: AuthUser): string {
-	const meta = user.user_metadata as Record<string, unknown>;
-	const full = meta.full_name ?? meta.name;
-	if (typeof full === "string" && full.trim()) {
-		return full.trim();
-	}
-	if (user.email) {
-		return user.email;
-	}
-	return "Player";
-}
-
-function avatarUrlFromUser(user: AuthUser): string | null {
-	const meta = user.user_metadata as Record<string, unknown>;
-	const avatar = meta.avatar_url ?? meta.picture;
-	if (typeof avatar === "string" && avatar.startsWith("http")) {
-		return avatar;
-	}
-	if (
-		avatar &&
-		typeof avatar === "object" &&
-		avatar !== null &&
-		"url" in avatar &&
-		typeof (avatar as { url: string }).url === "string"
-	) {
-		const u = (avatar as { url: string }).url;
-		return u.startsWith("http") ? u : null;
-	}
-	return null;
-}
 
 export function SidebarUserMenu() {
 	const [isOpen, setIsOpen] = useState(false);
@@ -97,9 +70,9 @@ export function SidebarUserMenu() {
 	const displayName = loading
 		? "…"
 		: user
-			? displayNameFromUser(user)
+			? displayNameFromAuthUser(user)
 			: "Player";
-	const avatarUrl = user ? avatarUrlFromUser(user) : null;
+	const avatarUrl = user ? avatarUrlFromAuthUser(user) : null;
 	const profileHref = user ? `/profile/${user.id}` : "/profile";
 
 	return (

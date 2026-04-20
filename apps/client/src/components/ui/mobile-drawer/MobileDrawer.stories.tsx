@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Provider } from "react-redux";
+import { LogoutDialogProvider } from "@/hooks/logoutDialogProvider";
 import uiReducer from "@/store/slices/uiSlice";
 import { MobileDrawer } from "./MobileDrawer";
 
@@ -15,6 +16,13 @@ const meta: Meta<typeof MobileDrawer> = {
 	title: "Navigation/MobileDrawer",
 	component: MobileDrawer,
 	tags: ["autodocs"],
+	decorators: [
+		(Story) => (
+			<LogoutDialogProvider>
+				<Story />
+			</LogoutDialogProvider>
+		),
+	],
 	parameters: {
 		layout: "fullscreen",
 	},
