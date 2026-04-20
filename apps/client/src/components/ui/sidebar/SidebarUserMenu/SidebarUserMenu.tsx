@@ -1,14 +1,58 @@
 "use client";
 
-import { LogOut, MoreVertical, User, UserCircle } from "lucide-react";
+import type { User as AuthUser } from "@supabase/supabase-js";
+import {
+	LogOut,
+	MoreVertical,
+	UserCircle,
+	User as UserIcon,
+} from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
+import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
+import {
+	avatarUrlFromAuthUser,
+	displayNameFromAuthUser,
+} from "@/lib/auth/supabase-user-display";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 export function SidebarUserMenu() {
 	const [isOpen, setIsOpen] = useState(false);
+	const [user, setUser] = useState<AuthUser | null>(null);
+	const [loading, setLoading] = useState(true);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const supabase = useMemo(() => createClient(), []);
+	const { openDialog: openLogoutDialog } = useLogoutDialog();
+
+	useEffect(() => {
+		let cancelled = false;
+
+		async function loadUser() {
+			const { data } = await supabase.auth.getUser();
+			if (!cancelled) {
+				setUser(data.user ?? null);
+				setLoading(false);
+			}
+		}
+
+		void loadUser();
+
+		const {
+			data: { subscription },
+		} = supabase.auth.onAuthStateChange((_event, session) => {
+			if (!cancelled) {
+				setUser(session?.user ?? null);
+			}
+		});
+
+		return () => {
+			cancelled = true;
+			subscription.unsubscribe();
+		};
+	}, [supabase]);
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -23,6 +67,14 @@ export function SidebarUserMenu() {
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, []);
 
+	const displayName = loading
+		? "…"
+		: user
+			? displayNameFromAuthUser(user)
+			: "Player";
+	const avatarUrl = user ? avatarUrlFromAuthUser(user) : null;
+	const profileHref = user ? `/profile/${user.id}` : "/profile";
+
 	return (
 		<div
 			className="mt-auto pt-6 border-t border-border px-4"
@@ -33,7 +85,7 @@ export function SidebarUserMenu() {
 				{isOpen && (
 					<div className="absolute bottom-full left-0 mb-2 w-full bg-bg-surface border border-border rounded-lg shadow-modal overflow-hidden z-10">
 						<Link
-							href="/profile/u1"
+							href={profileHref}
 							onClick={() => setIsOpen(false)}
 							className="flex items-center gap-3 px-4 min-h-[44px] text-small font-bold text-text-primary hover:bg-bg-elevated transition-colors duration-default uppercase tracking-widest"
 						>
@@ -50,6 +102,7 @@ export function SidebarUserMenu() {
 							className="w-full flex items-center gap-3 px-4 min-h-[44px] text-small font-bold text-error hover:bg-bg-elevated transition-colors duration-default uppercase tracking-widest"
 							onClick={() => {
 								setIsOpen(false);
+								openLogoutDialog();
 							}}
 						>
 							<LogOut size={16} strokeWidth={1.5} className="shrink-0" />
@@ -68,27 +121,33 @@ export function SidebarUserMenu() {
 				>
 					{/* Avatar */}
 					<div className="relative shrink-0">
-						<div className="w-10 h-10 rounded-full bg-bg-elevated border-2 border-accent flex items-center justify-center group-hover:scale-105 transition-transform duration-default">
-							<User
-								size={18}
-								strokeWidth={1.5}
-								className="text-text-secondary"
-							/>
+						<div className="relative w-10 h-10 rounded-full bg-bg-elevated border-2 border-accent overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform duration-default">
+							{avatarUrl ? (
+								<Image
+									src={avatarUrl}
+									alt=""
+									fill
+									className="object-cover"
+									sizes="40px"
+									unoptimized
+								/>
+							) : (
+								<UserIcon
+									size={18}
+									strokeWidth={1.5}
+									className="text-text-secondary"
+								/>
+							)}
 						</div>
 						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-accent rounded-full border-2 border-bg-base" />
 					</div>
 
-					{/* Name + tier */}
 					<div className="hidden lg:flex flex-col overflow-hidden flex-1 text-left">
 						<span className="text-small font-black text-text-primary uppercase tracking-wider truncate">
-							Alex Santos
-						</span>
-						<span className="text-micro font-bold text-accent uppercase tracking-tight">
-							Warrior 2
+							{displayName}
 						</span>
 					</div>
 
-					{/* Chevron indicator */}
 					<MoreVertical
 						size={16}
 						strokeWidth={1.5}

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 function FacebookIcon({ className }: { className?: string }) {
@@ -91,16 +92,35 @@ function QrIcon({ className }: { className?: string }) {
 
 export function LoginCard() {
 	const [isLoading, setIsLoading] = useState(false);
+	const supabase = useMemo(() => createClient(), []);
 
 	async function handleFacebookLogin() {
 		if (isLoading) return;
 		setIsLoading(true);
 		try {
-			// TODO: initiate Facebook OAuth flow
-			await new Promise((resolve) => setTimeout(resolve, 2000));
+			const origin = window.location.origin;
+			const { data, error } = await supabase.auth.signInWithOAuth({
+				provider: "facebook",
+				options: {
+					redirectTo: `${origin}/auth/callback?next=/dashboard`,
+					scopes: "public_profile email",
+				},
+			});
+
+			if (error) {
+				toast.error("Login failed. Please try again.");
+				setIsLoading(false);
+				return;
+			}
+
+			if (data.url) {
+				window.location.href = data.url;
+				return;
+			}
+			toast.error("Login failed. Please try again.");
+			setIsLoading(false);
 		} catch {
 			toast.error("Login failed. Please try again.");
-		} finally {
 			setIsLoading(false);
 		}
 	}

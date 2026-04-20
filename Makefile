@@ -1,16 +1,36 @@
 .PHONY: dev dev-landing dev-client dev-admin dev-umpire build lint check-fix type-check install format storybook storybook-client storybook-admin storybook-umpire build-storybook
 
-# Load nvm and run all apps in parallel via Turborepo
+# ngrok forwards to @rotra/client (Next default port 3000; other apps use 3001–3003 in turbo dev)
+CLIENT_DEV_PORT ?= 3000
+NGROK_CLIENT_DOMAIN ?= rotra-local.ngrok.dev
+
+# Load nvm, optional ngrok to client (port 3000), run all apps via Turborepo
+# Skip tunnel: make dev SKIP_NGROK=1
 dev:
-	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm dev
+	@. ${HOME}/.nvm/nvm.sh && nvm use && \
+		if [ "$(SKIP_NGROK)" != "1" ]; then \
+			command -v ngrok >/dev/null 2>&1 || { echo "error: ngrok not in PATH (install from https://ngrok.com or use: make dev SKIP_NGROK=1)"; exit 1; }; \
+			ngrok http $(CLIENT_DEV_PORT) --domain=$(NGROK_CLIENT_DOMAIN) & \
+			NGROK_PID=$$!; \
+			trap 'kill $$NGROK_PID 2>/dev/null; wait $$NGROK_PID 2>/dev/null || true' EXIT INT TERM HUP; \
+		fi; \
+		pnpm dev
 
 # Run dev server for the marketing / landing app only (port 3003)
 dev-landing:
 	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter @rotra/landing dev
 
-# Run dev server for the client app only
+# Run client only + same ngrok tunnel as make dev (open https://$(NGROK_CLIENT_DOMAIN))
+# Skip tunnel: make dev-client SKIP_NGROK=1
 dev-client:
-	@. ${HOME}/.nvm/nvm.sh && nvm use && pnpm --filter @rotra/client dev
+	@. ${HOME}/.nvm/nvm.sh && nvm use && \
+		if [ "$(SKIP_NGROK)" != "1" ]; then \
+			command -v ngrok >/dev/null 2>&1 || { echo "error: ngrok not in PATH (install from https://ngrok.com or use: make dev-client SKIP_NGROK=1)"; exit 1; }; \
+			ngrok http $(CLIENT_DEV_PORT) --domain=$(NGROK_CLIENT_DOMAIN) & \
+			NGROK_PID=$$!; \
+			trap 'kill $$NGROK_PID 2>/dev/null; wait $$NGROK_PID 2>/dev/null || true' EXIT INT TERM HUP; \
+		fi; \
+		pnpm --filter @rotra/client dev
 
 # Run dev server for the admin app only
 dev-admin:
