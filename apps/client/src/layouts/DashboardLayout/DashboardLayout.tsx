@@ -3,6 +3,7 @@ import { MobileDrawer } from "@/components/ui/mobile-drawer/MobileDrawer";
 import { MobileHeader } from "@/components/ui/mobile-header/MobileHeader";
 import { Navbar } from "@/components/ui/navbar/Navbar";
 import { Sidebar } from "@/components/ui/sidebar/Sidebar";
+import { LogoutDialogProvider } from "@/hooks/logoutDialogProvider";
 
 interface DashboardLayoutProps {
 	children: React.ReactNode;
@@ -16,26 +17,28 @@ export function DashboardLayout({
 	pageSubtitle = "ROTRA",
 }: DashboardLayoutProps) {
 	return (
-		<div className="min-h-screen bg-bg-base">
-			{/* Desktop sidebar — icon rail at md, full at lg */}
-			<Sidebar />
+		<LogoutDialogProvider>
+			<div className="min-h-screen bg-bg-base">
+				{/* Desktop sidebar — icon rail at md, full at lg */}
+				<Sidebar />
 
-			{/* Desktop top navbar — lg only */}
-			<Navbar pageTitle={pageTitle} pageSubtitle={pageSubtitle} />
+				{/* Desktop top navbar — lg only */}
+				<Navbar pageTitle={pageTitle} pageSubtitle={pageSubtitle} />
 
-			{/* Mobile top header — hidden at md+ */}
-			<MobileHeader />
+				{/* Mobile top header — hidden at md+ */}
+				<MobileHeader />
 
-			{/* Mobile navigation drawer — controlled by Redux */}
-			<MobileDrawer />
+				{/* Mobile navigation drawer — controlled by Redux */}
+				<MobileDrawer />
 
-			{/* Main content */}
-			<main className="md:ml-20 lg:ml-64 pt-16 pb-20 md:pb-8 min-h-screen">
-				{children}
-			</main>
+				{/* Main content */}
+				<main className="md:ml-20 lg:ml-64 pt-16 pb-20 md:pb-8 min-h-screen">
+					{children}
+				</main>
 
-			{/* Mobile bottom navigation — hidden at md+ */}
-			<BottomNav />
-		</div>
+				{/* Mobile bottom navigation — hidden at md+ */}
+				<BottomNav />
+			</div>
+		</LogoutDialogProvider>
 	);
 }

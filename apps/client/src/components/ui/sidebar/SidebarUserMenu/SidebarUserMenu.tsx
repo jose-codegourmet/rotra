@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +52,7 @@ export function SidebarUserMenu() {
 	const [loading, setLoading] = useState(true);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const supabase = useMemo(() => createClient(), []);
+	const { openDialog: openLogoutDialog } = useLogoutDialog();
 
 	useEffect(() => {
 		let cancelled = false;
@@ -100,12 +102,6 @@ export function SidebarUserMenu() {
 	const avatarUrl = user ? avatarUrlFromUser(user) : null;
 	const profileHref = user ? `/profile/${user.id}` : "/profile";
 
-	async function handleSignOut() {
-		setIsOpen(false);
-		await supabase.auth.signOut();
-		window.location.href = "/login";
-	}
-
 	return (
 		<div
 			className="mt-auto pt-6 border-t border-border px-4"
@@ -132,7 +128,8 @@ export function SidebarUserMenu() {
 							type="button"
 							className="w-full flex items-center gap-3 px-4 min-h-[44px] text-small font-bold text-error hover:bg-bg-elevated transition-colors duration-default uppercase tracking-widest"
 							onClick={() => {
-								void handleSignOut();
+								setIsOpen(false);
+								openLogoutDialog();
 							}}
 						>
 							<LogOut size={16} strokeWidth={1.5} className="shrink-0" />

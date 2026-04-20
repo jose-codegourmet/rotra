@@ -1,7 +1,9 @@
 "use client";
 
 import { LogOut, Search, Settings } from "lucide-react";
+
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle";
+import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
 
 export interface NavbarProps {
 	pageTitle?: string;
@@ -12,6 +14,8 @@ export function Navbar({
 	pageTitle = "Dashboard",
 	pageSubtitle = "ROTRA",
 }: NavbarProps) {
+	const { openDialog: openLogoutDialog } = useLogoutDialog();
+
 	return (
 		<header className="hidden lg:flex fixed top-0 right-0 w-[calc(100%-256px)] h-16 items-center justify-between px-8 z-40 border-b border-border backdrop-blur-xl bg-bg-surface/80">
 			{/* Left: breadcrumb */}
@@ -46,6 +50,9 @@ export function Navbar({
 					type="button"
 					className="text-text-disabled hover:text-accent transition-colors duration-default"
 					aria-label="Log out"
+					onClick={() => {
+						openLogoutDialog();
+					}}
 				>
 					<LogOut size={20} strokeWidth={1.5} />
 				</button>
