@@ -18,7 +18,12 @@ const nextConfig: NextConfig = {
 	serverExternalPackages: ["@prisma/client"],
 	transpilePackages: ["@rotra/ui", "@rotra/db", "@rotra/legal-content"],
 	images: {
-		remotePatterns: [{ hostname: "i.pravatar.cc" }],
+		remotePatterns: [
+			{ hostname: "i.pravatar.cc" },
+			{ protocol: "https", hostname: "*.fbcdn.net", pathname: "/**" },
+			{ protocol: "https", hostname: "*.fbsbx.com", pathname: "/**" },
+			{ protocol: "https", hostname: "graph.facebook.com", pathname: "/**" },
+		],
 	},
 };
 
