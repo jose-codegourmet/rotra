@@ -49,7 +49,7 @@ async function ensureProfileRow(user: User) {
 				facebookId,
 				name,
 				avatarUrl,
-				email: user.email ?? undefined,
+				email: user.email ?? null,
 			},
 		});
 	} catch (e) {
