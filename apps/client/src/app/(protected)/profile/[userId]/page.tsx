@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
-import { CurrentGearCard } from "@/components/modules/profile/CurrentGearCard/CurrentGearCard";
-import { MatchHistory } from "@/components/modules/profile/MatchHistory/MatchHistory";
-import { MetricsCard } from "@/components/modules/profile/MetricsCard/MetricsCard";
-import { PlayerHeaderCard } from "@/components/modules/profile/PlayerHeaderCard/PlayerHeaderCard";
-import { PlayStyleCard } from "@/components/modules/profile/PlayStyleCard/PlayStyleCard";
-import { SkillCalibrationCard } from "@/components/modules/profile/SkillCalibrationCard/SkillCalibrationCard";
-import { StatsCards } from "@/components/modules/profile/StatsCards/StatsCards";
-import { MOCK_PLAYER } from "@/constants/mock-player";
+import { ProfileLeftColumn } from "@/components/modules/profile/layout/ProfileLeftColumn";
+import { ProfileRightColumn } from "@/components/modules/profile/layout/ProfileRightColumn";
 
 export const metadata: Metadata = {
 	title: "Player Profile — ROTRA",
@@ -19,28 +13,11 @@ export default async function PlayerProfilePage({
 	params: Promise<{ userId: string }>;
 }) {
 	const { userId } = await params;
-	const player = MOCK_PLAYER;
-
-	console.log("[+] userId = ", userId);
 
 	return (
 		<div className="pb-12 px-4 md:px-8 flex flex-col lg:flex-row gap-8">
-			{/* ── Left Column (≈35%) ── */}
-			<div className="lg:w-[35%] shrink-0">
-				<div className="lg:sticky lg:top-24 space-y-6">
-					<PlayerHeaderCard player={player} />
-					<PlayStyleCard player={player} />
-					<CurrentGearCard player={player} />
-				</div>
-			</div>
-
-			{/* ── Right Column (flex-1) ── */}
-			<div className="flex-1 space-y-8">
-				<StatsCards player={player} />
-				<SkillCalibrationCard player={player} />
-				<MatchHistory matches={player.recentMatches} maxMatchPerView={3} />
-				<MetricsCard />
-			</div>
+			<ProfileLeftColumn userId={userId} />
+			<ProfileRightColumn userId={userId} />
 		</div>
 	);
 }

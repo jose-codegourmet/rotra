@@ -1,9 +1,12 @@
-import type { TPlayerModel } from "@/types/player";
+import { MOCK_PLAYER } from "@/constants/mock-player";
+import type { ProfileViewUser } from "@/types/profile-view-user";
 
 interface StatsCardsProps {
-	player: TPlayerModel;
+	user: ProfileViewUser;
 }
-export function StatsCards({ player }: StatsCardsProps) {
+export function StatsCards({ user }: StatsCardsProps) {
+	console.warn("[TODO] StatsCards for user = ", user);
+	const player = MOCK_PLAYER;
 	return (
 		<section className="grid grid-cols-3 gap-4">
 			{player.stats.map((stat) => (

@@ -1,10 +1,13 @@
 import { Package } from "lucide-react";
-import type { TPlayerModel } from "@/types/player";
+import { MOCK_PLAYER } from "@/constants/mock-player";
+import type { ProfileViewUser } from "@/types/profile-view-user";
 
 interface CurrentGearCardProps {
-	player: TPlayerModel;
+	user: ProfileViewUser;
 }
-export function CurrentGearCard({ player }: CurrentGearCardProps) {
+export function CurrentGearCard({ user }: CurrentGearCardProps) {
+	const player = MOCK_PLAYER;
+	console.warn("[TODO] CurrentGearCard for user = ", user);
 	return (
 		<div className="bg-bg-surface rounded-xl p-6">
 			<h3 className="text-[11px] font-black uppercase tracking-widest text-text-secondary mb-4 flex items-center gap-2">
