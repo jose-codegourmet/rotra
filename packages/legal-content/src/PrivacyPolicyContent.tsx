@@ -194,6 +194,17 @@ export function PrivacyPolicyContent() {
 					below. You may also lodge a complaint with a supervisory authority
 					where applicable.
 				</p>
+				<p className="text-text-secondary">
+					For step-by-step instructions on requesting deletion of your account
+					and associated data, see our{" "}
+					<a
+						className="font-medium text-accent underline-offset-2 hover:underline"
+						href="/data-deletion"
+					>
+						Data Deletion Instructions
+					</a>
+					.
+				</p>
 			</section>
 
 			<section className="space-y-3">
@@ -225,9 +236,14 @@ export function PrivacyPolicyContent() {
 				</h2>
 				<p className="text-text-secondary">
 					<strong className="font-medium text-text-primary">
-						Privacy contact placeholder:
+						Privacy contact:
 					</strong>{" "}
-					[privacy@yourdomain.com]
+					<a
+						className="font-medium text-accent underline-offset-2 hover:underline"
+						href="mailto:jose@codegourmet.io"
+					>
+						jose@codegourmet.io
+					</a>
 				</p>
 			</section>
 		</article>

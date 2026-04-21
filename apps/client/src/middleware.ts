@@ -23,7 +23,11 @@ function isPublicPath(pathname: string): boolean {
 	if (pathname.startsWith("/auth")) {
 		return true;
 	}
-	if (pathname === "/privacy" || pathname === "/terms") {
+	if (
+		pathname === "/privacy" ||
+		pathname === "/terms" ||
+		pathname === "/data-deletion"
+	) {
 		return true;
 	}
 	if (pathname.startsWith("/api")) {

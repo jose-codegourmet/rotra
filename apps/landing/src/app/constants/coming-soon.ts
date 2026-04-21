@@ -99,6 +99,7 @@ export const footerContent = {
 	links: [
 		{ label: "Privacy", href: "/privacy" },
 		{ label: "Terms", href: "/terms" },
+		{ label: "Data Deletion", href: "/data-deletion" },
 		{ label: "Changelog", href: "#footer-docs" },
 		{ label: "Join the waitlist", href: "#waitlist" },
 		{ label: "Support", href: "#footer-support" },
