@@ -114,9 +114,12 @@ export function DataDeletionContent() {
 				</h3>
 				<p className="text-text-secondary">
 					Send an email to{" "}
-					<strong className="font-medium text-text-primary">
-						[privacy@yourdomain.com]
-					</strong>{" "}
+					<a
+						className="font-medium text-accent underline-offset-2 hover:underline"
+						href="mailto:jose@codegourmet.io"
+					>
+						jose@codegourmet.io
+					</a>{" "}
 					from the address on file with the subject line{" "}
 					<em>“Delete my ROTRA data”</em>. Include your username, the email
 					associated with your account, and — if you signed in with Facebook —
@@ -240,9 +243,14 @@ export function DataDeletionContent() {
 				</h2>
 				<p className="text-text-secondary">
 					<strong className="font-medium text-text-primary">
-						Privacy contact placeholder:
+						Privacy contact:
 					</strong>{" "}
-					[privacy@yourdomain.com]
+					<a
+						className="font-medium text-accent underline-offset-2 hover:underline"
+						href="mailto:jose@codegourmet.io"
+					>
+						jose@codegourmet.io
+					</a>
 				</p>
 			</section>
 		</article>
