@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
+import { AuthSync } from "@/providers/AuthSync";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { ReduxProvider } from "@/providers/ReduxProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
@@ -25,12 +26,14 @@ export default function RootLayout({
 		>
 			<body className="bg-bg-base text-text-primary antialiased font-sans">
 				<ReduxProvider>
-					<QueryProvider>
-						<ThemeProvider>
-							{children}
-							<Toaster position="top-center" duration={4000} />
-						</ThemeProvider>
-					</QueryProvider>
+					<AuthSync>
+						<QueryProvider>
+							<ThemeProvider>
+								{children}
+								<Toaster position="top-center" duration={4000} />
+							</ThemeProvider>
+						</QueryProvider>
+					</AuthSync>
 				</ReduxProvider>
 			</body>
 		</html>

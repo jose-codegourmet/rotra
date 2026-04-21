@@ -2,13 +2,17 @@ import { configureStore } from "@reduxjs/toolkit";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Provider } from "react-redux";
 import { LogoutDialogProvider } from "@/hooks/logoutDialogProvider";
+import authReducer from "@/store/slices/authSlice";
 import uiReducer from "@/store/slices/uiSlice";
 import { MobileDrawer } from "./MobileDrawer";
 
 function makeStore(isMobileDrawerOpen: boolean) {
 	return configureStore({
-		reducer: { ui: uiReducer },
-		preloadedState: { ui: { isMobileDrawerOpen } },
+		reducer: { auth: authReducer, ui: uiReducer },
+		preloadedState: {
+			auth: { user: null, initialized: true },
+			ui: { isMobileDrawerOpen },
+		},
 	});
 }
 

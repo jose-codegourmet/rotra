@@ -11,7 +11,7 @@ export default async function ProtectedLayout({
 }) {
 	const profile = await getCurrentProfile();
 
-	if (profile && !profile.onboardingCompleted) {
+	if (!profile?.onboardingCompleted) {
 		redirect("/onboarding");
 	}
 
