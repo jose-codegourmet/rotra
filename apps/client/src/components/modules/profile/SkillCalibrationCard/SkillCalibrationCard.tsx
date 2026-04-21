@@ -1,12 +1,14 @@
 import { SkillRadarChart } from "@/components/modules/profile/SkillRadarChart/SkillRadarChart";
-import { SKILL_RATINGS } from "@/constants/mock-player";
+import { MOCK_PLAYER, SKILL_RATINGS } from "@/constants/mock-player";
 import { SKILL_DIMENSIONS } from "@/constants/skills";
-import type { TPlayerModel } from "@/types/player";
+import type { ProfileViewUser } from "@/types/profile-view-user";
 
 interface SkillCalibrationCardProps {
-	player: TPlayerModel;
+	user: ProfileViewUser;
 }
-export function SkillCalibrationCard({ player }: SkillCalibrationCardProps) {
+export function SkillCalibrationCard({ user }: SkillCalibrationCardProps) {
+	console.warn("[TODO] SkillCalibrationCard for user = ", user);
+	const player = MOCK_PLAYER;
 	const radarData = SKILL_DIMENSIONS.map((subject, i) => ({
 		subject,
 		value: SKILL_RATINGS[i] ?? 0,

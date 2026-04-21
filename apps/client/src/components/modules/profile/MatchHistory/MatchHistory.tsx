@@ -1,19 +1,22 @@
 import Link from "next/link";
-
-import { type Match, MatchCard } from "../MatchCard/MatchCard";
+import { MatchCard } from "@/components/modules/profile/MatchCard/MatchCard";
+import { MOCK_PLAYER } from "@/constants/mock-player";
+import type { ProfileViewUser } from "@/types/profile-view-user";
 
 interface MatchHistoryProps {
-	matches: Match[];
+	user: ProfileViewUser;
 	maxMatchPerView: number;
 	viewAllHref?: string;
 }
 
 export function MatchHistory({
-	matches,
+	user,
 	maxMatchPerView,
 	viewAllHref,
 }: MatchHistoryProps) {
-	const visibleMatches = matches.slice(0, maxMatchPerView);
+	console.warn("[TODO] MatchHistory for user = ", user);
+	const player = MOCK_PLAYER;
+	const visibleMatches = player.recentMatches.slice(0, maxMatchPerView);
 
 	return (
 		<section>
