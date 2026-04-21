@@ -1,111 +1,47 @@
 "use client";
 
-import type { User as AuthUser } from "@supabase/supabase-js";
-import { MoreVertical, User as UserIcon, X } from "lucide-react";
-import Image from "next/image";
+import { LogOutIcon, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 import { Logo } from "@/components/ui/logo/Logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle";
 import { NAV_ITEMS } from "@/constants/nav";
 import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
-import {
-	avatarUrlFromAuthUser,
-	displayNameFromAuthUser,
-} from "@/lib/auth/supabase-user-display";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeMobileDrawer } from "@/store/slices/uiSlice";
+import { SmallUserCard } from "../small-user-card/SmallUserCard";
 
 function MobileDrawerUserSection() {
 	const dispatch = useAppDispatch();
-	const [user, setUser] = useState<AuthUser | null>(null);
-	const [loading, setLoading] = useState(true);
-	const supabase = useMemo(() => createClient(), []);
+	const user = useAppSelector((s) => s.auth.user);
+	const initialized = useAppSelector((s) => s.auth.initialized);
+	const loading = !initialized;
 	const { openDialog: openLogoutDialog } = useLogoutDialog();
-
-	useEffect(() => {
-		let cancelled = false;
-
-		async function loadUser() {
-			const { data } = await supabase.auth.getUser();
-			if (!cancelled) {
-				setUser(data.user ?? null);
-				setLoading(false);
-			}
-		}
-
-		void loadUser();
-
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
-			if (!cancelled) {
-				setUser(session?.user ?? null);
-			}
-		});
-
-		return () => {
-			cancelled = true;
-			subscription.unsubscribe();
-		};
-	}, [supabase]);
-
-	const displayName = loading
-		? "…"
-		: user
-			? displayNameFromAuthUser(user)
-			: "Player";
-	const avatarUrl = user ? avatarUrlFromAuthUser(user) : null;
-	const profileHref = user ? `/profile/${user.id}` : "/profile";
 
 	return (
 		<div className="p-6 border-t border-border bg-bg-base">
 			<div className="flex items-center gap-3 p-3 bg-bg-surface rounded-lg border border-border/30">
-				<Link
-					href={profileHref}
-					onClick={() => dispatch(closeMobileDrawer())}
-					className="flex min-w-0 flex-1 items-center gap-3"
-				>
-					<div className="relative shrink-0">
-						<div className="relative w-10 h-10 rounded-full bg-bg-elevated border-2 border-accent overflow-hidden flex items-center justify-center shadow-[0_0_10px_rgba(0,255,136,0.3)]">
-							{avatarUrl ? (
-								<Image
-									src={avatarUrl}
-									alt=""
-									fill
-									className="object-cover"
-									sizes="40px"
-									unoptimized
-								/>
-							) : (
-								<UserIcon
-									size={18}
-									strokeWidth={1.5}
-									className="text-text-secondary"
-								/>
-							)}
-						</div>
-						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-accent rounded-full border-2 border-bg-base" />
-					</div>
-					<div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-						<span className="text-small font-black text-text-primary uppercase tracking-wider truncate">
-							{displayName}
-						</span>
-					</div>
-				</Link>
+				{user && (
+					<SmallUserCard
+						user={user}
+						isOwner={true}
+						loading={loading}
+						isMobile
+						onAvatarClick={() => dispatch(closeMobileDrawer())}
+					/>
+				)}
+
 				<button
 					type="button"
 					aria-label="Open account options"
-					className="shrink-0 rounded-md p-2 text-text-disabled transition-colors duration-default hover:bg-bg-elevated hover:text-text-primary"
+					className="shrink-0 rounded-md p-2 text-text-disabled transition-colors duration-default hover:bg-bg-elevated hover:text-text-primary ml-auto"
 					onClick={() => {
 						dispatch(closeMobileDrawer());
 						openLogoutDialog();
 					}}
 				>
-					<MoreVertical size={16} strokeWidth={1.5} />
+					<LogOutIcon size={16} strokeWidth={1.5} />
 				</button>
 			</div>
 		</div>

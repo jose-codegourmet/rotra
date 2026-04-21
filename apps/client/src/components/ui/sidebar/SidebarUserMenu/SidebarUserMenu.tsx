@@ -1,58 +1,20 @@
 "use client";
 
-import type { User as AuthUser } from "@supabase/supabase-js";
-import {
-	LogOut,
-	MoreVertical,
-	UserCircle,
-	User as UserIcon,
-} from "lucide-react";
-import Image from "next/image";
+import { LogOut, MoreVertical, UserCircle } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
-import {
-	avatarUrlFromAuthUser,
-	displayNameFromAuthUser,
-} from "@/lib/auth/supabase-user-display";
-import { createClient } from "@/lib/supabase/client";
+
 import { cn } from "@/lib/utils";
+import { useAppSelector } from "@/store/hooks";
+import { SmallUserCard } from "../../small-user-card/SmallUserCard";
 
 export function SidebarUserMenu() {
 	const [isOpen, setIsOpen] = useState(false);
-	const [user, setUser] = useState<AuthUser | null>(null);
-	const [loading, setLoading] = useState(true);
+	const user = useAppSelector((s) => s.auth.user);
 	const containerRef = useRef<HTMLDivElement>(null);
-	const supabase = useMemo(() => createClient(), []);
 	const { openDialog: openLogoutDialog } = useLogoutDialog();
-
-	useEffect(() => {
-		let cancelled = false;
-
-		async function loadUser() {
-			const { data } = await supabase.auth.getUser();
-			if (!cancelled) {
-				setUser(data.user ?? null);
-				setLoading(false);
-			}
-		}
-
-		void loadUser();
-
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
-			if (!cancelled) {
-				setUser(session?.user ?? null);
-			}
-		});
-
-		return () => {
-			cancelled = true;
-			subscription.unsubscribe();
-		};
-	}, [supabase]);
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -67,12 +29,6 @@ export function SidebarUserMenu() {
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, []);
 
-	const displayName = loading
-		? "…"
-		: user
-			? displayNameFromAuthUser(user)
-			: "Player";
-	const avatarUrl = user ? avatarUrlFromAuthUser(user) : null;
 	const profileHref = user ? `/profile/${user.id}` : "/profile";
 
 	return (
@@ -112,51 +68,26 @@ export function SidebarUserMenu() {
 				)}
 
 				{/* User row trigger */}
-				<button
-					type="button"
-					aria-label="Open user menu"
-					aria-expanded={isOpen}
-					onClick={() => setIsOpen((prev) => !prev)}
-					className="w-full flex items-center gap-3 lg:bg-bg-surface lg:p-3 rounded-lg transition-colors duration-default hover:bg-bg-elevated cursor-pointer group min-h-[44px]"
-				>
-					{/* Avatar */}
-					<div className="relative shrink-0">
-						<div className="relative w-10 h-10 rounded-full bg-bg-elevated border-2 border-accent overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform duration-default">
-							{avatarUrl ? (
-								<Image
-									src={avatarUrl}
-									alt=""
-									fill
-									className="object-cover"
-									sizes="40px"
-									unoptimized
-								/>
-							) : (
-								<UserIcon
-									size={18}
-									strokeWidth={1.5}
-									className="text-text-secondary"
-								/>
+				{user && (
+					<button
+						type="button"
+						aria-label="Open user menu"
+						aria-expanded={isOpen}
+						onClick={() => setIsOpen((prev) => !prev)}
+						className="w-full flex items-center gap-3 lg:bg-bg-surface lg:p-3 rounded-lg transition-colors duration-default hover:bg-bg-elevated cursor-pointer group min-h-[44px]"
+					>
+						<SmallUserCard user={user} isOwner={true} />
+
+						<MoreVertical
+							size={16}
+							strokeWidth={1.5}
+							className={cn(
+								"hidden lg:block ml-auto text-text-disabled transition-transform duration-default",
+								isOpen && "rotate-90",
 							)}
-						</div>
-						<div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-accent rounded-full border-2 border-bg-base" />
-					</div>
-
-					<div className="hidden lg:flex flex-col overflow-hidden flex-1 text-left">
-						<span className="text-small font-black text-text-primary uppercase tracking-wider truncate">
-							{displayName}
-						</span>
-					</div>
-
-					<MoreVertical
-						size={16}
-						strokeWidth={1.5}
-						className={cn(
-							"hidden lg:block ml-auto text-text-disabled transition-transform duration-default",
-							isOpen && "rotate-90",
-						)}
-					/>
-				</button>
+						/>
+					</button>
+				)}
 			</div>
 		</div>
 	);

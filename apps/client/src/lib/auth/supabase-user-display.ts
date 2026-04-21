@@ -1,6 +1,16 @@
 import type { User as AuthUser } from "@supabase/supabase-js";
 
-export function displayNameFromAuthUser(user: AuthUser): string {
+export function displayNameFromAuthUser({
+	user,
+	loading = false,
+}: {
+	user?: AuthUser | null;
+	loading?: boolean;
+}): string {
+	return loading ? "…" : user ? _getDisplayName(user) : "Player";
+}
+
+function _getDisplayName(user: AuthUser): string {
 	const meta = user.user_metadata as Record<string, unknown>;
 	const full = meta.full_name ?? meta.name;
 	if (typeof full === "string" && full.trim()) {
@@ -10,6 +20,29 @@ export function displayNameFromAuthUser(user: AuthUser): string {
 		return user.email;
 	}
 	return "Player";
+}
+
+/**
+ * Facebook Graph user id for `profiles.facebook_id`, aligned with the DB trigger
+ * (`raw_user_meta_data->>'provider_id'`).
+ */
+export function facebookIdFromAuthUser(user: AuthUser): string | null {
+	const meta = user.user_metadata as Record<string, unknown>;
+	const direct = meta.provider_id;
+	if (typeof direct === "string" && direct.trim()) {
+		return direct.trim();
+	}
+	for (const identity of user.identities ?? []) {
+		if (identity.provider !== "facebook") continue;
+		const raw = identity.identity_data;
+		if (raw && typeof raw === "object") {
+			const sub = (raw as { sub?: unknown }).sub;
+			if (typeof sub === "string" && sub.trim()) {
+				return sub.trim();
+			}
+		}
+	}
+	return null;
 }
 
 export function avatarUrlFromAuthUser(user: AuthUser): string | null {
