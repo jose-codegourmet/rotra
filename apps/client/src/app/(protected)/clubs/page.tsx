@@ -7,7 +7,9 @@ import {
 	Users,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
+import { Button } from "@/components/ui/button/Button";
 import { MY_CLUBS } from "@/constants/mock-clubs";
 
 export const metadata: Metadata = {
@@ -20,7 +22,7 @@ export default function ClubsPage() {
 		<div className="max-w-[1400px] mx-auto p-4 md:p-8">
 			<div className="flex flex-col gap-6">
 				{/* Page header */}
-				<div className="flex items-start justify-between gap-4">
+				<div className="flex items-start justify-between gap-4 flex-wrap">
 					<div>
 						<p className="text-micro font-bold uppercase tracking-widest text-accent mb-1">
 							Clubs
@@ -32,13 +34,35 @@ export default function ClubsPage() {
 							Manage your club memberships and sessions.
 						</p>
 					</div>
-					<button
-						type="button"
-						className="shrink-0 flex items-center gap-2 h-10 px-4 text-small font-black uppercase tracking-widest text-bg-base bg-gradient-to-br from-[#f1ffef] to-accent rounded-md shadow-accent transition-transform active:scale-95"
+					<Button
+						size="lg"
+						className="shrink-0 uppercase tracking-widest font-black"
+						asChild
 					>
-						<Plus size={16} strokeWidth={2} />
-						<span className="hidden sm:inline">New Club</span>
-					</button>
+						<Link href="/clubs/apply" className="gap-2">
+							<Plus size={16} strokeWidth={2} />
+							<span className="hidden sm:inline">Apply to start a club</span>
+							<span className="sm:hidden">Apply</span>
+						</Link>
+					</Button>
+				</div>
+
+				<div className="rounded-lg border border-border bg-bg-surface p-5 shadow-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+					<div>
+						<p className="text-heading font-semibold text-text-primary">
+							Run your own sessions
+						</p>
+						<p className="text-small text-text-secondary mt-1 max-w-xl">
+							Apply to start a club, grow a community, and host sessions on
+							ROTRA.
+						</p>
+					</div>
+					<Button variant="default" asChild>
+						<Link href="/clubs/apply" className="gap-2 shrink-0">
+							<Plus size={16} strokeWidth={2} />
+							Apply to start a club
+						</Link>
+					</Button>
 				</div>
 
 				{/* My clubs */}
@@ -68,7 +92,12 @@ export default function ClubsPage() {
 												strokeWidth={1.5}
 												className="shrink-0"
 											/>
-											<span>{club.location}</span>
+											<span>
+												{club.location}
+												{"venueName" in club && club.venueName
+													? ` · ${club.venueName}`
+													: null}
+											</span>
 										</div>
 
 										{/* Stats row */}
@@ -114,19 +143,22 @@ export default function ClubsPage() {
 								Create a club or explore existing ones to join.
 							</p>
 						</div>
-						<button
-							type="button"
-							className="flex items-center gap-2 h-10 px-5 text-small font-black uppercase tracking-widest text-bg-base bg-accent rounded-md"
+						<Button
+							size="lg"
+							className="uppercase tracking-widest font-black"
+							asChild
 						>
-							<Plus size={16} strokeWidth={2} />
-							Create Club
-						</button>
+							<Link href="/clubs/apply" className="gap-2">
+								<Plus size={16} strokeWidth={2} />
+								Apply to start a club
+							</Link>
+						</Button>
 					</div>
 				)}
 
 				{/* Discover more clubs link */}
 				<div className="border-t border-border pt-4">
-					<a
+					<Link
 						href="/explore"
 						className="flex items-center justify-between p-4 bg-bg-surface border border-border rounded-lg hover:bg-bg-elevated transition-colors duration-default"
 					>
@@ -143,7 +175,7 @@ export default function ClubsPage() {
 							strokeWidth={1.5}
 							className="text-text-disabled shrink-0"
 						/>
-					</a>
+					</Link>
 				</div>
 			</div>
 		</div>

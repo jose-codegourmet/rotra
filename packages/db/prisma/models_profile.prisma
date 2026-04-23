@@ -59,8 +59,9 @@ model Profile {
   sandbaggingFlags            SandbaggingFlag[]           @relation("SandbaggingPlayer")
   sandbaggingFlagsResolved    SandbaggingFlag[]           @relation("SandbaggingResolvedBy")
   notifications               Notification[]
-  clubOwnerApplications       ClubOwnerApplication[]      @relation("ClubAppPlayer")
-  clubOwnerApplicationsReviewed ClubOwnerApplication[]    @relation("ClubAppReviewedBy")
+  clubApplicationsSubmitted ClubApplication[]           @relation("ClubApplicationPlayer")
+  clubApplicationsReviewed    ClubApplication[]           @relation("ClubApplicationReviewedBy")
+  adminActionLogs             AdminActionLog[]            @relation("AdminActionActor")
   killSwitchesUpdated         KillSwitch[]                @relation("KillSwitchUpdatedBy")
   platformConfigsUpdated      PlatformConfig[]            @relation("PlatformConfigUpdatedBy")
   moderationFlagsReported     ModerationFlag[]            @relation("ModerationReporter")

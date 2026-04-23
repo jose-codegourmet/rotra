@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton/Skeleton";
 import { cn } from "@/lib/utils";
 
 interface ProfileRightColumnSkeletonProps {

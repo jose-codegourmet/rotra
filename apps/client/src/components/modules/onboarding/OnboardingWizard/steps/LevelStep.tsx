@@ -3,7 +3,7 @@
 import { useFormContext } from "react-hook-form";
 
 import { StepBlock } from "@/components/modules/onboarding/StepBlock/StepBlock";
-import { FieldError } from "@/components/ui/field";
+import { FieldError } from "@/components/ui/field/Field";
 import type { OnboardingFormValues } from "@/lib/onboarding/onboarding-form-schema";
 import type { OnboardingPayload } from "@/lib/onboarding/validate-payload";
 import { cn } from "@/lib/utils";

@@ -6,7 +6,7 @@ import { useFormContext } from "react-hook-form";
 
 import { ChipRow } from "@/components/modules/onboarding/ChipRow/ChipRow";
 import { StepBlock } from "@/components/modules/onboarding/StepBlock/StepBlock";
-import { FieldError } from "@/components/ui/field";
+import { FieldError } from "@/components/ui/field/Field";
 import type { OnboardingFormValues } from "@/lib/onboarding/onboarding-form-schema";
 
 type ChoiceField =
