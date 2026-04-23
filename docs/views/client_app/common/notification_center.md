@@ -1,7 +1,21 @@
 # View: Notification Center
 
 ## Purpose
-The in-app notification inbox. Shows all push and in-app notifications for the authenticated user — session reminders, club events, review prompts, EXP awards, match alerts, and system messages. Serves as a fallback for users who denied OS push permissions (in-app only in that case).
+The in-app notification inbox. Shows all push and in-app notifications for the authenticated user — session reminders, club events, review prompts, EXP awards, match alerts, club application outcomes, and system messages. Serves as a fallback for users who denied OS push permissions (in-app only in that case).
+
+## Navbar notification dropdown
+
+In addition to this full-page inbox, the **top bar / navbar** (or shell header) exposes a **dropdown** anchored to the bell icon:
+
+- Shows the **5 most recent** notifications (read + unread mixed, newest first).
+- **Unread badge** on the bell shows total unread count (driven by server state; client may subscribe via Realtime — see below).
+- **Mark all as read** control at the top of the dropdown (same behavior as full page).
+- Footer link: **View all** → navigates to `/notifications`.
+- **Tap a row:** mark that notification as read (if unread), then **navigate** using `related_entity_type` + `related_entity_id` (same mapping as the full list).
+
+## Realtime (Client app)
+
+Subscribe to `INSERT` on `notifications` filtered by `recipient_id` (see [`../../../database/07_notifications.md`](../../../database/07_notifications.md)) so new items appear without polling; badge count updates immediately.
 
 ## Route
 `/notifications` — authenticated users only
@@ -85,7 +99,7 @@ Full-screen scrollable page accessible from the bottom nav notification tab. Hea
   - Icon types by notification category:
     - Session / match: shuttlecock or court icon
     - Review prompt: star icon
-    - Club event: users icon
+    - Club event / application: users or document icon
     - EXP / level-up: lightning bolt / tier badge icon
     - System / account: info circle icon
     - Payment: currency icon
@@ -106,7 +120,10 @@ Full-screen scrollable page accessible from the bottom nav notification tab. Hea
 | Que Master assigned | `/clubs/:id` |
 | Level-up | `/profile` (EXP ledger) |
 | EXP awarded | `/profile/exp-ledger` |
-| Club Owner approved | `/home` |
+| `club_application_approved` / `club_application_rejected` / SLA reject | `/profile/applications` |
+| `club_application_submitted` (receipt) | `/profile/applications` |
+| `club_closed` / `club_demotion_completed` | `/clubs/:id` or `/profile/applications` per payload |
+| `complaint_submitted` | `/profile` (no resolution follow-up) |
 | Payment reminder | `/sessions/:id` |
 
 **Swipe to dismiss:** Swipe left on any row → row slides to reveal red `CLEAR` zone (background `color-error` at 20% opacity, white trash icon + `CLEAR` label). Release to dismiss permanently from list.
@@ -150,7 +167,8 @@ Full-screen scrollable page accessible from the bottom nav notification tab. Hea
 - `An opponent rated your performance highly. +5 EXP bonus.`
 
 ### System / Account
-- `Your Club Owner request has been approved. Create your first club.`
+- `Your club application for Sunrise BC was approved.`
+- `Your club application was not approved.` (with reason summary)
 - `You've leveled up to Warrior 2!`
 - `Your playing level has been adjusted by the system.`
 

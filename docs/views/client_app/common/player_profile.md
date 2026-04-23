@@ -11,6 +11,12 @@ All authenticated roles. The player viewing their own profile sees an edit butto
 
 ---
 
+## Report to admins (complaints)
+
+When the viewer is an **active member of the same club context** as the profile being viewed (e.g. opened from a club roster or session), show **Report player** in the header overflow (`⋯`). Submits a `complaints` row with `target_type = 'player'` and `target_id` = profile id. Same modal pattern as club profile (reason + optional context). See [`../../../database/12_club_governance.md`](../../../database/12_club_governance.md).
+
+---
+
 ## Layout
 Single-column scrollable page. No inner tabs — sections stack vertically. Sticky header on scroll that shows the player's name + avatar once the hero section scrolls out of view.
 

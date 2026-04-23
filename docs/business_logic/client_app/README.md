@@ -61,12 +61,12 @@ Register (Facebook Login)
 
 ### Club Owner Flow
 ```
-Request Club Owner role (manual approval → Admin App)
-  → Create Club
-    → Configure membership settings
-      → Invite / approve members
-        → Assign Que Master(s)
-          → Monitor sessions and club statistics
+Submit club application (/clubs/apply) → Admin approves in Admin App → Club row created
+  → Configure membership settings
+    → Invite / approve members
+      → Assign Que Master(s)
+        → Monitor sessions and club statistics
+(Additional clubs: repeat application + approval for each new club.)
 ```
 
 ### Que Master Flow
@@ -90,5 +90,5 @@ Assigned by Club Owner
 | Que Master generates Quick Umpire token | Client App | Token opens in Umpire App |
 | Umpire submits score | Umpire App | Score appears on Client App Court View |
 | Smart monitoring alert (score nearing end) | Client App receives push | Triggered by Umpire App score updates |
-| Club Owner approval | Client App (request) | Processed in Admin App |
+| Club application approval | Client App (`/clubs/apply`, `/profile/applications`) | Admin App (`/admin/approvals/*`; see `database/12_club_governance.md`) |
 | Kill switch disables a feature | Admin App toggles | Client App feature disappears |

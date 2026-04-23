@@ -1,292 +1,97 @@
-# View: Club Owner Approvals
+# View: Approvals (Club applications & demotions)
 
 ## Purpose
 
-The approvals view is the structured replacement for the manual email-based Club Owner application process (`jose@codegourmet.io`). It presents all pending Club Owner applications in a sortable queue and provides a split-pane review interface where the admin can examine the applicant's profile, activity history, and stated purpose before approving or rejecting.
+Primary admin surface for **reviewing `club_applications`** (mint new clubs) and **`club_demotion_requests`** (transfer ownership, archive, reject). Replaces ad-hoc email review. See [`../../database/12_club_governance.md`](../../database/12_club_governance.md) and [`../../business_logic/admin_app/04_approvals_and_moderation.md`](../../business_logic/admin_app/04_approvals_and_moderation.md).
 
-Approval is immediate and irreversible without a follow-up admin action. Rejection requires an optional note; rejected applicants are notified in-app and cannot re-apply for a configurable cooldown period (default 30 days).
+## Routes
 
-## Route
-
-`/admin/approvals` — authenticated admins only
+| Path | Tab |
+|------|-----|
+| `/admin/approvals` | Redirect to **Club applications** (default) |
+| `/admin/approvals/club-applications` | Club application queue |
+| `/admin/approvals/demotions` | Demotion queue |
 
 ## Roles
 
-Platform Admin, Super Admin. Both roles have equal access to this view.
+Platform Admin, Super Admin.
 
 ---
 
-## Layout
+## Global layout
 
-Two-column split pane. The left pane holds the application queue table. The right pane shows the detail view for the selected application. When no application is selected, the right pane shows an empty state prompt.
+- **Desktop:** Two-column split pane — queue (~45%) + detail (~55%), as in previous wireframes.
+- **Mobile / narrow:** **Stacked layout** — queue full width on top; selecting a row opens the detail pane **below** (or as a full-width sheet with back affordance). No “unsupported on mobile” — admin must be usable on phone.
 
-```
-┌─────────────────────┬──────────────────────────────────────────────────────┐
-│  SIDEBAR (240px)    │  ● PRODUCTION                              Admin ▾   │
-│                     ├──────────────────────────────────────────────────────┤
-│  [▪] Dashboard      │  Club Owner Approvals                                │
-│  [▪] Kill Switches  │  ─────────────────────────────────────────────────   │
-│  [▪] Environments   │  3 Pending  ·  142 Total (all time)                  │
-│  [▪] Approvals   3← │                                                      │
-│  ...                ├────────────────────────────┬───────────────────────── │
-│                     │  QUEUE  (45%)              │  DETAIL PANE  (55%)     │
-│                     │                            │                         │
-│                     │  [ Filter: Pending ▾ ]     │  ← Select an applica-   │
-│                     │  [ Sort: Oldest First ▾ ]  │     tion to review      │
-│                     │                            │                         │
-│                     │  ┌────────────────────────┐│                         │
-│                     │  │ ● Alex Santos          ││                         │
-│                     │  │ Sunrise BC · 2 days    ││                         │
-│                     │  │ [ Pending ]            ││                         │
-│                     │  ├────────────────────────┤│                         │
-│                     │  │ ● Maria Reyes          ││                         │
-│                     │  │ Metro BC · 5 days      ││                         │
-│                     │  │ [ Pending ]            ││                         │
-│                     │  ├────────────────────────┤│                         │
-│                     │  │ ● Carlo Dizon          ││                         │
-│                     │  │ Eastside Shuttlers     ││                         │
-│                     │  │ · 1 day    [ Pending ] ││                         │
-│                     │  └────────────────────────┘│                         │
-└─────────────────────┴────────────────────────────┴─────────────────────────┘
-```
+### Page chrome
 
-When an application is selected in the queue:
-
-```
-┌──────────────────────────────────┬─────────────────────────────────────────┐
-│  QUEUE (selected row highlighted)│  DETAIL PANE                            │
-│                                  │                                         │
-│  [● Alex Santos — selected]      │  Alex Santos          [ View Profile ↗ ]│
-│  [  Maria Reyes               ]  │  @alex_santos · Facebook: Alex Santos   │
-│  [  Carlo Dizon               ]  │  Applied: Mar 28, 2026 (2 days ago)     │
-│                                  │                                         │
-│                                  │  Requested club name:                   │
-│                                  │  Sunrise Badminton Club                 │
-│                                  │                                         │
-│                                  │  Purpose / Description:                 │
-│                                  │  "We want to organise weekly sessions   │
-│                                  │   at Sunrise Sports Hall, targeting     │
-│                                  │   intermediate-level players..."        │
-│                                  │                                         │
-│                                  │  ── Player Activity ─────────────────   │
-│                                  │  Sessions attended:   24                │
-│                                  │  Matches played:      87                │
-│                                  │  Clubs joined:        2                 │
-│                                  │  Member since:        Jan 2026          │
-│                                  │  Tier:                Elite 1           │
-│                                  │                                         │
-│                                  │  ── Previous Applications ────────────  │
-│                                  │  None                                   │
-│                                  │                                         │
-│                                  │  ┌─────────────────┐ ┌───────────────┐  │
-│                                  │  │  Reject         │ │  Approve ✓    │  │
-│                                  │  └─────────────────┘ └───────────────┘  │
-└──────────────────────────────────┴─────────────────────────────────────────┘
-```
+- Horizontal **tabs** under the page title: `[ Club applications ] [ Demotions ]`.
+- Optional third nav entry **Audit log** may link to [`audit_log.md`](./audit_log.md) (`/admin/audit-log`) instead of duplicating log UI here.
 
 ---
 
-## Components
+## Tab: Club applications
 
-### Queue Summary Bar
+### Queue controls
 
-- Full-width strip directly below the page header
-- Background: `color-bg-surface`; border-bottom: 1px `color-border`; `space-5` padding
-- **Pending count:** `text-body`, Bold, `color-text-primary` (e.g. `3 Pending`)
-- **Total all-time:** `text-body`, `color-text-secondary` (e.g. `142 Total (all time)`)
-- Separator: `·` between the two counts
+- **Filters:** Pending (default), In review, Approved, Rejected, All.
+- **Sort:** Newest first (default), Oldest first, **Longest waiting** (by `updated_at` ascending for pending — surfaces SLA risk).
+- **SLA indicator:** per pending row, show time remaining until **24h auto-reject** from `updated_at`.
 
-### Queue Controls
+### Queue row
 
-Two inline dropdowns in the queue pane header:
+Applicant name, requested club name, city, submitted/updated relative time, status pill.
 
-- **Filter dropdown:** `Pending` (default) · `Approved` · `Rejected` · `All`
-  - Dropdown: `color-bg-elevated` background, `color-border` border, `radius-md`, `text-body`, 40px height, 160px width
-- **Sort dropdown:** `Oldest First` (default) · `Newest First` · `A–Z by Name`
-  - Same styling as filter dropdown
+### Detail pane
 
-### Queue List
+- Applicant header + **View profile** (opens client profile in new tab).
+- Full application payload: description, intent, venue fields, URLs, phone, expected bucket, notes.
+- **Collision warning** banner when other clubs share the same name — list city, owner, status, approved date.
+- **Player activity** summary (sessions, matches, clubs, tier) — optional for MVP richness.
+- **Previous applications** for same player (link to filtered history).
 
-- Background: `color-bg-surface`
-- Each application row: 80px height, `space-4` horizontal padding; border-bottom 1px `color-border`
-- Row layout:
-  - **Avatar:** 36×36px circle, initials-based, `radius-full`; background colour derived from applicant name (deterministic hue)
-  - **Player name:** `text-body` (15px, Medium), `color-text-primary`
-  - **Requested club name:** `text-small`, `color-text-secondary`
-  - **Submission age:** `text-small`, `color-text-disabled` — e.g. `"2 days ago"`
-  - **Status badge:** right-aligned pill
-    - `Pending` — `color-warning-subtle` bg, `color-warning` text
-    - `Approved` — `color-accent-subtle` bg, `color-accent` text
-    - `Rejected` — `color-error-subtle` bg, `color-error` text
-- Selected row: `color-accent-subtle` background; 3px left inset bar `color-accent`
-- Hover (unselected): `color-bg-elevated` background
-- Clicking a row selects it and loads the detail pane
-- Empty state (no applications matching filter): centred message `"No applications found."` — `text-body`, `color-text-disabled`
+### Actions
 
-### Detail Pane
+- **Approve** → confirmation modal → creates `clubs` row, sets `resulting_club_id`, logs `admin_action_log`, notifies `club_application_approved`.
+- **Reject** → modal with **required** `application_rejection_reason_enum` + optional note → notifies `club_application_rejected`.
+- **Bulk reject** (multi-select rows): single reason + note applied to all selected pending rows.
+- **Export CSV** of visible queue (respects filter/sort).
 
-Shown when an application is selected. Right-side panel, 55% width.
+**No bulk approve.**
 
-- Background: `color-bg-base`; left border: 1px `color-border`; `space-6` padding
-- Scrollable if content exceeds viewport height
+---
 
-**Applicant Header:**
-- Player name — `text-title` (20px, SemiBold), `color-text-primary`
-- Username / Facebook identity — `text-small`, `color-text-secondary`
-- Submission date — `text-small`, `color-text-disabled` — full date + relative (e.g. `"Mar 28, 2026 (2 days ago)"`)
-- `View Profile ↗` link — top-right, `text-small`, `color-accent` — opens the player's Client App profile in a new tab
+## Tab: Demotions
 
-**Requested Club Name:**
-- Label: `"Requested club name:"` — `text-small`, `color-text-secondary`
-- Value: `text-heading` (18px, SemiBold), `color-text-primary`
+### Queue
 
-**Purpose / Description:**
-- Label: `"Purpose / Description:"` — `text-small`, `color-text-secondary`
-- Body: quotation-styled block — `text-body`, `color-text-primary`; `color-bg-surface` background; `radius-md`; `space-4` padding; left border 3px `color-accent-dim`
-- Max display height: 160px; if content is taller, the block scrolls internally with a fade-out gradient at the bottom
+Columns: Club, current owner, requester + role (`owner_self` / `member` / `admin`), status, submitted time, linked complaint (if any).
 
-**Player Activity Section:**
+### Detail
 
-Section label: `"Player Activity"` — `text-small`, uppercase, `color-text-disabled`; divider line
-
-A 3-column stats grid:
-
-| Stat | Value |
-|---|---|
-| Sessions attended | count |
-| Matches played | count |
-| Clubs joined | count |
-| Member since | month + year |
-| Current tier | tier name + sub-rank |
-| Win rate | % (shown only if ≥ 5 scored matches) |
-
-- Each stat: label (`text-small`, `color-text-secondary`) + value (`text-heading`, `color-text-primary`) stacked vertically
-- Arranged in a 3-column grid with `space-4` gap
-- Tier badge: small coloured pill matching tier colour
-
-**Previous Applications Section:**
-
-Section label: `"Previous Applications"` — `text-small`, uppercase, `color-text-disabled`; divider line
-
-- If no prior applications: `"None"` — `text-body`, `color-text-disabled`
-- If prior applications exist: a table of past submissions:
-  - Columns: Date · Club Name Requested · Outcome · Decided By · Re-apply Cooldown
-  - Rejected rows show a cooldown badge: `"Re-apply eligible: [date]"` — `color-warning-subtle` bg, `color-warning` text if cooldown active; `color-accent-subtle` bg if cooldown has passed
-
-**Action Buttons:**
-
-Two buttons at the bottom of the detail pane, anchored to the bottom edge (sticky footer within the pane):
-
-- **Reject button:** `color-bg-surface` background, `color-error` border (1px), `color-error` label `"Reject"`, `text-label`, `radius-md`, height 44px, width 160px — triggers the Reject Modal
-- **Approve button:** `color-accent` background, white label `"Approve ✓"`, `text-label`, `radius-md`, height 44px, width 160px — triggers the Approve Confirmation Modal
+- Reason text, evidence URL, complaint deep link.
+- **Resolution:**
+  - **Transfer** — dropdown: Que Masters (active) first, then other active members; confirm.
+  - **Archive club** — confirm; notifies all members `club_closed`.
+  - **Reject** — `demotion_rejection_reason_enum` + optional note.
+- **One-click admin demote** (toolbar): shortcut into archive or transfer with minimal steps; must still write **`admin_action_log`**.
 
 ---
 
 ## Modals
 
-### Approve Confirmation Modal
-
-```
-┌───────────────────────────────────────────────────┐
-│  Approve Club Owner: Alex Santos?                 │
-│  ─────────────────────────────────────────────    │
-│  This will immediately grant Club Owner role to   │
-│  Alex Santos. They will be able to create a club  │
-│  and manage sessions.                             │
-│                                                   │
-│  Alex will receive an in-app notification.        │
-│                                                   │
-│  [  Cancel  ]              [ Approve → ]          │
-└───────────────────────────────────────────────────┘
-```
-
-- Same modal card spec as other views (`shadow-modal`, `radius-xl`, `color-bg-surface`, max-width 440px)
-- **Title:** `"Approve Club Owner: [Name]?"` — `text-heading`, `color-text-primary`
-- **Body:** impact statement — `text-body`, `color-text-secondary`
-- **Notification note:** `text-small`, `color-text-disabled`
-- **Cancel button:** `color-bg-elevated`, `color-text-primary`
-- **Approve button:** `color-accent` background, white, label `"Approve →"`
-- On confirmation: application status updates to `Approved` in the queue; detail pane shows approved state; player receives in-app notification; queue row moves out of Pending filter if filter is active
-
-### Reject Modal
-
-```
-┌───────────────────────────────────────────────────┐
-│  Reject application: Alex Santos                  │
-│  ─────────────────────────────────────────────    │
-│  Rejection reason (shown to the applicant):       │
-│  [ _________________________________________ ]    │
-│  [ _________________________________________ ]    │
-│  Optional. Max 500 characters.                    │
-│                                                   │
-│  The applicant cannot re-apply for 30 days.       │
-│                                                   │
-│  [  Cancel  ]            [ Confirm Rejection ]    │
-└───────────────────────────────────────────────────┘
-```
-
-- **Title:** `"Reject application: [Name]"` — `text-heading`, `color-text-primary`
-- **Rejection note textarea:** optional; `color-bg-elevated` bg, `radius-md`, `color-border` border; placeholder `"Optional: explain why this application was rejected. This note will be shown to the applicant."`; max 500 chars; character counter (`text-micro`, `color-text-disabled`)
-- **Cooldown note:** `text-small`, `color-text-secondary` — `"The applicant cannot re-apply for [N] days."` (N from platform config `thresholds.reapply_after_rejection_days`)
-- **Cancel button:** `color-bg-elevated`, `color-text-primary`
-- **Confirm button:** `color-error` background, white, label `"Confirm Rejection"`
-- On confirmation: application status updates to `Rejected`; rejection note attached to record; player receives in-app notification (with note if provided); queue row removed from Pending filter
+Reuse modal card spec from prior doc: `shadow-modal`, `radius-xl`, `color-bg-surface`, max-width ~440–480px; primary/secondary buttons consistent with Admin design system.
 
 ---
 
-## States
+## Design tokens
 
-### Empty Queue (all pending resolved)
-Queue pane shows: large checkmark icon (40px, `color-accent`) + `"All applications reviewed."` — `text-heading`, `color-text-secondary`. Sidebar badge clears to zero.
-
-### Application Loading
-Clicking a queue row triggers a brief skeleton placeholder in the detail pane while data loads (skeleton bars for each content block, `color-bg-elevated` background, pulse animation).
-
-### Decision Confirmed
-After approve or reject is confirmed:
-- The queue row badge updates to `Approved` or `Rejected`
-- The detail pane action buttons become inactive (replaced by a read-only outcome strip: `"Approved by [Admin] on [date]"` or `"Rejected by [Admin] on [date]"`)
-- The detail pane remains visible so the admin can review the decision before moving on
-
-### Applicant in Cooldown
-If an application is in the queue for a player who previously had a rejected application within the cooldown window, the Previous Applications section in the detail pane shows a warning: `"This applicant re-applied before their cooldown period ended."` — `color-warning-subtle` bg banner, `color-warning` text. The approve/reject actions are still available; the admin makes the call.
+Use existing admin tokens: `color-bg-base`, `color-bg-surface`, `color-accent`, `color-error`, `color-warning`, `color-border`, `text-heading`, `text-body`, `text-small`.
 
 ---
 
-## Responsive Layout
+## Cross-links
 
-| Breakpoint | Range | Layout |
-|---|---|---|
-| Desktop (primary) | ≥ 1280px | Two-column split pane (45% queue / 55% detail) |
-| Desktop (compact) | 1024px–1279px | Two-column split pane (40% / 60%) |
-| Tablet | 768px–1023px | Queue full-width; detail pane opens as a right-side drawer overlay |
-| Mobile | < 768px | Not supported |
-
----
-
-## Design Tokens
-
-| Token | Usage |
-|---|---|
-| `color-bg-base` | Detail pane background |
-| `color-bg-surface` | Queue list, section cards, modal card |
-| `color-bg-elevated` | Row hover, filter dropdowns, reject note textarea |
-| `color-border` | Row separators, panel borders, input borders |
-| `color-accent` | Approve button, selected row bar, CTA links, tier-colour for Apex |
-| `color-accent-subtle` | Selected row background, approved badge background, cooldown-passed badge |
-| `color-accent-dim` | Description block left border |
-| `color-error` | Reject button border + label, rejected badge text, confirm rejection button |
-| `color-error-subtle` | Rejected badge background |
-| `color-warning` | Pending badge text, cooldown-active badge text, early re-apply warning |
-| `color-warning-subtle` | Pending badge background, cooldown-active badge background, early re-apply banner |
-| `color-text-primary` | Player name, stats values, modal titles |
-| `color-text-secondary` | Metadata, labels, modal body |
-| `color-text-disabled` | Submission age, section headers, empty states |
-| `shadow-modal` | Confirmation modals |
-| `radius-xl` 20px | Modal cards |
-| `radius-md` 10px | Buttons, inputs, description block |
-| `text-title` 20px SemiBold | Player name in detail pane |
-| `text-heading` 18px SemiBold | Club name, stats values |
-| `text-body` 15px | Queue row names, description text |
-| `text-small` 13px | Metadata, labels, previous applications |
-| `text-micro` 10px | Character counters, badge text |
+- Admin notifications: [`admin_notifications.md`](./admin_notifications.md)
+- Audit log: [`audit_log.md`](./audit_log.md)
+- Client application form: [`../client_app/player/club_application.md`](../client_app/player/club_application.md)

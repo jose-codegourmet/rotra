@@ -106,8 +106,12 @@ Sent when club-level events occur.
 
 | Trigger | Recipient | Message |
 |---------|-----------|---------|
-| Club Owner request approved | Player | "Your request to become a Club Owner has been approved. Create your first club." |
-| Club Owner request rejected | Player | "Your Club Owner request was not approved. Contact jose@codegourmet.io for details." |
+| Club application approved | Player | "Your club application was approved. [Club name] is ready." (`club_application_approved`) |
+| Club application rejected | Player | "Your club application was not approved." Includes reason summary (`club_application_rejected`) |
+| Club application SLA timeout | Player | Auto-rejected pending application after 24h without review (`club_application_rejected`) |
+| Club closed (archived) | All members of that club | "[Club name] has been closed." (`club_closed`) |
+| Demotion / ownership ended | Former owner | Ownership ended for that club (`club_demotion_completed`) |
+| Complaint submitted (optional receipt) | Reporter | "We received your report." (`complaint_submitted` — no follow-up on resolution) |
 | Player levels up (tier upgrade) | Player | "You've leveled up to [new tier]! Your rating has reached a new milestone." |
 | Sandbagging flag applied | Player | "Your displayed playing level has been adjusted by the system based on match data." |
 | Sandbagging flag cleared | Player | "Your playing level display has been restored to your self-declared level." |

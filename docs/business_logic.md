@@ -52,15 +52,11 @@ All users begin as **Players**. Elevated roles are granted additively — a Club
 
 ### 2.2 Club Owner / Host
 
-* Must be **requested and approved** — role is not self-assignable
-* Current approval flow:
-  * Player submits a request with club name and intent
-  * Request is reviewed at: `jose@codegourmet.io`
-  * Approval is manual until Admin role is built (see 2.4)
+* Must be **requested and approved per club** — each new `clubs` row comes from an admin-approved **`club_applications`** record (see `database/12_club_governance.md` and Admin App approvals).
 
 * Inherits all Player capabilities within their own club
 * Additionally can:
-  * Create, edit, and delete clubs they own
+  * Apply for additional clubs (repeat application flow); **archive** clubs they own (no hard delete)
   * Create **club queue** sessions under their clubs (set **Schedule type**: MMR vs Fun Games)
   * Configure membership settings (auto-approve, invite links)
   * Invite players directly or via link/QR
@@ -109,7 +105,7 @@ All users begin as **Players**. Elevated roles are granted additively — a Club
 
 * Platform-level role, not club-scoped
 * Will handle:
-  * Approving or rejecting Club Owner applications
+  * Approving or rejecting **club applications** and **demotion requests**; triaging **complaints** and **`moderation_flags`**
   * Platform-wide moderation (flagged reviews, bans)
   * Managing global rankings and featured leaderboards
   * Configuring gamification parameters (EXP rates, badge thresholds)
@@ -1122,7 +1118,7 @@ Goal: Expand beyond casual sessions into structured competition.
 * Tournament module (brackets, skill tiers, dedicated admin)
 * Global leaderboard
 * Badge / achievement system
-* Admin role (Club Owner approval, moderation, gamification config)
+* Admin role (club application & demotion approvals, moderation, gamification config)
 * Payment platform integrations (GCash, PayMaya, etc.)
 * Reporting system for flagged reviews
 * Advance player-to-player search and discovery
@@ -1151,7 +1147,7 @@ Goal: Expand beyond casual sessions into structured competition.
 ```
 - All users start as Players upon registration
 
-- Club Owner role requires manual approval (request to jose@codegourmet.io until Admin module is built)
+- Owning a club requires an admin-approved club application per club (`database/12_club_governance.md`); 24h SLA auto-reject on stale pending rows
 
 - Que Master is not a global role; it is assigned per club by the Club Owner
 - Club Owner can assign multiple members as Que Masters simultaneously (no cap; bulk assignment supported)

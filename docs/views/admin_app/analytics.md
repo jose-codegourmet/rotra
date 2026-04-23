@@ -134,7 +134,7 @@ Each metric card:
 | New Clubs Created | count | absolute delta | — |
 | Player Churn | % | pp change | `"% of players with no activity in last 60 days"` |
 | Returning Players | % | pp change | `"% active this week who were active last week"` |
-| Club Owner Applications | count submitted | — | `"[N] approved / [N] rejected"` |
+| Club applications | count submitted | — | `"[N] approved / [N] rejected"` |
 
 Cards arranged in a responsive grid: 3 across, then 2, wrapping to fill.
 
@@ -227,7 +227,7 @@ Queue health and content safety metrics.
 | Flagged Reviews Resolved | count | `"In the selected time range"` |
 | Avg Review Resolution Time | duration | `"Time from flagged to actioned"` |
 | Active Suspensions | count | `"Currently suspended accounts"` |
-| Club Owner Applications Pending | count | Links to `/admin/approvals` |
+| Club applications pending | count | Links to `/admin/approvals/club-applications` |
 
 - Metric cards that link to other views show a `"→ Go to [view]"` text link below the primary value, `text-small`, `color-accent`
 - Pending counts with values > 0 show `color-warning` left inset bar on the card

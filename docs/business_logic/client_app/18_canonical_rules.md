@@ -15,9 +15,9 @@ RULE-002: One Facebook account maps to exactly one Player account.
           A Facebook user ID is the unique identity key.
           Duplicate registration is rejected silently (existing account is returned).
 
-RULE-003: Club Owner role requires manual approval.
-          Requests are sent to jose@codegourmet.io until the Admin module is live.
-          No player can self-assign the Club Owner role.
+RULE-003: Owning a **club** requires an admin-approved **club application** per club.
+          Each approval mints exactly one `clubs` row; no player can self-assign ownership without that approval.
+          Pending applications are subject to a **24-hour review SLA** from `updated_at` (see [`../../database/12_club_governance.md`](../../database/12_club_governance.md)).
 ```
 
 ---
