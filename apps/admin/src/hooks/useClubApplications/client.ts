@@ -29,7 +29,12 @@ export function clubApplicationsListQueryKey(params: {
 }
 
 export function clubApplicationNameCollisionsQueryKey(applicationId: string) {
-	return ["admin", "clubApplications", applicationId, "nameCollisions"] as const;
+	return [
+		"admin",
+		"clubApplications",
+		applicationId,
+		"nameCollisions",
+	] as const;
 }
 
 export function useClubApplicationsListQuery(params: {
@@ -45,13 +50,14 @@ export function useClubApplicationsListQuery(params: {
 	});
 }
 
-export function useClubApplicationNameCollisionsQuery(applicationId: string | null) {
+export function useClubApplicationNameCollisionsQuery(
+	applicationId: string | null,
+) {
 	return useQuery({
 		queryKey: applicationId
 			? clubApplicationNameCollisionsQueryKey(applicationId)
 			: (["admin", "clubApplications", "nameCollisions", "none"] as const),
-		queryFn: () =>
-			fetchClubApplicationNameCollisions(applicationId as string),
+		queryFn: () => fetchClubApplicationNameCollisions(applicationId as string),
 		enabled: Boolean(applicationId),
 	});
 }

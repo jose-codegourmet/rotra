@@ -1,5 +1,16 @@
 "use client";
 
+import { useState } from "react";
+import { ClubApplicationForm } from "@/components/modules/clubs/club-application-form/ClubApplicationForm";
+import type { ClubApplicationCreateFormValues } from "@/components/modules/clubs/club-application-form/schema";
+import { Button } from "@/components/ui/button/Button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog/Dialog";
 import type { ClubApplicationDto } from "@/types/club-application";
 
 const SLA_HOURS = 24;
@@ -12,11 +23,21 @@ function formatSlaDeadline(updatedAtIso: string): string {
 
 export type ClubApplicationPendingBannerProps = {
 	pending: ClubApplicationDto;
+	syncFromPending: ClubApplicationCreateFormValues | null;
+	rejectedDismissed: boolean;
+	isBusy: boolean;
 };
 
 export function ClubApplicationPendingBanner({
 	pending,
+	rejectedDismissed,
+	isBusy,
+	syncFromPending,
 }: ClubApplicationPendingBannerProps) {
+	const [showPendingDetails, setShowPendingDetails] = useState(false);
+	const handleShowPendingDetails = () => {
+		setShowPendingDetails(true);
+	};
 	return (
 		<div
 			className="rounded-lg border border-warning/50 bg-bg-elevated p-4 text-body text-text-secondary"
@@ -38,10 +59,26 @@ export function ClubApplicationPendingBanner({
 				will close automatically and you can submit again. You will get in-app
 				notifications when there is a decision.
 			</p>
-			<p className="text-micro text-text-disabled mt-2">
+			<p className="text-micro text-text-disabled mt-2 mb-4">
 				Last updated {new Date(pending.updatedAt).toLocaleString()} · Review
 				deadline from last save: {formatSlaDeadline(pending.updatedAt)}
 			</p>
+			<Button onClick={handleShowPendingDetails}>Show pending details</Button>
+			<Dialog open={showPendingDetails} onOpenChange={setShowPendingDetails}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Pending details</DialogTitle>
+					</DialogHeader>
+					<div className="h-screen max-h-[60vh] overflow-y-auto">
+						<p>These are the pending details.</p>
+						<ClubApplicationForm
+							key={`${pending?.id ?? "new"}-${rejectedDismissed ? "d" : "r"}`}
+							syncFromPending={syncFromPending}
+							disabled={isBusy}
+						/>
+					</div>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

@@ -25,7 +25,9 @@ type Row = {
 	player: { name: string; email: string | null };
 };
 
-export function toClubApplicationListRowDto(row: Row): ClubApplicationListRowDto {
+export function toClubApplicationListRowDto(
+	row: Row,
+): ClubApplicationListRowDto {
 	return {
 		id: row.id,
 		playerId: row.playerId,

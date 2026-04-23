@@ -1,6 +1,17 @@
 "use client";
 
+import {
+	createColumnHelper,
+	flexRender,
+	getCoreRowModel,
+	type OnChangeFn,
+	type RowSelectionState,
+	useReactTable,
+} from "@tanstack/react-table";
+import * as React from "react";
+
 import { Button } from "@/components/ui/button/Button";
+import { Checkbox } from "@/components/ui/checkbox/Checkbox";
 import type { ClubApplicationListRowDto } from "@/types/club-application-admin";
 
 import { ApplicationStatusPill } from "./ApplicationStatusPill";
@@ -22,6 +33,117 @@ export type ApplicationQueueTableProps = {
 	onRefresh: () => void;
 };
 
+const columnHelper = createColumnHelper<ClubApplicationListRowDto>();
+
+function buildColumns(
+	sort: string,
+	onSortChange: (sort: string) => void,
+	selectedIds: Set<string>,
+	onToggleSelectAllOnPage: (ids: string[], selected: boolean) => void,
+) {
+	return [
+		columnHelper.display({
+			id: "select",
+			header: ({ table }) => {
+				const actionableIds = table
+					.getRowModel()
+					.rows.filter((r) => r.getCanSelect())
+					.map((r) => r.original.id);
+				const allSelected =
+					actionableIds.length > 0 &&
+					actionableIds.every((id) => selectedIds.has(id));
+				return (
+					<Checkbox
+						checked={allSelected}
+						onCheckedChange={(checked: boolean) =>
+							onToggleSelectAllOnPage(actionableIds, checked)
+						}
+						aria-label="Select all actionable on page"
+					/>
+				);
+			},
+			cell: ({ row }) => (
+				<Checkbox
+					disabled={!row.getCanSelect()}
+					checked={row.getIsSelected()}
+					onCheckedChange={(checked: boolean) => row.toggleSelected(checked)}
+					onClick={(e: React.MouseEvent<HTMLElement>) => e.stopPropagation()}
+					aria-label={`Select ${row.original.clubName}`}
+				/>
+			),
+		}),
+		columnHelper.display({
+			id: "applicant",
+			header: "Applicant",
+			cell: ({ row }) => (
+				<>
+					<div className="font-medium text-text-primary">
+						{row.original.applicantName}
+					</div>
+					<div className="text-text-secondary text-micro">
+						{row.original.applicantEmail}
+					</div>
+				</>
+			),
+		}),
+		columnHelper.accessor("clubName", {
+			header: "Club",
+			cell: (info) => (
+				<span className="text-text-primary">{info.getValue()}</span>
+			),
+		}),
+		columnHelper.accessor("locationCity", {
+			header: "City",
+			cell: (info) => (
+				<span className="text-text-secondary">{info.getValue()}</span>
+			),
+		}),
+		columnHelper.accessor("status", {
+			header: "Status",
+			cell: (info) => <ApplicationStatusPill status={info.getValue()} />,
+		}),
+		columnHelper.display({
+			id: "sla",
+			header: "SLA",
+			cell: ({ row }) => (
+				<span className="text-text-secondary whitespace-nowrap">
+					{formatSlaRemaining(row.original)}
+				</span>
+			),
+		}),
+		columnHelper.accessor("updatedAt", {
+			header: () => (
+				<button
+					type="button"
+					className="underline-offset-2 hover:underline text-left"
+					onClick={() =>
+						onSortChange(
+							sort === "newest"
+								? "oldest"
+								: sort === "oldest"
+									? "sla"
+									: "newest",
+						)
+					}
+				>
+					Updated
+				</button>
+			),
+			cell: (info) => (
+				<span className="text-text-secondary whitespace-nowrap">
+					{new Date(info.getValue()).toLocaleString()}
+				</span>
+			),
+		}),
+	];
+}
+
+function rowSelectionFromSet(selectedIds: Set<string>): RowSelectionState {
+	const r: RowSelectionState = {};
+	for (const id of selectedIds) r[id] = true;
+	return r;
+}
+
 export function ApplicationQueueTable({
 	rows,
 	isLoading,
@@ -37,12 +159,41 @@ export function ApplicationQueueTable({
 	onSelectRow,
 	onRefresh,
 }: ApplicationQueueTableProps) {
-	const actionable = rows.filter(
-		(r) => r.status === "pending" || r.status === "in_review",
+	const rowSelection = React.useMemo(
+		() => rowSelectionFromSet(selectedIds),
+		[selectedIds],
 	);
-	const allActionableSelected =
-		actionable.length > 0 &&
-		actionable.every((r) => selectedIds.has(r.id));
+
+	const onRowSelectionChange = React.useCallback<OnChangeFn<RowSelectionState>>(
+		(updater) => {
+			const prev = rowSelectionFromSet(selectedIds);
+			const next = typeof updater === "function" ? updater(prev) : updater;
+			const keys = new Set([...Object.keys(prev), ...Object.keys(next)]);
+			for (const id of keys) {
+				const was = !!prev[id];
+				const now = !!next[id];
+				if (was !== now) onToggleSelect(id, now);
+			}
+		},
+		[selectedIds, onToggleSelect],
+	);
+
+	const columns = React.useMemo(
+		() =>
+			buildColumns(sort, onSortChange, selectedIds, onToggleSelectAllOnPage),
+		[sort, onSortChange, selectedIds, onToggleSelectAllOnPage],
+	);
+
+	const table = useReactTable({
+		data: rows,
+		columns,
+		getRowId: (row) => row.id,
+		state: { rowSelection },
+		onRowSelectionChange,
+		enableRowSelection: (row) =>
+			row.original.status === "pending" || row.original.status === "in_review",
+		getCoreRowModel: getCoreRowModel(),
+	});
 
 	return (
 		<div className="space-y-3">
@@ -53,9 +204,7 @@ export function ApplicationQueueTable({
 						className="rounded-md border border-border bg-bg-surface px-2 py-1.5"
 						value={status ?? ""}
 						onChange={(e) =>
-							onStatusChange(
-								e.target.value === "" ? undefined : e.target.value,
-							)
+							onStatusChange(e.target.value === "" ? undefined : e.target.value)
 						}
 					>
 						<option value="">All</option>
@@ -100,96 +249,70 @@ export function ApplicationQueueTable({
 				<div className="overflow-x-auto rounded-lg border border-border">
 					<table className="min-w-[760px] w-full text-left text-small">
 						<thead className="border-b border-border bg-bg-elevated text-micro font-bold uppercase tracking-widest text-text-secondary">
-							<tr>
-								<th className="px-2 py-2 w-10">
-									<input
-										type="checkbox"
-										className="rounded border-border"
-										checked={allActionableSelected}
-										onChange={(e) =>
-											onToggleSelectAllOnPage(
-												actionable.map((r) => r.id),
-												e.target.checked,
-											)
-										}
-										aria-label="Select all actionable on page"
-									/>
-								</th>
-								<th className="px-2 py-2">Applicant</th>
-								<th className="px-2 py-2">Club</th>
-								<th className="px-2 py-2">City</th>
-								<th className="px-2 py-2">Status</th>
-								<th className="px-2 py-2">SLA</th>
-								<th className="px-2 py-2">
-									<button
-										type="button"
-										className="underline-offset-2 hover:underline text-left"
-										onClick={() =>
-											onSortChange(
-												sort === "newest"
-													? "oldest"
-													: sort === "oldest"
-														? "sla"
-														: "newest",
-											)
-										}
-									>
-										Updated
-									</button>
-								</th>
-							</tr>
+							{table.getHeaderGroups().map((headerGroup) => (
+								<tr key={headerGroup.id}>
+									{headerGroup.headers.map((header) => (
+										<th
+											key={header.id}
+											className={`px-2 py-2 ${header.column.id === "select" ? "w-10" : ""}`}
+										>
+											{header.isPlaceholder
+												? null
+												: flexRender(
+														header.column.columnDef.header,
+														header.getContext(),
+													)}
+										</th>
+									))}
+								</tr>
+							))}
 						</thead>
 						<tbody>
-							{rows.map((row) => {
-								const selectable =
-									row.status === "pending" || row.status === "in_review";
-								return (
-									<tr
-										key={row.id}
-										className={`border-b border-border last:border-0 cursor-pointer hover:bg-bg-elevated/60 ${
-											selectedId === row.id ? "bg-bg-elevated" : ""
-										}`}
-										onClick={() => onSelectRow(row)}
-									>
-										<td
-											className="px-2 py-2"
-											onClick={(e) => e.stopPropagation()}
-										>
-											<input
-												type="checkbox"
-												className="rounded border-border"
-												disabled={!selectable}
-												checked={selectedIds.has(row.id)}
-												onChange={(e) =>
-													onToggleSelect(row.id, e.target.checked)
-												}
-												aria-label={`Select ${row.clubName}`}
-											/>
-										</td>
-										<td className="px-2 py-2">
-											<div className="font-medium text-text-primary">
-												{row.applicantName}
-											</div>
-											<div className="text-text-secondary text-micro">
-												{row.applicantEmail}
-											</div>
-										</td>
-										<td className="px-2 py-2 text-text-primary">{row.clubName}</td>
-										<td className="px-2 py-2 text-text-secondary">
-											{row.locationCity}
-										</td>
-										<td className="px-2 py-2">
-											<ApplicationStatusPill status={row.status} />
-										</td>
-										<td className="px-2 py-2 text-text-secondary whitespace-nowrap">
-											{formatSlaRemaining(row)}
-										</td>
-										<td className="px-2 py-2 text-text-secondary whitespace-nowrap">
-											{new Date(row.updatedAt).toLocaleString()}
-										</td>
-									</tr>
-								);
-							})}
+							{table.getRowModel().rows.map((row) => (
+								<tr
+									key={row.id}
+									tabIndex={0}
+									className={`border-b border-border last:border-0 cursor-pointer hover:bg-bg-elevated/60 ${
+										selectedId === row.original.id ? "bg-bg-elevated" : ""
+									}`}
+									onClick={() => onSelectRow(row.original)}
+									onKeyDown={(e) => {
+										if (e.key === "Enter" || e.key === " ") {
+											e.preventDefault();
+											onSelectRow(row.original);
+										}
+									}}
+								>
+									{row.getVisibleCells().map((cell) => {
+										const isSelect = cell.column.id === "select";
+										return (
+											<td
+												key={cell.id}
+												className="px-2 py-2"
+												{...(isSelect
+													? {
+															onClick: (
+																e: React.MouseEvent<HTMLTableCellElement>,
+															) => e.stopPropagation(),
+															onKeyDown: (
+																e: React.KeyboardEvent<HTMLTableCellElement>,
+															) => {
+																if (e.key === "Enter" || e.key === " ") {
+																	e.stopPropagation();
+																}
+															},
+														}
+													: {})}
+											>
+												{flexRender(
+													cell.column.columnDef.cell,
+													cell.getContext(),
+												)}
+											</td>
+										);
+									})}
+								</tr>
+							))}
 						</tbody>
 					</table>
 				</div>

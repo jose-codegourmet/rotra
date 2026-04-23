@@ -1,10 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-
 import { useQueryClient } from "@tanstack/react-query";
-
-import type { ClubApplicationRejectFormValues } from "./reject-reason-form/schema";
+import { useCallback, useMemo, useState } from "react";
 import {
 	clubApplicationNameCollisionsQueryKey,
 	useApproveClubApplicationMutation,
@@ -14,14 +11,14 @@ import {
 	useRejectClubApplicationMutation,
 } from "@/hooks/useClubApplications/client";
 import type { ClubApplicationListRowDto } from "@/types/club-application-admin";
-
 import { ApplicationDetailPanel } from "./ApplicationDetailPanel";
 import { ApplicationQueueTable } from "./ApplicationQueueTable";
-import { ApproveConfirmModal } from "./ApproveConfirmModal";
 import { ApprovalsPageLayout } from "./ApprovalsPageLayout";
+import { ApproveConfirmModal } from "./ApproveConfirmModal";
 import { BulkRejectToolbar } from "./BulkRejectToolbar";
 import { ExportCsvButton } from "./ExportCsvButton";
 import { RejectReasonFormModal } from "./RejectReasonFormModal";
+import type { ClubApplicationRejectFormValues } from "./reject-reason-form/schema";
 
 const PAGE_SIZE = 20;
 
@@ -70,10 +67,7 @@ export function ClubApplicationsApprovalsView() {
 		let n = 0;
 		for (const id of selectedIds) {
 			const row = rows.find((r) => r.id === id);
-			if (
-				row &&
-				(row.status === "pending" || row.status === "in_review")
-			) {
+			if (row && (row.status === "pending" || row.status === "in_review")) {
 				n += 1;
 			}
 		}
@@ -89,23 +83,27 @@ export function ClubApplicationsApprovalsView() {
 		});
 	}, []);
 
-	const toggleSelectAllOnPage = useCallback((ids: string[], selected: boolean) => {
-		setSelectedIds((prev) => {
-			const next = new Set(prev);
-			for (const id of ids) {
-				if (selected) next.add(id);
-				else next.delete(id);
-			}
-			return next;
-		});
-	}, []);
+	const toggleSelectAllOnPage = useCallback(
+		(ids: string[], selected: boolean) => {
+			setSelectedIds((prev) => {
+				const next = new Set(prev);
+				for (const id of ids) {
+					if (selected) next.add(id);
+					else next.delete(id);
+				}
+				return next;
+			});
+		},
+		[],
+	);
 
 	const onSelectRow = useCallback((row: ClubApplicationListRowDto) => {
 		setSelectedId(row.id);
 		setDetailOpenMobile(true);
 	}, []);
 
-	const busy = approveMut.isPending || rejectMut.isPending || bulkRejectMut.isPending;
+	const busy =
+		approveMut.isPending || rejectMut.isPending || bulkRejectMut.isPending;
 
 	const openRejectSingle = (id: string) => {
 		setBulkRejectOpen(false);
@@ -117,10 +115,7 @@ export function ClubApplicationsApprovalsView() {
 		if (bulkRejectOpen) {
 			const ids = Array.from(selectedIds).filter((id) => {
 				const row = rows.find((r) => r.id === id);
-				return (
-					row &&
-					(row.status === "pending" || row.status === "in_review")
-				);
+				return row && (row.status === "pending" || row.status === "in_review");
 			});
 			if (ids.length === 0) {
 				setBulkRejectOpen(false);
@@ -131,7 +126,9 @@ export function ClubApplicationsApprovalsView() {
 				{
 					applicationIds: ids,
 					reason: values.reason,
-					reviewNote: values.reviewNote || undefined,
+					...(values.reviewNote != null && values.reviewNote !== ""
+						? { reviewNote: values.reviewNote }
+						: {}),
 				},
 				{
 					onSuccess: () => {
@@ -151,7 +148,9 @@ export function ClubApplicationsApprovalsView() {
 			{
 				applicationId,
 				reason: values.reason,
-				reviewNote: values.reviewNote || undefined,
+				...(values.reviewNote != null && values.reviewNote !== ""
+					? { reviewNote: values.reviewNote }
+					: {}),
 			},
 			{
 				onSuccess: () => {
@@ -174,8 +173,8 @@ export function ClubApplicationsApprovalsView() {
 						Club applications
 					</h1>
 					<p className="text-body text-text-secondary mt-1">
-						Review pending requests. Approve or reject requires admin actor env or{" "}
-						<code className="text-micro">X-Rotra-Admin-Profile-Id</code>.
+						Review pending requests. Approve or reject requires admin actor env
+						or <code className="text-micro">X-Rotra-Admin-Profile-Id</code>.
 					</p>
 				</div>
 				<ExportCsvButton rows={rows} disabled={isLoading} />
@@ -272,7 +271,9 @@ export function ClubApplicationsApprovalsView() {
 						setRejectApplicationId(null);
 					}
 				}}
-				title={bulkRejectOpen ? "Reject selected applications" : "Reject application"}
+				title={
+					bulkRejectOpen ? "Reject selected applications" : "Reject application"
+				}
 				busy={rejectMut.isPending || bulkRejectMut.isPending}
 				onSubmit={handleRejectSubmit}
 			/>

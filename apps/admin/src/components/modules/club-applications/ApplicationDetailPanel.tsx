@@ -75,7 +75,9 @@ export function ApplicationDetailPanel({
 			</div>
 
 			{collisionsLoading ? (
-				<p className="text-small text-text-secondary">Checking name collisions…</p>
+				<p className="text-small text-text-secondary">
+					Checking name collisions…
+				</p>
 			) : (
 				<NameCollisionBanner clubs={collisions} />
 			)}
@@ -148,7 +150,9 @@ export function ApplicationDetailPanel({
 					<dt className="text-micro font-bold uppercase text-text-secondary">
 						Contact
 					</dt>
-					<dd className="text-text-primary mt-0.5">{row.contactNumber ?? "—"}</dd>
+					<dd className="text-text-primary mt-0.5">
+						{row.contactNumber ?? "—"}
+					</dd>
 				</div>
 				<div>
 					<dt className="text-micro font-bold uppercase text-text-secondary">

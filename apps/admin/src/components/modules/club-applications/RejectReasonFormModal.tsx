@@ -17,8 +17,8 @@ import {
 import { emptyRejectReasonForm } from "./reject-reason-form/defaults";
 import { RejectReasonForm } from "./reject-reason-form/RejectReasonForm";
 import {
-	rejectReasonFormSchema,
 	type ClubApplicationRejectFormValues,
+	rejectReasonFormSchema,
 } from "./reject-reason-form/schema";
 
 export type RejectReasonFormModalProps = {

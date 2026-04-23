@@ -1,14 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { ClubApplicationApplySkeleton } from "@/components/modules/clubs/club-application/ClubApplicationApplySkeleton";
 import { ClubApplicationPendingBanner } from "@/components/modules/clubs/club-application/ClubApplicationPendingBanner";
 import { ClubApplicationRejectedPanel } from "@/components/modules/clubs/club-application/ClubApplicationRejectedPanel";
-import { ClubApplicationSubmitConfirmDialog } from "@/components/modules/clubs/club-application/ClubApplicationSubmitConfirmDialog";
 import { ClubApplicationForm } from "@/components/modules/clubs/club-application-form/ClubApplicationForm";
 import type { ClubApplicationCreateFormValues } from "@/components/modules/clubs/club-application-form/schema";
 import { Button } from "@/components/ui/button/Button";
@@ -19,38 +17,34 @@ import {
 } from "@/hooks/useClubApplication/client";
 
 export default function ClubApplyPage() {
-	const router = useRouter();
 	const { data, isLoading, error, refetch } = useMyClubApplication();
 	const saveMut = useSaveClubApplicationMutation();
 	const cancelMut = useCancelClubApplicationMutation();
 
-	const pending = data?.pending ?? null;
+	const isPending = data?.pending ?? null;
 	const lastRejected = data?.lastRejected ?? null;
 
-	const [confirmOpen, setConfirmOpen] = useState(false);
-	const [submitBody, setSubmitBody] =
-		useState<ClubApplicationCreateFormValues | null>(null);
 	const [rejectedDismissed, setRejectedDismissed] = useState(false);
 
-	const busy = saveMut.isPending || cancelMut.isPending;
+	const isBusy = saveMut.isPending || cancelMut.isPending;
 
-	const syncValues = pending
+	const syncValues = isPending
 		? ({
-				clubName: pending.clubName,
-				description: pending.description,
-				intent: pending.intent,
-				locationCity: pending.locationCity,
-				locationVenue: pending.locationVenue,
-				venueAddress: pending.venueAddress,
-				facebookPageUrl: pending.facebookPageUrl ?? "",
-				facebookProfileUrl: pending.facebookProfileUrl ?? "",
-				contactNumber: pending.contactNumber ?? "",
-				expectedPlayerCount: pending.expectedPlayerCount,
-				additionalNotes: pending.additionalNotes ?? "",
+				clubName: isPending.clubName,
+				description: isPending.description,
+				intent: isPending.intent,
+				locationCity: isPending.locationCity,
+				locationVenue: isPending.locationVenue,
+				venueAddress: isPending.venueAddress,
+				facebookPageUrl: isPending.facebookPageUrl ?? "",
+				facebookProfileUrl: isPending.facebookProfileUrl ?? "",
+				contactNumber: isPending.contactNumber ?? "",
+				expectedPlayerCount: isPending.expectedPlayerCount,
+				additionalNotes: isPending.additionalNotes ?? "",
 			} satisfies ClubApplicationCreateFormValues)
 		: null;
 
-	const showRejected = !pending && lastRejected != null && !rejectedDismissed;
+	const showRejected = !isPending && lastRejected != null && !rejectedDismissed;
 
 	return (
 		<div className="mx-auto w-full max-w-[600px] md:max-w-[640px] p-4 md:p-8 space-y-6">
@@ -95,7 +89,14 @@ export default function ClubApplyPage() {
 
 			{!isLoading && !error ? (
 				<>
-					{pending ? <ClubApplicationPendingBanner pending={pending} /> : null}
+					{isPending ? (
+						<ClubApplicationPendingBanner
+							pending={isPending}
+							rejectedDismissed={rejectedDismissed}
+							syncFromPending={syncValues}
+							isBusy={isBusy}
+						/>
+					) : null}
 
 					{showRejected ? (
 						<ClubApplicationRejectedPanel
@@ -106,24 +107,22 @@ export default function ClubApplyPage() {
 						/>
 					) : null}
 
-					<ClubApplicationForm
-						key={`${pending?.id ?? "new"}-${rejectedDismissed ? "d" : "r"}`}
-						syncFromPending={syncValues}
-						disabled={busy}
-						onValidatedSubmit={(body) => {
-							setSubmitBody(body);
-							setConfirmOpen(true);
-						}}
-					/>
+					{!isPending ? (
+						<ClubApplicationForm
+							key={`new-${rejectedDismissed ? "d" : "r"}`}
+							syncFromPending={syncValues}
+							disabled={isBusy}
+						/>
+					) : null}
 
-					{pending ? (
+					{isPending ? (
 						<div className="pt-2 border-t border-border">
 							<Button
 								type="button"
 								variant="outline"
-								disabled={busy}
+								disabled={isBusy}
 								onClick={() => {
-									cancelMut.mutate(pending.id, {
+									cancelMut.mutate(isPending.id, {
 										onSuccess: () => {
 											toast.success("Application cancelled.");
 											void refetch();
@@ -146,36 +145,6 @@ export default function ClubApplyPage() {
 					)}
 				</>
 			) : null}
-
-			<ClubApplicationSubmitConfirmDialog
-				open={confirmOpen}
-				onOpenChange={(open) => {
-					setConfirmOpen(open);
-					if (!open) setSubmitBody(null);
-				}}
-				isUpdate={Boolean(pending)}
-				busy={saveMut.isPending}
-				onConfirm={() => {
-					if (!submitBody) return;
-					saveMut.mutate(
-						{ applicationId: pending?.id ?? null, body: submitBody },
-						{
-							onSuccess: () => {
-								toast.success(
-									pending ? "Application updated." : "Application submitted.",
-								);
-								setConfirmOpen(false);
-								setSubmitBody(null);
-								void refetch();
-								void router.push("/clubs");
-							},
-							onError: (e) => {
-								toast.error(String(e.message));
-							},
-						},
-					);
-				}}
-			/>
 		</div>
 	);
 }

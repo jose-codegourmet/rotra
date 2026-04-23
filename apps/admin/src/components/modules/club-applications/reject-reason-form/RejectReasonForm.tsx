@@ -56,7 +56,9 @@ export function RejectReasonForm({
 			</Field>
 
 			<Field data-invalid={!!errors.reviewNote}>
-				<FieldLabel htmlFor="reject-note">Note for applicant (optional)</FieldLabel>
+				<FieldLabel htmlFor="reject-note">
+					Note for applicant (optional)
+				</FieldLabel>
 				<FieldContent>
 					<Input
 						id="reject-note"

@@ -3,10 +3,7 @@
 import { cn } from "@/lib/utils";
 import type { ClubApplicationListRowDto } from "@/types/club-application-admin";
 
-const STATUS_STYLES: Record<
-	ClubApplicationListRowDto["status"],
-	string
-> = {
+const STATUS_STYLES: Record<ClubApplicationListRowDto["status"], string> = {
 	pending: "bg-warning/15 text-warning border-warning/40",
 	in_review: "bg-accent/10 text-accent border-accent/30",
 	approved: "bg-accent/20 text-text-primary border-accent/40",
