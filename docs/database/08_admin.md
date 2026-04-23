@@ -2,18 +2,19 @@
 
 ## Overview
 
-The Admin app (`apps/admin`) manages platform-level operations. These four tables back the core admin features: Club Owner application approvals, feature kill switches, platform-wide configuration, and content moderation flags.
+The Admin app (`apps/admin`) manages platform-level operations. **Club applications, demotions, member complaints, admin notifications, and the admin action log** are documented in [`12_club_governance.md`](12_club_governance.md). This file covers **kill switches**, **platform configuration**, and **moderation flags** (automated / moderation-queue flags).
 
 Marketing **waitlist** signups (`waitlist_signups`) are documented separately in [`11_waitlist_signups.md`](11_waitlist_signups.md); the Admin app lists them on the Waitlist screen.
 
-All rows in these tables are readable and writable only by users with the Admin role (enforced via RLS — see `09_rls_and_realtime.md`).
+Rows in `kill_switches`, `platform_config`, and `moderation_flags` are readable and writable only by users with the Admin role (enforced via RLS — see `09_rls_and_realtime.md`). Governance tables in doc 12 use a mix of admin-only and player-scoped policies as listed there.
 
 ---
 
 ## Enums
 
 ```sql
-CREATE TYPE application_status_enum AS ENUM ('pending', 'approved', 'rejected');
+CREATE TYPE application_status_enum AS ENUM ('pending', 'approved', 'rejected', 'cancelled', 'in_review');
+-- Extended values used by club_applications; see 12_club_governance.md
 
 CREATE TYPE moderation_entity_enum AS ENUM ('review', 'player', 'club');
 
@@ -24,72 +25,9 @@ CREATE TYPE environment_enum AS ENUM ('production', 'staging', 'development');
 
 ---
 
-## Table: `club_owner_applications`
+## Club applications and governance (moved)
 
-Players submit a Club Owner application with their intended club name and a short intent statement. Until the Admin module is fully built, these are reviewed manually at `jose@codegourmet.io`. The table supports the future Admin UI approval flow.
-
-```sql
-CREATE TABLE club_owner_applications (
-  id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  player_id uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-
-  -- Intended club details (the club does not exist yet at submission time)
-  club_name text NOT NULL,
-  intent    text NOT NULL,
-
-  status    application_status_enum NOT NULL DEFAULT 'pending',
-
-  -- Filled when an Admin reviews the application
-  reviewed_by  uuid REFERENCES profiles(id),
-  review_note  text,
-  reviewed_at  timestamptz,
-
-  created_at   timestamptz NOT NULL DEFAULT now(),
-  updated_at   timestamptz NOT NULL DEFAULT now()
-);
-```
-
-### Approval Flow
-
-```
-Player submits application
-         │
-         ▼
-  status = 'pending'
-         │
-   Admin reviews in Admin app (or manual email review for MVP)
-         │
-    ┌────┴────┐
- approved   rejected
-    │            │
-    ▼            ▼
-Create clubs   Notify player
-row for new    (notification
-club + notify  inserted)
-player
-```
-
-When approved:
-1. A row is inserted into `clubs` with `owner_id = player_id`.
-2. A notification is sent to the player.
-3. `status` is set to `'approved'` and `reviewed_by`, `reviewed_at` are populated.
-
-When rejected:
-1. A notification is sent to the player with the rejection note.
-2. `status` is set to `'rejected'`.
-
-### Notes
-
-- A player may have multiple application rows (e.g. applied, rejected, re-applied). Only one `pending` application per player is enforced at the application layer (not at DB level, to preserve history).
-- Players are notified of the outcome via the `notifications` table (`type = 'club_owner_application_result'`).
-
-### Indexes
-
-```sql
-CREATE INDEX idx_club_apps_player_id ON club_owner_applications(player_id);
-CREATE INDEX idx_club_apps_status    ON club_owner_applications(status);
-CREATE INDEX idx_club_apps_created   ON club_owner_applications(created_at DESC);
-```
+The legacy **`club_owner_applications`** table is superseded by **`club_applications`** and related governance tables (`club_demotion_requests`, `complaints`, `admin_notifications`, `admin_action_log`). Schema, enums, approval/demotion flows, SLA auto-reject, and indexes are defined in **[`12_club_governance.md`](12_club_governance.md)**.
 
 ---
 
@@ -312,10 +250,10 @@ See `09_rls_and_realtime.md` for the full RLS configuration.
 ## Relationships
 
 ```
-profiles ──► club_owner_applications (1:many as applicant)
-profiles ──► club_owner_applications (1:many as reviewer)
 profiles ──► kill_switches (1:many as updater)
 profiles ──► platform_config (1:many as updater)
 profiles ──► moderation_flags (1:many as reporter)
 profiles ──► moderation_flags (1:many as reviewer)
 ```
+
+Governance relationships (`club_applications`, `complaints`, `admin_action_log`, etc.) are diagrammed in [`12_club_governance.md`](12_club_governance.md).

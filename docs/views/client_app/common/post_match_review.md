@@ -13,6 +13,12 @@ The post-match review flow where players rate each other after a completed match
 
 ---
 
+## Report to admins (complaints)
+
+From the post-match flow or session summary (same club context), authenticated members may open **Report session** or **Report Que Master** (targets `session` or `que_master` in `complaints`). Modal: required reason text + optional context. See [`../../../database/12_club_governance.md`](../../../database/12_club_governance.md).
+
+---
+
 ## Layout
 Full-screen multi-step flow. One player is reviewed per step (step 1 of N where N = other players in the match). After rating all players, a final summary and submit screen is shown. No bottom navigation bar — this is an isolated modal-like flow.
 

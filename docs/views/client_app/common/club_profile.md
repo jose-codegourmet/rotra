@@ -11,6 +11,18 @@ All authenticated roles. The join/action CTA changes based on the user's members
 
 ---
 
+## Report to admins (complaints)
+
+**Active members only** may open **Report** from the club profile overflow menu (`⋯`) or a secondary **Report club** text action.
+
+- Opens a modal with **reason** (required, free text) and optional **context**.
+- Creates a `complaints` row with `target_type = 'club'` (or `club_owner` when reporting the owner — product choice for separate entry on owner row).
+- Optional toast / `complaint_submitted` notification (receipt only; no resolution notification).
+
+See [`../../../database/12_club_governance.md`](../../../database/12_club_governance.md).
+
+---
+
 ## Layout
 Scrollable single-column page. Top section is a club hero block. Below it: description, stats row, members preview, and sessions list. Sticky bottom action bar for join/request CTA.
 

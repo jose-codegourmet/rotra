@@ -512,12 +512,11 @@ CREATE POLICY "notifications_update_own"
 
 ---
 
-### Admin Tables (`club_owner_applications`, `kill_switches`, `platform_config`, `moderation_flags`, `ranking_tier_config`, `skill_dimensions`, `sandbagging_flags`)
+### Admin Tables (`kill_switches`, `platform_config`, `moderation_flags`, `ranking_tier_config`, `skill_dimensions`, `sandbagging_flags`)
+
+Governance tables (`club_applications`, `club_demotion_requests`, `complaints`, `admin_notifications`, `admin_action_log`) are defined in [`12_club_governance.md`](12_club_governance.md). Example RLS patterns:
 
 ```sql
--- All admin tables follow the same pattern:
-
-ALTER TABLE club_owner_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE kill_switches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE platform_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE moderation_flags ENABLE ROW LEVEL SECURITY;
@@ -525,8 +524,13 @@ ALTER TABLE ranking_tier_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE skill_dimensions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sandbagging_flags ENABLE ROW LEVEL SECURITY;
 
+ALTER TABLE club_applications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE club_demotion_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE complaints ENABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_action_log ENABLE ROW LEVEL SECURITY;
+
 -- Admin full access
-CREATE POLICY "admin_only_club_apps"       ON club_owner_applications FOR ALL USING (is_admin());
 CREATE POLICY "admin_only_kill_switches"   ON kill_switches           FOR ALL USING (is_admin());
 CREATE POLICY "admin_only_platform_config" ON platform_config         FOR ALL USING (is_admin());
 CREATE POLICY "admin_only_mod_flags"       ON moderation_flags        FOR ALL USING (is_admin());
@@ -548,16 +552,38 @@ CREATE POLICY "sandbagging_flags_select"
     OR (club_id IS NOT NULL AND (is_club_owner(club_id) OR is_que_master(club_id)))
   );
 
--- Players can submit their own Club Owner application
-CREATE POLICY "club_apps_insert_self"
-  ON club_owner_applications FOR INSERT
+-- club_applications: players insert/update own pending rows; admins full access
+CREATE POLICY "club_applications_admin_all"
+  ON club_applications FOR ALL USING (is_admin());
+CREATE POLICY "club_applications_insert_self"
+  ON club_applications FOR INSERT WITH CHECK (player_id = auth_uid());
+CREATE POLICY "club_applications_select_own"
+  ON club_applications FOR SELECT USING (player_id = auth_uid() OR is_admin());
+CREATE POLICY "club_applications_update_own_pending"
+  ON club_applications FOR UPDATE
+  USING (player_id = auth_uid() AND status = 'pending')
   WITH CHECK (player_id = auth_uid());
 
--- Players can read their own application status
-CREATE POLICY "club_apps_select_own"
-  ON club_owner_applications FOR SELECT
-  USING (player_id = auth_uid() OR is_admin());
+-- club_demotion_requests, complaints: admin full access; extend with club-scoped SELECT for owners/members as needed
+CREATE POLICY "demotion_requests_admin" ON club_demotion_requests FOR ALL USING (is_admin());
+CREATE POLICY "complaints_insert_authenticated"
+  ON complaints FOR INSERT WITH CHECK (reporter_id = auth_uid());
+CREATE POLICY "complaints_select_own"
+  ON complaints FOR SELECT USING (reporter_id = auth_uid() OR is_admin());
+
+-- admin_notifications: recipient admin only
+CREATE POLICY "admin_notifications_own"
+  ON admin_notifications FOR ALL USING (is_admin() AND admin_id = auth_uid());
+
+-- admin_action_log: append-only, admin read (writes via service role / SECURITY DEFINER only)
+CREATE POLICY "admin_action_log_select" ON admin_action_log FOR SELECT USING (is_admin());
 ```
+
+> **Note:** `admin_action_log` inserts should use a **service role** or `SECURITY DEFINER` function so policies are not bypassed by mistake. Tune `complaints` SELECT policies when member-vs-admin UX is finalized.
+
+### Legacy table
+
+If `club_owner_applications` still exists in an older database, migrate rows to `club_applications` then drop; policies above target `club_applications` only.
 
 ---
 
@@ -669,7 +695,8 @@ Migrations must be applied in dependency order:
 0006_reviews_and_ratings.sql    — skill_dimensions, match_reviews, match_review_ratings, player_skill_ratings
 0007_gamification.sql           — exp_transactions, mmr_transactions, ranking_tier_config, sandbagging_flags
 0008_notifications.sql          — notifications
-0009_admin.sql                  — club_owner_applications, kill_switches, platform_config, moderation_flags
+0009_admin.sql                  — kill_switches, platform_config, moderation_flags (+ legacy club_owner_applications if not yet migrated)
+0012_club_governance.sql        — club_applications, complaints, club_demotion_requests, admin_notifications, admin_action_log (see 12_club_governance.md)
 0010_rls_policies.sql           — all RLS policies and helper functions
 0011_realtime.sql               — publication configuration
 0012_storage.sql                — bucket creation and policies

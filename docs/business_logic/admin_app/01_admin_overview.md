@@ -19,7 +19,7 @@ There is a single admin role at the platform level. Admin accounts are created d
 
 | Action | Details |
 |--------|---------|
-| Approve / reject Club Owner applications | Replaces the current manual email process (`jose@codegourmet.io`) |
+| Approve / reject **club applications**; manage **demotion requests** and **complaints** | Structured queues; see [`../../database/12_club_governance.md`](../../database/12_club_governance.md) |
 | Manage all kill switches | Toggle any feature flag on/off across the platform |
 | Switch and configure environments | Manage dev, staging, and production configs |
 | Platform-wide moderation | Flagged reviews, account suspensions, content removal |
@@ -43,13 +43,13 @@ There is a single admin role at the platform level. Admin accounts are created d
 | Super Admin | Platform owner | Created at system level; cannot be deleted |
 | Admin | Internal team member | Created by Super Admin; can be revoked |
 
-All admin actions are logged with:
+All admin actions are logged in **`admin_action_log`** with:
 - Timestamp
 - Admin account that performed the action
-- Action type and affected entity (e.g. `club_owner_approved: user_id=xxx`)
-- Before and after state where applicable
+- `action`, `entity_type`, `entity_id`
+- `before_value` / `after_value` JSON (uncapped) and optional `note`
 
-Logs are immutable — no admin can edit or delete action logs.
+Logs are append-only — no admin can edit or delete rows (future cron may prune very old rows).
 
 ---
 
@@ -65,6 +65,6 @@ Logs are immutable — no admin can edit or delete action logs.
 
 ## MVP Phase
 
-The Admin App replaces the current manual process of handling Club Owner approvals via email (`jose@codegourmet.io`). The full Admin App ships in Phase 3 of the MVP plan. Prior to Phase 3, the manual email process remains the fallback.
+The Admin App is the canonical surface for **club applications**, **demotions**, **complaints**, **`admin_notifications`**, and **`admin_action_log`**. See [`../client_app/16_mvp_plan.md`](../client_app/16_mvp_plan.md) — Phase 3, Admin Role section.
 
-See [`../client_app/16_mvp_plan.md`](../client_app/16_mvp_plan.md) — Phase 3, Admin Role section.
+In-app **admin notifications** (dropdown + `/admin/notifications`) are fetched when opened; full **Realtime** is optional and not required for MVP on the Admin app.

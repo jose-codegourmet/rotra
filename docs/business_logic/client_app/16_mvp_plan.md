@@ -24,8 +24,8 @@ Development is split into three phases. Each phase builds on the previous and is
 
 #### Club System
 
-* [ ] Club Owner role request flow (email to `jose@codegourmet.io`)
-* [ ] Club creation, editing, and deletion
+* [ ] **Club application** flow: submit `club_applications`, Admin approve/reject in Admin app ([`../../database/12_club_governance.md`](../../database/12_club_governance.md))
+* [ ] Club creation (post-approval), editing, and **archive** (no hard delete)
 * [ ] Membership settings: Auto-Approve ON/OFF, Invite Link ON/OFF
 * [ ] Join methods: Invite Link / QR, Direct Invite, Request to Join
 * [ ] Pending join request management (approve / reject)

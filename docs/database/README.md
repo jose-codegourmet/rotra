@@ -12,7 +12,7 @@ The schema is designed for **Supabase** as the backend (PostgreSQL), with Prisma
 |---|---|
 | Auth | `profiles` extends `auth.users`; Supabase handles Facebook OAuth and email verification; two registration paths: Facebook login and email invitation |
 | Verification | `profiles.is_verified` is a generated column — true only when Facebook linked + email verified + onboarding completed |
-| Club ownership | `clubs.owner_id` is authoritative for ownership; owner is also inserted into `club_members` with `role = 'owner'` so membership queries are unified |
+| Club ownership | `clubs.owner_id` is authoritative for ownership; owner is also inserted into `club_members` with `role = 'owner'` so membership queries are unified. New clubs are created only after an admin-approved **`club_applications`** row (see [`12_club_governance.md`](12_club_governance.md)). |
 | Primary keys | `uuid` via `gen_random_uuid()` on all tables |
 | Timestamps | `timestamptz` throughout — never `timestamp` |
 | Type safety | Postgres `ENUM` types for all finite state columns |
@@ -34,7 +34,8 @@ The schema is designed for **Supabase** as the backend (PostgreSQL), with Prisma
 | [05_reviews_and_ratings.md](05_reviews_and_ratings.md) | `skill_dimensions`, `match_reviews`, `match_review_ratings`, `player_skill_ratings` |
 | [06_gamification.md](06_gamification.md) | `exp_transactions`, `mmr_transactions`, `ranking_tier_config`, `sandbagging_flags` |
 | [07_notifications.md](07_notifications.md) | `notifications` |
-| [08_admin.md](08_admin.md) | `club_owner_applications`, `kill_switches`, `platform_config`, `moderation_flags` |
+| [08_admin.md](08_admin.md) | `kill_switches`, `platform_config`, `moderation_flags` |
+| [12_club_governance.md](12_club_governance.md) | `club_applications`, `club_demotion_requests`, `complaints`, `admin_notifications`, `admin_action_log` |
 | [09_rls_and_realtime.md](09_rls_and_realtime.md) | RLS policies, Realtime subscriptions, Storage buckets |
 | [10_prisma_supabase_migrations.md](10_prisma_supabase_migrations.md) | Prisma migrations, Supabase connection strings, deploy workflow |
 | [11_waitlist_signups.md](11_waitlist_signups.md) | `waitlist_signups` (landing marketing capture) |
@@ -303,14 +304,13 @@ erDiagram
         timestamptz sent_at
     }
 
-    club_owner_applications {
+    club_applications {
         uuid id PK
         uuid player_id FK
         text club_name
-        text intent
         application_status_enum status
-        uuid reviewed_by FK
-        timestamptz created_at
+        uuid resulting_club_id FK
+        timestamptz updated_at
     }
 
     kill_switches {
@@ -383,7 +383,8 @@ erDiagram
     profiles ||--o{ sandbagging_flags : "flagged_by"
 
     profiles ||--o{ notifications : "receives"
-    profiles ||--o{ club_owner_applications : "submits"
+    profiles ||--o{ club_applications : "submits"
+    club_applications }o--|| clubs : "approved_into"
 ```
 
 ## Supabase Project Structure
@@ -416,4 +417,4 @@ Not all tables need to be built at once. The MVP is phased as follows:
 `skill_dimensions`, `match_reviews`, `match_review_ratings`, `player_skill_ratings`, `player_self_assessments`, `exp_transactions`, `mmr_transactions`, `ranking_tier_config`, `sandbagging_flags`
 
 ### Phase 3 — Admin & Platform Config
-`club_owner_applications`, `kill_switches`, `platform_config`, `moderation_flags`
+`club_applications`, `club_demotion_requests`, `complaints`, `admin_notifications`, `admin_action_log` ([`12_club_governance.md`](12_club_governance.md)), `kill_switches`, `platform_config`, `moderation_flags`

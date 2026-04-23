@@ -2,7 +2,36 @@
 
 ## Overview
 
-Clubs are the **primary organizational unit** of the app. Every queue session, leaderboard, and membership exists under a club. A player can belong to multiple clubs. A club is created and owned by a Club Owner.
+Clubs are the **primary organizational unit** of the app. Every queue session, leaderboard, and membership exists under a club. A player can belong to multiple clubs. A club is **minted** only after an admin-approved **`club_applications`** row sets that player as `clubs.owner_id` (see [`../../database/12_club_governance.md`](../../database/12_club_governance.md)).
+
+---
+
+## 4.0 Club creation, demotion, and complaints
+
+### Creating a club
+
+1. Player submits **`club_applications`** from the Client app (`/clubs/apply`) with full venue and verification-oriented fields.
+2. Admin reviews in **Admin app** → Approve inserts **`clubs`** + links `resulting_club_id`; Reject sends `club_application_rejected` with a **required rejection reason code** and optional note.
+3. **Defaults on minted club:** `auto_approve = true`, `invite_link_enabled = true`, invite token generated (see database doc 12). *Product note: `auto_approve` default may later flip to `false` if join approval should start closed.*
+4. **SLA:** if a pending application is not decided within **24 hours** of `updated_at`, it is auto-rejected; each applicant edit resets the window.
+
+### Duplicate names and discovery
+
+* **Club names may duplicate** globally; the canonical identifier is **`clubs.id`**.
+* Discovery and profile UIs should show **city / location** (and owner when helpful) as a subtitle so players can tell clubs apart.
+
+### Demotion, transfer, and closure
+
+* **Per club:** demotion, transfer, or voluntary step-down affects **one club** at a time.
+* **Archive, never hard-delete:** closed clubs use `status = archived`; history remains queryable.
+* When a club is closed or archived after demotion, **all members** receive a **`club_closed`** notification.
+* **Ownership transfer:** former owner remains an **active member** with role `member`; new owner is set on `clubs.owner_id` and `club_members.role = owner`.
+
+### Member complaints to admins
+
+* Members file **`complaints`** (separate from automated **`moderation_flags`**) from club profile, player profile, session, etc. Only **members of the relevant club** may file (enforced in app logic).
+* Admins triage duplicates; complainants do **not** receive resolution notifications.
+* Escalation creates a **`club_demotion_requests`** row linked from the complaint when appropriate.
 
 ---
 
@@ -24,10 +53,10 @@ Clubs are the **primary organizational unit** of the app. Every queue session, l
 | Paused   | Temporarily suspended | Blocked | Blocked |
 | Archived | Read-only historical record | Blocked | Blocked |
 
-* Only Club Owners can change a club's state
+* Club Owners can change a club's state between **active** and **paused**; **archived** is also used when admins or demotion flows close a club (see §4.0).
 * Archived clubs retain all historical data (sessions, match history, leaderboards)
 * A Paused club can be reactivated to Active at any time
-* Archiving is intended to be permanent; there is no unarchive flow in MVP
+* Archiving is intended to be permanent; there is no unarchive flow in MVP. Clubs are **not hard-deleted**.
 
 ---
 
@@ -37,9 +66,9 @@ Each club has a public profile visible to all players (members and non-members):
 
 | Field | Description |
 |-------|-------------|
-| Club name | Required, unique per owner |
-| Description | Optional short bio of the club |
-| Location | Optional (city or venue) |
+| Club name | Required; **may duplicate** other clubs (disambiguate by location / id in UI) |
+| Description | Short bio (also captured on application; may be refined after creation) |
+| Location | **City / venue** shown on cards and profiles for disambiguation (free text in MVP) |
 | Member count | Public, shown on profile |
 | Founded date | System-generated |
 | Club Owner | Shown publicly |

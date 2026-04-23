@@ -7,7 +7,7 @@ The app has four roles. All users start as **Players** upon registration. Elevat
 ```
 ── CLIENT APP ──────────────────────────────────────
   Player (default)
-    └── Club Owner (approved)
+    └── Club Owner (per club they created via approved application)
           └── Que Master (assigned per club)
 
 ── UMPIRE APP ──────────────────────────────────────
@@ -60,14 +60,12 @@ An elevated role for players who want to create and manage a badminton club.
 
 ### How to Become One
 
-* Role is **not self-assignable** — requires approval
-* Player submits a request including:
-  * Intended club name
-  * Brief description of the club's purpose/context
-* Request is reviewed manually at: `jose@codegourmet.io`
-* Once approved, the player gains Club Owner capabilities for any clubs they create
+* **Per club:** owning a club is not a single global “Club Owner role.” Each new club requires the player to submit a **`club_applications`** row and receive **Admin approval** in the Admin app. Approval inserts the `clubs` row and sets that player as `owner_id`.
+* The application captures club name, description, intent, location (city, venue, full address), optional verification fields (Facebook URLs, phone), expected size bucket, and optional notes — see [`../../database/12_club_governance.md`](../../database/12_club_governance.md) and the Client view spec **Club application**.
+* A player may own **unlimited** clubs over time (each creation path goes through its own application).
+* **SLA:** pending applications not reviewed within **24 hours** of the last applicant edit are auto-rejected; the applicant may re-apply immediately.
 
-> Approval will be handled by the Admin module in a future phase (see 2.4).
+> Historical note: early MVP used email-based review; that process is superseded by the Admin app and persisted applications.
 
 ### Capabilities
 
@@ -75,9 +73,9 @@ Inherits all Player capabilities within their own club, plus:
 
 | Action | Details |
 |--------|---------|
-| Create clubs | Can own and manage multiple clubs |
+| Create additional clubs | Each new club requires another approved application (same player may own many clubs) |
 | Edit club settings | Name, description, membership settings |
-| Delete clubs | Deletes all sessions and history under it |
+| Archive clubs | Clubs are **never hard-deleted**; owners (or admins via demotion) use **archived** state. Historical sessions and records remain. |
 | Configure membership settings | Auto-approve ON/OFF, Invite link ON/OFF |
 | Invite players directly | Search by name/profile and send invite |
 | Approve or reject join requests | With optional note to the player |
@@ -114,7 +112,7 @@ The Club Owner has access to a **Statistics tab** in the club management panel:
 
 * Cannot assign themselves as Que Master via the system — they may run sessions as owner but Que Master assignments are for other members
 * Club Owner status in Club A grants no elevated privileges in Club B (unless they own Club B too)
-* Cannot approve their own Club Owner application
+* Cannot approve their own **club application** (admin-only action in Admin app)
 * Cannot blacklist a player who is currently an Active Member — must remove first, then blacklist
 
 ---
@@ -202,7 +200,7 @@ A platform-level role with global authority. No club affiliation required.
 
 | Action | Details |
 |--------|---------|
-| Approve or reject Club Owner applications | Replaces the current manual email process |
+| Approve or reject **club applications** and **demotion requests** | Structured queues in Admin app ([`../../database/12_club_governance.md`](../../database/12_club_governance.md)) |
 | Platform-wide moderation | Flagged reviews, account bans, content removal |
 | Manage global rankings | Featured leaderboards, cross-club standings |
 | Configure gamification parameters | EXP rates, tier thresholds, badge criteria |
@@ -231,7 +229,7 @@ A platform-level role with global authority. No club affiliation required.
 | Configure club settings | — | — | ✓ | — | — | — |
 | View club statistics & financials | — | — | ✓ | — | — | — |
 | Manage blacklist | — | — | ✓ | — | — | — |
-| Approve Club Owners | — | — | — | — | — | ✓ |
+| Approve club applications / demotions | — | — | — | — | — | ✓ |
 | Moderate platform | — | — | — | — | — | ✓ |
 | Configure gamification | — | — | — | — | — | ✓ |
 
@@ -239,8 +237,8 @@ A platform-level role with global authority. No club affiliation required.
 
 ## Role Transition Rules
 
-* A Player becomes a Club Owner when approved by the admin contact
+* A Player becomes the **Club Owner of a specific club** when their **`club_applications`** row for that club is approved in the Admin app (which mints the `clubs` row)
 * A Club Owner becomes a Que Master only if assigned by another Club Owner in a different club (they cannot self-assign)
 * Que Master access is revoked when: (a) Club Owner revokes it, (b) the player is removed from the club
-* Club Owner access is revoked only by Admin (future) or via manual email process
+* Club Owner access for a given club is revoked via **Admin demotion / transfer / archive** flows ([`../../database/12_club_governance.md`](../../database/12_club_governance.md)); other clubs the same player owns are unaffected unless separately actioned
 * All role changes are logged with timestamp and actor

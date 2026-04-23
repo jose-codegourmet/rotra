@@ -35,7 +35,14 @@ CREATE TYPE notification_type_enum AS ENUM (
   -- Club events
   'join_request_result',     -- approved or rejected
   'direct_invite_received',  -- Club Owner sent a direct invite
-  'club_owner_application_result'  -- Admin approved or rejected application
+
+  -- Club applications & governance (see 12_club_governance.md)
+  'club_application_submitted',   -- optional receipt when player submits application
+  'club_application_approved',
+  'club_application_rejected',
+  'club_demotion_completed',      -- former owner demoted / ownership ended for that club
+  'club_closed',                  -- club archived; notify all members
+  'complaint_submitted'           -- optional receipt to reporter (content-only; no resolution follow-up)
 );
 ```
 
@@ -96,7 +103,12 @@ CREATE TABLE notifications (
 | `leaderboard_published` | "Final standings live" | "The final leaderboard for [session] is now published." |
 | `join_request_result` | "Join request update" | "Your request to join [club name] was approved / rejected." |
 | `direct_invite_received` | "Club invitation" | "[Club Owner name] has invited you to join [club name]." |
-| `club_owner_application_result` | "Application update" | "Your Club Owner application has been approved / rejected." |
+| `club_application_submitted` | "Application received" | "Your club application has been submitted for review." |
+| `club_application_approved` | "Club approved" | "Your club application was approved. [Club name] is ready." |
+| `club_application_rejected` | "Application update" | "Your club application was not approved. [Reason summary]." |
+| `club_demotion_completed` | "Ownership update" | "Your ownership of [club name] has ended." |
+| `club_closed` | "Club closed" | "[Club name] has been closed. Thank you for playing with the community." |
+| `complaint_submitted` | "Report received" | "We received your report. Our team will review it." |
 
 ### Indexes
 

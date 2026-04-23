@@ -11,6 +11,8 @@ This file covers:
 - `club_blacklist` — silently blocked players per club
 - `club_membership_audit_log` — immutable log of all membership state changes
 
+**Club creation, demotions, complaints, and admin audit** live in [`12_club_governance.md`](12_club_governance.md). Clubs are **never hard-deleted** — closure and demotion use `status = 'archived'` (see demotion flows in doc 12).
+
 ---
 
 ## Enums
@@ -40,9 +42,12 @@ CREATE TYPE membership_action_enum AS ENUM (
   'join_request_approved',
   'join_request_rejected',
   'invite_link_rotated',
-  'ownership_transferred'
+  'ownership_transferred',
+  'ownership_revoked'
 );
 ```
+
+`ownership_revoked` is used when ownership ends without a transfer (e.g. club archived after demotion). See [`12_club_governance.md`](12_club_governance.md).
 
 ---
 

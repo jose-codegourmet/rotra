@@ -2,60 +2,56 @@
 
 ## Overview
 
-The Admin App handles two categories of human review: **Club Owner applications** (before Phase 3, handled via email) and **platform moderation** (flagged reviews, account actions, content removal).
+The Admin App handles human review for:
+
+1. **Club applications** — players requesting a new `clubs` row (per-club approval).
+2. **Club demotion requests** — ownership transfer, archive, voluntary step-down, or admin-initiated demotion.
+3. **Member complaints** — `complaints` table (separate from automated `moderation_flags`).
+4. **Platform moderation** — flagged reviews, account actions, content removal (`moderation_flags` and related flows).
+
+Database reference: [`../../database/12_club_governance.md`](../../database/12_club_governance.md). Client role context: [`../client_app/02_user_roles.md`](../client_app/02_user_roles.md) §2.2.
 
 ---
 
-## Part A: Club Owner Approvals
+## Part A1: Club applications
 
-### Background
+### Queue
 
-Players who want to create clubs must apply for Club Owner status. Until the Admin App is live (Phase 3), this is handled manually via email to `jose@codegourmet.io`. The Admin App replaces this process with a structured queue.
-
-Reference: [`../client_app/02_user_roles.md`](../client_app/02_user_roles.md) — Section 2.2
-
----
-
-### Application Queue
-
-The Admin App shows all pending Club Owner applications in a table:
-
-| Column | Description |
-|--------|-------------|
-| Player name | Applicant's display name and profile link |
-| Facebook account | Linked Facebook identity |
-| Submission date | When the application was submitted |
-| Club name (requested) | The name they want for their club |
-| Description | Their stated purpose/context for the club |
-| Player stats | Sessions attended, matches played, clubs joined |
-| Status | Pending / Approved / Rejected |
-
-Applications are sorted by submission date (oldest first) by default.
-
----
-
-### Review Flow
-
-```
-Admin opens an application
-    ↓
-Reviews player profile, stated purpose, and activity history
-    ↓
-Approves → player gains Club Owner role
-    or
-Rejects → admin adds optional rejection note
-    ↓
-Player receives in-app notification with outcome
-    (rejection note is shown to the player if provided)
-```
+- Routes under **`/admin/approvals/club-applications`** (tab within Approvals).
+- Columns: applicant, contact/verification fields, club name, location (city, venue, address), intent, expected size bucket, submitted / **SLA countdown** (time until auto-reject from `updated_at`), status (`pending`, `in_review`, `approved`, `rejected`, `cancelled`).
+- **Default sort:** newest first; filters include **pending**, **longest waiting**, and status filters.
+- **Collision warning:** when reviewing, show other clubs with the same or similar name (city, owner, status, approved date) so admins can spot squatting or confusion.
+- **Bulk actions:** **bulk reject** (shared rejection reason + note), **export CSV**. **No bulk approve** — each approval mints a club and must be individually confirmed.
+- **Reject:** admin must pick a value from **`application_rejection_reason_enum`** plus optional free-text note shown to the player.
+- **Approve:** inserts `clubs`, sets `resulting_club_id`, notifies `club_application_approved`. Defaults for minted club: `auto_approve = true`, `invite_link_enabled = true`, invite token generated (see doc 12).
 
 ### Rules
 
-- An Admin cannot approve their own application (not applicable since Admins are internal)
-- Approval is immediate — the player gains Club Owner capability the moment the Admin confirms
-- Rejected applicants can re-apply after 30 days (configurable)
-- All decisions are logged with the Admin's identity and timestamp
-- The current manual email fallback (`jose@codegourmet.io`) is deprecated once the Admin App is live
+- At most **one `pending` application per player** (enforced in API).
+- Applicant may **edit** while `pending` (each edit resets **24h SLA** on `updated_at`).
+- **SLA auto-reject:** pending rows older than 24h since `updated_at` without a decision are auto-rejected with reason `other` and explanatory note.
+- All approve/reject actions append **`admin_action_log`** with before/after JSON where applicable.
+
+---
+
+## Part A2: Demotion requests
+
+- Route: **`/admin/approvals/demotions`** (tab within Approvals).
+- **Transfer:** admin selects new owner from **Que Masters** first, then any **active member**; if no suitable member, **archive** or delete path is not used — **archive only** (no hard delete). Former owner becomes **`member`**.
+- **Archive:** set `clubs.status = archived`; notify **all members** with `club_closed`.
+- **Voluntary step-down (`owner_self`):** auto-approved on submission per product spec; still logged.
+- **Admin one-click demote:** creates or completes demotion in one action; must log `admin_action_log` (`club_manual_demoted` / `club_manual_archived` as applicable).
+- **Reject demotion:** use **`demotion_rejection_reason_enum`** + optional note.
+- Escalation from **complaints:** admin uses “Escalate to demotion” → pre-fills `club_demotion_requests` with link to complaint; complaint status → `escalated`.
+
+---
+
+## Part A3: Complaints & audit
+
+- **`complaints`** are listed/reviewed in the moderation area or a dedicated complaints view; triage duplicates (no rate limit).
+- Complainants **do not** receive resolution notifications.
+- **`admin_action_log`:** read-only **`/admin/audit-log`** in the Admin app — filter by admin, entity, action, date; JSON diff for `before_value` / `after_value` (uncapped size).
+- **`admin_notifications`:** dropdown (5 recent) + **`/admin/notifications`**; fetch on open (no Realtime requirement for MVP).
 
 ---
 
@@ -89,7 +85,7 @@ Reference: [`../client_app/07_review_system.md`](../client_app/07_review_system.
 | **Remove + warn reviewer** | Review removed; reviewer receives a platform warning |
 | **Remove + suspend reviewer** | Review removed; account suspended (see Account Actions below) |
 
-All moderation decisions are logged with the Admin's identity and the stated reason.
+All moderation decisions are logged with the Admin's identity and the stated reason, and should emit **`admin_action_log`** rows for traceability alongside any existing moderation-specific logging.
 
 ---
 
@@ -139,3 +135,5 @@ Every moderation action produces an immutable log entry:
 | Target | Affected entity (review ID, player ID, etc.) |
 | Reason | Admin-selected reason code |
 | Notes | Optional free-text explanation |
+
+Platform-wide **admin writes** (approvals, kill switches, `platform_config`, complaints, demotions, etc.) are also recorded in **`admin_action_log`** (see [`../../database/12_club_governance.md`](../../database/12_club_governance.md)).
