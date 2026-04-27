@@ -120,6 +120,7 @@ enum MembershipAction {
   join_request_rejected
   invite_link_rotated
   ownership_transferred
+  ownership_revoked
 
   @@map("membership_action_enum")
 }
@@ -304,6 +305,9 @@ enum NotificationType {
   join_request_result
   direct_invite_received
   club_owner_application_result
+  club_application_submitted
+  club_application_approved
+  club_application_rejected
 
   @@map("notification_type_enum")
 }
@@ -312,10 +316,67 @@ enum NotificationType {
 
 enum ApplicationStatus {
   pending
+  in_review
   approved
   rejected
+  cancelled
 
   @@map("application_status_enum")
+}
+
+enum ExpectedPlayerBucket {
+  one_to_ten
+  eleven_to_twentyfive
+  twentysix_to_fifty
+  fiftyone_to_hundred
+  hundred_plus
+
+  @@map("expected_player_bucket_enum")
+}
+
+enum ApplicationRejectionReason {
+  insufficient_information
+  unverifiable_venue
+  unverifiable_contact
+  duplicate_or_squatting
+  policy_violation
+  spam_or_low_quality
+  applicant_history
+  other
+
+  @@map("application_rejection_reason_enum")
+}
+
+enum AdminAction {
+  application_approved
+  application_rejected
+  demotion_approved_archived
+  demotion_approved_transferred
+  demotion_rejected
+  complaint_dismissed
+  complaint_escalated
+  complaint_resolved
+  moderation_flag_resolved
+  moderation_flag_dismissed
+  kill_switch_toggled
+  platform_config_updated
+  club_manual_archived
+  club_manual_demoted
+
+  @@map("admin_action_enum")
+}
+
+enum AdminActionEntity {
+  club_application
+  club_demotion_request
+  complaint
+  moderation_flag
+  kill_switch
+  platform_config
+  club
+  profile
+
+  @@map("admin_action_entity_enum")
 }
 
 enum ModerationEntity {

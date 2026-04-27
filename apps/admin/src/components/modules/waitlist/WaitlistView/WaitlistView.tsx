@@ -13,7 +13,7 @@ import {
 	type WaitlistApiResponse,
 	type WaitlistStatsResponse,
 	waitlistQueryKeys,
-} from "@/lib/waitlist-admin";
+} from "@/lib/waitlist-shared";
 
 async function fetchWaitlistStats(): Promise<WaitlistStatsResponse> {
 	const res = await fetch("/api/waitlist/stats");

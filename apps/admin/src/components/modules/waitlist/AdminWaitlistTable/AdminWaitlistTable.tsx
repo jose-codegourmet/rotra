@@ -11,7 +11,7 @@ import {
 import * as React from "react";
 import { Button } from "@/components/ui/button/Button";
 import { cn } from "@/lib/utils";
-import type { WaitlistApiResponse } from "@/lib/waitlist-admin";
+import type { WaitlistApiResponse } from "@/lib/waitlist-shared";
 
 type WaitlistRow = WaitlistApiResponse["rows"][number];
 

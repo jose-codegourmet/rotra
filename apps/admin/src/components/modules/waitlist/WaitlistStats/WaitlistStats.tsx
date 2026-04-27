@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { WaitlistStatsResponse } from "@/lib/waitlist-admin";
+import type { WaitlistStatsResponse } from "@/lib/waitlist-shared";
 
 const numberFmt = new Intl.NumberFormat(undefined, {
 	maximumFractionDigits: 0,

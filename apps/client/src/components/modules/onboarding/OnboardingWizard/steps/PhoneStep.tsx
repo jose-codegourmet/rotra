@@ -3,12 +3,12 @@
 import { useFormContext } from "react-hook-form";
 
 import { StepBlock } from "@/components/modules/onboarding/StepBlock/StepBlock";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field/Field";
 import { Input } from "@/components/ui/input/Input";
 import {
 	NativeSelect,
 	NativeSelectOption,
-} from "@/components/ui/native-select";
+} from "@/components/ui/native-select/NativeSelect";
 import type { OnboardingFormValues } from "@/lib/onboarding/onboarding-form-schema";
 import type { IsoCountry } from "@/lib/phone/country-dial";
 

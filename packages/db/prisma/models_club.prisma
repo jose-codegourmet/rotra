@@ -5,6 +5,10 @@ model Club {
   description String?
   avatarUrl   String? @map("avatar_url")
 
+  /// Primary venue / city for cards and discovery (optional; set when minted from an application).
+  locationCity  String? @map("location_city")
+  locationVenue String? @map("location_venue")
+
   status ClubStatus @default(active)
 
   autoApprove       Boolean @default(false) @map("auto_approve")
@@ -22,6 +26,7 @@ model Club {
   auditLog         ClubMembershipAuditLog[]
   queueSessions    QueueSession[]
   sandbaggingFlags SandbaggingFlag[]
+  mintedFromApplication ClubApplication?      @relation("ClubMintedFromApplication")
 
   @@index([ownerId], map: "idx_clubs_owner_id")
   @@index([inviteToken], map: "idx_clubs_invite_token")
@@ -103,4 +108,46 @@ model ClubMembershipAuditLog {
   @@index([playerId], map: "idx_audit_log_player_id")
   @@index([createdAt(sort: Desc)], map: "idx_audit_log_created_at")
   @@map("club_membership_audit_log")
+}
+
+/// Player-submitted request to create a new club; mints `clubs` on admin approval.
+model ClubApplication {
+  id        String @id @default(uuid()) @db.Uuid
+  playerId  String @map("player_id") @db.Uuid
+
+  clubName    String @map("club_name")
+  description String
+  intent      String
+
+  locationCity  String @map("location_city")
+  locationVenue String @map("location_venue")
+  venueAddress  String @map("venue_address")
+
+  facebookPageUrl    String? @map("facebook_page_url")
+  facebookProfileUrl String? @map("facebook_profile_url")
+  contactNumber        String? @map("contact_number")
+
+  expectedPlayerCount ExpectedPlayerBucket @map("expected_player_count")
+  additionalNotes     String? @map("additional_notes")
+
+  status ApplicationStatus @default(pending)
+
+  rejectionReason ApplicationRejectionReason? @map("rejection_reason")
+  reviewNote      String? @map("review_note")
+  reviewedById    String? @map("reviewed_by") @db.Uuid
+  reviewedAt      DateTime? @map("reviewed_at") @db.Timestamptz(6)
+
+  resultingClubId String? @unique @map("resulting_club_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  player        Profile  @relation("ClubApplicationPlayer", fields: [playerId], references: [id], onDelete: Cascade)
+  reviewedBy    Profile? @relation("ClubApplicationReviewedBy", fields: [reviewedById], references: [id])
+  resultingClub Club?    @relation("ClubMintedFromApplication", fields: [resultingClubId], references: [id])
+
+  @@index([playerId], map: "idx_club_applications_player_id")
+  @@index([status], map: "idx_club_applications_status")
+  @@index([createdAt(sort: Desc)], map: "idx_club_applications_created")
+  @@map("club_applications")
 }

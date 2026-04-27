@@ -1,7 +1,7 @@
 import type {
 	WaitlistApiRow,
 	WaitlistStatsResponse,
-} from "@/lib/waitlist-admin";
+} from "@/lib/waitlist-shared";
 
 export const MOCK_WAITLIST_STATS: WaitlistStatsResponse = {
 	total: 124,
