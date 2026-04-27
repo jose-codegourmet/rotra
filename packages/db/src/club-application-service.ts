@@ -1,5 +1,3 @@
-import { randomBytes } from "node:crypto";
-
 import type {
 	ApplicationRejectionReason,
 	ApplicationStatus,
@@ -24,7 +22,9 @@ export class ClubApplicationError extends Error {
 }
 
 export function generateInviteToken(): string {
-	return randomBytes(16).toString("base64url");
+	const bytes = new Uint8Array(16);
+	globalThis.crypto.getRandomValues(bytes);
+	return Buffer.from(bytes).toString("base64url");
 }
 
 export type ClubApplicationCreatePayload = {
