@@ -159,57 +159,43 @@ apps/client/src/components/
 │       ├── Button.tsx
 │       └── Button.stories.tsx
 ├── rotra/                    # Client-specific components
-│   ├── PlayerRow/
+│   ├── player-row/
 │   │   ├── PlayerRow.tsx
 │   │   ├── PlayerRow.types.ts
 │   │   └── PlayerRow.stories.tsx
-│   ├── CourtCard/
-│   ├── StatusBadge/
-│   ├── TierBadge/
-│   ├── QueueSlider/
-│   └── FeatureGate/
+│   ├── court-card/
+│   ├── status-badge/
+│   ├── tier-badge/
+│   ├── queue-slider/
+│   └── feature-gate/
 └── layout/
-    ├── BottomNav/
+    ├── bottom-nav/
     │   ├── BottomNav.tsx
     │   └── BottomNav.stories.tsx
-    └── PageShell/
+    └── page-shell/
 
 apps/admin/src/components/
 ├── shadcn/                   # shadcn/ui generated components
 ├── rotra/                    # Admin-specific components
-│   ├── KillSwitchRow/
-│   ├── ApprovalCard/
-│   └── FeatureGate/
+│   ├── kill-switch-row/
+│   ├── approval-card/
+│   └── feature-gate/
 └── layout/
 
 apps/umpire/src/components/
 ├── shadcn/                   # shadcn/ui generated components
 └── rotra/                    # Umpire-specific components
-    ├── ScoreDisplay/
-    └── PointButton/
+    ├── score-display/
+    └── point-button/
 ```
 
 #### Component File Structure
 
-Every component follows the same file structure, regardless of whether it lives under `shadcn/`, `rotra/`, or `layout/`:
+Every component is a functional component that lives in a kebab-case folder containing PascalCase dotted-suffix files (`ComponentName.tsx`, `ComponentName.stories.tsx`, optional `ComponentName.variants.ts` for `cva` recipes, optional `ComponentName.helpers.ts`, optional `ComponentName.types.ts`). Props types live in `ComponentName.tsx`, never in `.types.ts`.
 
-```
-components/<category>/<ComponentName>/
-├── <ComponentName>.tsx          # Component implementation
-├── <ComponentName>.types.ts     # Props interface (if not inlined in .tsx)
-└── <ComponentName>.stories.tsx  # Storybook stories
-```
+Full convention — file roles, when each optional file is required, sub-component nesting, the worked Button example, and the pre-PR checklist — lives in [12_component_creation_guidelines.md](./12_component_creation_guidelines.md#12-component-creation-guidelines).
 
-Example:
-
-```
-components/rotra/PlayerRow/
-├── PlayerRow.tsx
-├── PlayerRow.types.ts
-└── PlayerRow.stories.tsx
-```
-
-> **No `index.ts` barrel files.** Import directly from the component file — `import { PlayerRow } from '@/components/rotra/PlayerRow/PlayerRow'`, not from the folder. Barrel files (`index.ts`) obscure where symbols come from and slow down TypeScript resolution. Reference the actual file.
+> **No `index.ts` barrel files.** Import directly from the component file — `import { PlayerRow } from '@/components/rotra/player-row/PlayerRow'`, not from the folder. Barrel files (`index.ts`) obscure where symbols come from and slow down TypeScript resolution. Reference the actual file.
 
 #### Component Rules
 
@@ -226,7 +212,7 @@ components/rotra/PlayerRow/
 |------|------------|---------|
 | Component files | PascalCase | `PlayerRow.tsx` |
 | Component story files | `[Name].stories.tsx` | `PlayerRow.stories.tsx` |
-| Component folder | PascalCase matching the component | `PlayerRow/` |
+| Component folder | kebab-case matching the component | `player-row/` |
 | Component props interface | `[Name]Props` | `PlayerRowProps` |
 | Hook files | `use-kebab-case.ts` | `use-session-state.ts` |
 | Utility files | `kebab-case.ts` | `format-score.ts` |

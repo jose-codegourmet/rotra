@@ -4,7 +4,7 @@ import { Field, FieldLabel } from "@/components/ui/field/Field";
 import { NativeSelect, NativeSelectOption } from "./NativeSelect";
 
 const meta: Meta<typeof NativeSelect> = {
-	title: "shadcn/NativeSelect",
+	title: "UI/NativeSelect",
 	component: NativeSelect,
 	tags: ["autodocs"],
 };

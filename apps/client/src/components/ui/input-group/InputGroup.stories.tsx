@@ -10,7 +10,7 @@ import {
 } from "./InputGroup";
 
 const meta: Meta<typeof InputGroup> = {
-	title: "shadcn/InputGroup",
+	title: "UI/InputGroup",
 	component: InputGroup,
 	tags: ["autodocs"],
 };

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
 
 const meta: Meta<typeof Tabs> = {
-	title: "shadcn/Tabs",
+	title: "UI/Tabs",
 	component: Tabs,
 	tags: ["autodocs"],
 };

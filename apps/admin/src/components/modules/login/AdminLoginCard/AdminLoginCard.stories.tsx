@@ -13,7 +13,7 @@ type Story = StoryObj<typeof AdminLoginCard>;
 export const Default: Story = {
 	render: () => (
 		<div className="flex min-h-[480px] items-center justify-center p-6">
-			<AdminLoginCard />
+			<AdminLoginCard nextPath="#" />
 		</div>
 	),
 };

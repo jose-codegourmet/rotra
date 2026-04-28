@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react";
-
-import { MOCK_PLAYER } from "@/constants/mock-player";
-
 import { PlayStyleCard } from "./PlayStyleCard";
+
+const MOCK_USER = {
+	id: "user-1",
+	name: "Alex Chen",
+	avatarUrl: null,
+};
 
 const meta: Meta<typeof PlayStyleCard> = {
 	title: "profile/PlayStyleCard",
 	component: PlayStyleCard,
 	tags: ["autodocs"],
 	argTypes: {
-		player: { control: "object" },
+		user: { control: "object" },
 	},
 };
 
@@ -18,40 +21,24 @@ type Story = StoryObj<typeof PlayStyleCard>;
 
 export const Default: Story = {
 	args: {
-		player: MOCK_PLAYER,
+		user: MOCK_USER,
 	},
 };
 
 export const SingleTag: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
-			playStyle: ["All-Rounder"],
-		},
+		user: { ...MOCK_USER, name: "Sam Lee" },
 	},
 };
 
 export const ManyTags: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
-			playStyle: [
-				"Aggressive Smasher",
-				"Net Specialist",
-				"Endurance Tank",
-				"Defensive Baseline",
-				"Drop Shot Artist",
-				"Serve & Net",
-			],
-		},
+		user: { ...MOCK_USER, name: "Elena Reyes" },
 	},
 };
 
 export const EmptyTags: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
-			playStyle: [],
-		},
+		user: { ...MOCK_USER, name: "Jordan Cruz" },
 	},
 };

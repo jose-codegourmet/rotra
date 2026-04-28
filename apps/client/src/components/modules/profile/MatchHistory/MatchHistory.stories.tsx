@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react";
-
-import { MOCK_PLAYER } from "@/constants/mock-player";
-
 import { MatchHistory } from "./MatchHistory";
+
+const MOCK_USER = {
+	id: "user-1",
+	name: "Alex Chen",
+	avatarUrl: null,
+};
 
 const meta: Meta<typeof MatchHistory> = {
 	title: "profile/MatchHistory",
 	component: MatchHistory,
 	tags: ["autodocs"],
 	argTypes: {
-		matches: { control: "object" },
+		user: { control: "object" },
 		maxMatchPerView: { control: "number" },
 		viewAllHref: { control: "text" },
 	},
@@ -20,14 +23,14 @@ type Story = StoryObj<typeof MatchHistory>;
 
 export const Default: Story = {
 	args: {
-		matches: MOCK_PLAYER.recentMatches,
+		user: MOCK_USER,
 		maxMatchPerView: 3,
 	},
 };
 
 export const WithViewAllLink: Story = {
 	args: {
-		matches: MOCK_PLAYER.recentMatches,
+		user: MOCK_USER,
 		maxMatchPerView: 3,
 		viewAllHref: "/matches",
 	},
@@ -35,14 +38,14 @@ export const WithViewAllLink: Story = {
 
 export const LimitedToOne: Story = {
 	args: {
-		matches: MOCK_PLAYER.recentMatches,
+		user: MOCK_USER,
 		maxMatchPerView: 1,
 	},
 };
 
 export const EmptyHistory: Story = {
 	args: {
-		matches: [],
+		user: MOCK_USER,
 		maxMatchPerView: 5,
 	},
 };
