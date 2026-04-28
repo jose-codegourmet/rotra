@@ -5,10 +5,8 @@ import { useCallback, useMemo, useState } from "react";
 import {
 	clubApplicationNameCollisionsQueryKey,
 	useApproveClubApplicationMutation,
-	useBulkRejectClubApplicationsMutation,
 	useClubApplicationNameCollisionsQuery,
 	useClubApplicationsListQuery,
-	useRejectClubApplicationMutation,
 } from "@/hooks/useClubApplications/client";
 import type { ClubApplicationListRowDto } from "@/types/club-application-admin";
 import { ApplicationDetailPanel } from "./ApplicationDetailPanel";
@@ -18,7 +16,7 @@ import { ApproveConfirmModal } from "./ApproveConfirmModal";
 import { BulkRejectToolbar } from "./BulkRejectToolbar";
 import { ExportCsvButton } from "./ExportCsvButton";
 import { RejectReasonFormModal } from "./RejectReasonFormModal";
-import type { ClubApplicationRejectFormValues } from "./reject-reason-form/schema";
+import type { RejectReasonMutationTarget } from "./reject-reason-form/RejectReasonForm";
 
 const PAGE_SIZE = 20;
 
@@ -52,8 +50,6 @@ export function ClubApplicationsApprovalsView() {
 	const { data, isLoading, error, refetch } =
 		useClubApplicationsListQuery(listParams);
 	const approveMut = useApproveClubApplicationMutation(listParams);
-	const rejectMut = useRejectClubApplicationMutation(listParams);
-	const bulkRejectMut = useBulkRejectClubApplicationsMutation(listParams);
 
 	const collisionsQuery = useClubApplicationNameCollisionsQuery(selectedId);
 
@@ -102,8 +98,7 @@ export function ClubApplicationsApprovalsView() {
 		setDetailOpenMobile(true);
 	}, []);
 
-	const busy =
-		approveMut.isPending || rejectMut.isPending || bulkRejectMut.isPending;
+	const busy = approveMut.isPending;
 
 	const openRejectSingle = (id: string) => {
 		setBulkRejectOpen(false);
@@ -111,58 +106,37 @@ export function ClubApplicationsApprovalsView() {
 		setRejectOpen(true);
 	};
 
-	const handleRejectSubmit = (values: ClubApplicationRejectFormValues) => {
+	const rejectMutationTarget = useMemo<RejectReasonMutationTarget>(() => {
 		if (bulkRejectOpen) {
-			const ids = Array.from(selectedIds).filter((id) => {
+			const applicationIds = Array.from(selectedIds).filter((id) => {
 				const row = rows.find((r) => r.id === id);
 				return row && (row.status === "pending" || row.status === "in_review");
 			});
-			if (ids.length === 0) {
-				setBulkRejectOpen(false);
-				setRejectOpen(false);
-				return;
-			}
-			bulkRejectMut.mutate(
-				{
-					applicationIds: ids,
-					reason: values.reason,
-					...(values.reviewNote != null && values.reviewNote !== ""
-						? { reviewNote: values.reviewNote }
-						: {}),
-				},
-				{
-					onSuccess: () => {
-						setBulkRejectOpen(false);
-						setRejectOpen(false);
-						setRejectApplicationId(null);
-						setSelectedIds(new Set());
-						void refetch();
-					},
-				},
-			);
-			return;
+			return { type: "bulk", applicationIds };
 		}
-		const applicationId = rejectApplicationId;
-		if (!applicationId) return;
-		rejectMut.mutate(
-			{
-				applicationId,
-				reason: values.reason,
-				...(values.reviewNote != null && values.reviewNote !== ""
-					? { reviewNote: values.reviewNote }
-					: {}),
-			},
-			{
-				onSuccess: () => {
-					setRejectOpen(false);
-					setRejectApplicationId(null);
-					void queryClient.invalidateQueries({
-						queryKey: clubApplicationNameCollisionsQueryKey(applicationId),
-					});
-					void refetch();
-				},
-			},
-		);
+		return {
+			type: "single",
+			applicationId: rejectApplicationId ?? "",
+		};
+	}, [bulkRejectOpen, selectedIds, rows, rejectApplicationId]);
+
+	const handleRejectSuccess = () => {
+		const lastRejectApplicationId = rejectApplicationId;
+		const isBulk = bulkRejectOpen;
+		setRejectOpen(false);
+		setBulkRejectOpen(false);
+		setRejectApplicationId(null);
+		if (isBulk) {
+			setSelectedIds(new Set());
+		}
+		if (lastRejectApplicationId) {
+			void queryClient.invalidateQueries({
+				queryKey: clubApplicationNameCollisionsQueryKey(
+					lastRejectApplicationId,
+				),
+			});
+		}
+		void refetch();
 	};
 
 	return (
@@ -274,8 +248,9 @@ export function ClubApplicationsApprovalsView() {
 				title={
 					bulkRejectOpen ? "Reject selected applications" : "Reject application"
 				}
-				busy={rejectMut.isPending || bulkRejectMut.isPending}
-				onSubmit={handleRejectSubmit}
+				mutationTarget={rejectMutationTarget}
+				onSuccess={handleRejectSuccess}
+				onError={() => {}}
 			/>
 		</div>
 	);

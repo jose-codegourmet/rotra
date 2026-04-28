@@ -1,10 +1,19 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { Menu, User, X } from "lucide-react";
+import { LogOut, Menu, User, X } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button/Button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog/Dialog";
 import { Logo } from "@/components/ui/logo/Logo";
 import {
 	ADMIN_APP_DISPLAY_NAME,
@@ -12,6 +21,7 @@ import {
 	getAdminShellPageTitle,
 	ROUTES,
 } from "@/constants/admin";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 export interface AdminShellProps {
@@ -62,6 +72,37 @@ export function AdminShell({
 	const derivedTitle = getAdminShellPageTitle(pathname);
 	const pageTitle = pageTitleOverride ?? derivedTitle;
 	const [mobileNavOpen, setMobileNavOpen] = useState(false);
+	const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
+	const [signOutPending, setSignOutPending] = useState(false);
+	const [signOutError, setSignOutError] = useState<string | null>(null);
+	const router = useRouter();
+	const supabase = useMemo(() => createClient(), []);
+
+	function openSignOutDialog() {
+		setMobileNavOpen(false);
+		setSignOutError(null);
+		setSignOutDialogOpen(true);
+	}
+
+	async function handleConfirmSignOut() {
+		setSignOutPending(true);
+		setSignOutError(null);
+		try {
+			const { error } = await supabase.auth.signOut();
+			if (error) throw error;
+			setSignOutDialogOpen(false);
+			router.replace(ROUTES.LOGIN);
+			router.refresh();
+		} catch (err) {
+			const message =
+				err instanceof Error
+					? err.message
+					: "Unable to sign out right now. Please try again.";
+			setSignOutError(message);
+		} finally {
+			setSignOutPending(false);
+		}
+	}
 
 	return (
 		<div className="min-h-screen bg-bg-base">
@@ -166,6 +207,17 @@ export function AdminShell({
 						);
 					})}
 				</nav>
+				<div className="border-t border-border p-3">
+					<Button
+						type="button"
+						variant="ghost"
+						className="w-full justify-start text-text-secondary hover:text-text-primary"
+						onClick={openSignOutDialog}
+					>
+						<LogOut className="size-4" />
+						Sign out
+					</Button>
+				</div>
 			</aside>
 
 			<header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between gap-3 border-b border-border bg-bg-base/80 px-4 backdrop-blur-xl md:hidden">
@@ -201,10 +253,52 @@ export function AdminShell({
 						>
 							<User className="size-5" strokeWidth={1.5} />
 						</span>
+						<Button type="button" variant="outline" onClick={openSignOutDialog}>
+							<LogOut className="size-4" />
+							Sign out
+						</Button>
 					</div>
 				</header>
 				<main className="flex-1 p-4 md:p-6">{children}</main>
 			</div>
+			<Dialog
+				open={signOutDialogOpen}
+				onOpenChange={(open) => {
+					if (signOutPending) return;
+					setSignOutDialogOpen(open);
+					if (!open) setSignOutError(null);
+				}}
+			>
+				<DialogContent className="max-w-md">
+					<DialogHeader>
+						<DialogTitle>Sign out of admin?</DialogTitle>
+						<DialogDescription>
+							You will be signed out of your current admin session and returned
+							to the login page.
+						</DialogDescription>
+					</DialogHeader>
+					{signOutError ? (
+						<p className="text-small text-danger">{signOutError}</p>
+					) : null}
+					<DialogFooter>
+						<Button
+							type="button"
+							variant="outline"
+							disabled={signOutPending}
+							onClick={() => setSignOutDialogOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button
+							type="button"
+							disabled={signOutPending}
+							onClick={handleConfirmSignOut}
+						>
+							{signOutPending ? "Signing out..." : "Sign out"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

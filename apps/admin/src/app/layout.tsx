@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { AuthSync } from "@/components/providers/AuthSync";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { cn } from "@/lib/utils";
 import "./globals.css";
@@ -40,9 +42,13 @@ export default function RootLayout({
 			suppressHydrationWarning
 		>
 			<body className="bg-bg-base text-text-primary antialiased font-sans">
-				<QueryProvider>
-					<ThemeProvider>{children}</ThemeProvider>
-				</QueryProvider>
+				<ReduxProvider>
+					<AuthSync>
+						<QueryProvider>
+							<ThemeProvider>{children}</ThemeProvider>
+						</QueryProvider>
+					</AuthSync>
+				</ReduxProvider>
 			</body>
 		</html>
 	);

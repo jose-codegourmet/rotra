@@ -5,8 +5,8 @@ import {
 	rejectClubApplication,
 } from "@rotra/db";
 import { NextResponse } from "next/server";
-
 import { getAdminActorProfileId } from "@/lib/admin-actor";
+import { AdminSessionError } from "@/lib/auth/admin-session";
 
 export const runtime = "nodejs";
 
@@ -26,16 +26,6 @@ export async function POST(
 	context: { params: Promise<{ id: string }> },
 ) {
 	const { id } = await context.params;
-	const adminId = getAdminActorProfileId(request);
-	if (!adminId) {
-		return NextResponse.json(
-			{
-				error:
-					"Missing admin actor: set header X-Rotra-Admin-Profile-Id or env ROTRA_ADMIN_ACTOR_PROFILE_ID.",
-			},
-			{ status: 400 },
-		);
-	}
 
 	let body: { reason?: string; reviewNote?: string | null };
 	try {
@@ -56,6 +46,7 @@ export async function POST(
 	}
 
 	try {
+		const adminId = await getAdminActorProfileId();
 		await rejectClubApplication(db, {
 			applicationId: id,
 			adminProfileId: adminId,
@@ -69,6 +60,9 @@ export async function POST(
 		if (e instanceof ClubApplicationError) {
 			const status = e.code === "not_found" ? 404 : 409;
 			return NextResponse.json({ error: e.message }, { status });
+		}
+		if (e instanceof AdminSessionError) {
+			return NextResponse.json({ error: e.message }, { status: e.status });
 		}
 		console.error("[admin club-applications reject]", e);
 		return NextResponse.json(
