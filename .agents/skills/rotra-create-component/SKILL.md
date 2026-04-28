@@ -61,15 +61,17 @@ Steps:
 3. **Read guidelines** at [docs/techstack/12_component_creation_guidelines.md](../../../docs/techstack/12_component_creation_guidelines.md). Treat the "Implementer and Agent Checklist (Pre-PR)" as the authoritative checklist for the output.
 4. **Optional shadcn reference.** If `[shadcn link]` was provided, call `WebFetch` against the URL once. Use the returned API + examples to inform: which props to expose, whether the component is a single-element wrapper (`asChild` candidate), and which sub-components belong to its public composition. Never run `npx shadcn@latest` from this skill.
 5. **Decide shape.** Combine `[instructions]` and the shadcn API (if any) to answer:
-   - Does the component need `cva` variants/sizes? -> if unclear, ask `has_variants`.
+   - **Is the component shadcn-origin?** A `[shadcn link]` was provided, OR `[instructions]` says it is from shadcn / a registry. If yes, the component is treated as a single-file compound (see "shadcn-origin exception" below). Skip the `subcomponents` question — scaffold every sub-component shadcn ships with it, all in the same `<ComponentName>.tsx`.
+   - Does the component need `cva` variants/sizes? -> if unclear, ask `has_variants`. For shadcn-origin components, mirror what shadcn ships (extracted into one shared `<ComponentName>.variants.ts`).
    - Is it a single interactive DOM element that should accept `asChild`? -> if unclear, ask `as_child`.
-   - Does it expose sub-components as part of its public API? -> if unclear, ask `subcomponents`.
+   - **Non-shadcn only:** Does it expose sub-components as part of its public API? -> if unclear, ask `subcomponents`.
    - Are there 3+ pure helpers needed? -> default to "no" unless the user said so explicitly. With 1-2 helpers, inline them.
 6. **Pick a blueprint** from [references/templates.md](references/templates.md):
-   - Variant component (most shadcn primitives) -> "Variant component" blueprint (`.tsx` + `.variants.ts`).
+   - Shadcn-origin compound (e.g. `Pagination`, `Card`, `Select`, `Dialog`) -> "shadcn-origin compound" blueprint. **One** `<ComponentName>.tsx` exporting every sub-component, **one** optional `<ComponentName>.variants.ts` holding every cva recipe used by that file. Do NOT create nested kebab folders for the sub-parts.
+   - Variant component (custom, non-shadcn, with variants/sizes) -> "Variant component" blueprint (`.tsx` + `.variants.ts`).
    - Non-variant component -> "Non-variant component" blueprint (`.tsx` only).
-   - Always pair with the "Stories" blueprint for `ComponentName.stories.tsx`.
-   - If sub-components were chosen, scaffold each sub-component using the same blueprint inside its own nested kebab folder per the guidelines doc, "Sub-Component Structure".
+   - Always pair with the "Stories" blueprint for `<ComponentName>.stories.tsx`. Stories cover every exported sub-component in one file for shadcn-origin compounds.
+   - If sub-components were chosen for a **non-shadcn** component, scaffold each sub-component using the same blueprint inside its own nested kebab folder per the guidelines doc, "Sub-Component Structure".
 7. **Write the files.** Replace placeholders in the blueprint:
    - `<ComponentName>` -> the PascalCase name
    - `<componentName>` -> the camelCase name
@@ -92,7 +94,10 @@ These mirror the "Non-Negotiable Standards" section of the guidelines and overri
 - Helpers MUST be pure. With 1-2 helpers, inline at the top of the `.tsx`. With 3+, move all of them to `<ComponentName>.helpers.ts`.
 - `<ComponentName>.types.ts` is created **only** for non-prop shared types referenced by more than one of `.tsx`, `.helpers.ts`, `.variants.ts`, `.stories.tsx`. If the only type is the props type, this file is not created.
 - Stories file is always created. Story fixtures must come from `app/constants/`. If no mock exists yet, leave a `// TODO: import mock from app/constants/<file>.ts` comment instead of inlining fixtures.
-- Sub-components live in nested kebab folders and follow every rule above. The parent folder does not re-export them.
+- **Sub-component placement depends on origin.**
+  - **shadcn-origin (the component came from a shadcn registry, including `[shadcn link]` or anything `npx shadcn@latest add` would produce):** keep every sub-component co-located in `<ComponentName>.tsx`. Do **not** create nested kebab folders for sub-parts (no `pagination-link/`, no `card-header/`). All cva recipes for the parent + every sub-component live in a single `<ComponentName>.variants.ts` (or stay absent if the upstream shadcn source has no cva). One stories file covers the whole compound. See "Shadcn-Origin Exception" in [docs/techstack/12_component_creation_guidelines.md](../../../docs/techstack/12_component_creation_guidelines.md) for the canonical rule.
+  - **Non-shadcn (custom ROTRA component that exposes a public composition):** sub-components live in nested kebab folders and follow every other rule above. The parent folder does not re-export them.
+- **Atomic / small components stay flat.** If the component is small enough to live in one file (a few dozen lines, no public sub-parts) and the user did not explicitly ask for sub-components, do not invent nesting. Pagination-style over-engineering is forbidden.
 
 ## Decisions you must ask the user
 
@@ -105,7 +110,7 @@ Use `AskQuestion` only for the cases below. Do not invent extra prompts.
 | `target_app` | `folder` is bare like `ui` or `modules/clubs` and could match more than one app under `apps/*/src/components/` | Options: each matching app (e.g. `apps/client`, `apps/admin`, `apps/umpire`). |
 | `has_variants` | `[instructions]` and the optional shadcn link give no signal whether the component needs `cva` variants/sizes | Options: `yes - scaffold with .variants.ts`, `no - single style`. |
 | `as_child` | The component clearly wraps a single interactive DOM element but `asChild` support is unstated | Options: `yes - support asChild via Slot`, `no - render fixed element`. |
-| `subcomponents` | Shadcn docs (or instructions) suggest public sub-parts (e.g. `Card` + `CardHeader`) but the set is not specified | Options: each candidate sub-component as a multi-select. |
+| `subcomponents` | **Non-shadcn only.** Instructions suggest public sub-parts but the set is not specified. (For shadcn-origin components, scaffold every sub-component shadcn ships, all in the parent `.tsx` — never ask.) | Options: each candidate sub-component as a multi-select. |
 | `dom_element` | The component wraps a single element and the underlying tag is ambiguous | Options: the small set of plausible tags (e.g. `button`, `a`, `div`). |
 
 If `componentName` or `folder` requires free-text from the user, prefer plain follow-up messaging over `AskQuestion` (which is multiple choice only).

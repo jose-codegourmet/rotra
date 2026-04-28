@@ -90,6 +90,27 @@ components/<category>/component-name/
 - Each sub-component is imported directly from its own file. The parent folder does **not** re-export sub-components.
 - Use a sub-folder **only when the sub-component is part of the parent's public composition contract**. One-off internal pieces (a small layout helper used in only one render block) stay inlined inside the parent's `.tsx`.
 
+### Shadcn-Origin Exception
+
+Components imported from a shadcn registry (anything `npx shadcn@latest add` would produce — `Pagination`, `Card`, `Select`, `Dialog`, `DropdownMenu`, `Tabs`, `Sheet`, `Drawer`, `AlertDialog`, `Form`, `Breadcrumb`, `NavigationMenu`, `InputOTP`, etc.) keep shadcn's single-file layout. All sub-components are co-located as named exports inside the parent's `ComponentName.tsx`. Do **not** create nested kebab folders for the sub-parts.
+
+```text
+components/ui/pagination/
+├── Pagination.tsx              # parent + PaginationContent, PaginationItem,
+│                               # PaginationLink, PaginationPrevious,
+│                               # PaginationNext, PaginationEllipsis, etc.
+├── Pagination.stories.tsx
+└── Pagination.variants.ts      # only if any sub-part uses cva
+```
+
+Why: shadcn primitives are atomic compounds. Splitting `PaginationLink` into its own folder produces a ~30-line file plus an unused `.stories.tsx` per sub-part, with no API or testing benefit.
+
+Everything else in this doc still applies to shadcn-origin components: kebab parent folder, PascalCase dotted-suffix files, `cn` from `@/lib/utils`, ROTRA tokens (replace shadcn theme classes like `bg-background` / `text-muted-foreground` with ROTRA tokens like `bg-bg-base` / `text-text-secondary` per [05_coding_design_system.md §4.4](./05_coding_design_system.md#44-shadcnui-component-overrides)), one `ComponentName.variants.ts` holding every cva recipe used by the file (if cva is used), no `index.ts`.
+
+Custom (non-shadcn) ROTRA components that expose a public composition still follow the nested-folder layout in "Sub-Component Structure" above.
+
+> **Existing shadcn components are not retroactively migrated as part of this doc.** Layouts already split into sub-folders (e.g. the current `pagination/` tree) can be flattened in a follow-up. New shadcn additions follow this rule from day one.
+
 ---
 
 ## Helpers
@@ -283,6 +304,6 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
 - [ ] Imports of the component reference the full file path (`.../player-row/PlayerRow`), not the folder.
 - [ ] Storybook file exists and covers the default state plus each variant.
 - [ ] Story fixtures are imported from `app/constants/`, not inlined.
-- [ ] Sub-components, if any, live in their own nested kebab folders following all of the above rules.
+- [ ] Sub-components, if any, follow the right placement: shadcn-origin compounds keep all sub-components co-located as named exports in the parent's `.tsx` (per "Shadcn-Origin Exception"); custom non-shadcn components put each sub-component in its own nested kebab folder following all of the above rules.
 
 ---

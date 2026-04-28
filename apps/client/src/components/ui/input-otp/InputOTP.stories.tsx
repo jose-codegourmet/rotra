@@ -45,7 +45,7 @@ function OtpWithSeparator() {
 }
 
 const meta: Meta<typeof InputOTP> = {
-	title: "shadcn/InputOTP",
+	title: "UI/InputOTP",
 	component: InputOTP,
 	tags: ["autodocs"],
 };

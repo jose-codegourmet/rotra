@@ -184,9 +184,11 @@ Replace `<category>` with the category folder the component lives in (e.g. `UI`,
 
 ---
 
-## Blueprint E — Sub-component scaffold
+## Blueprint E — Non-shadcn sub-component scaffold
 
-Only when sub-components are part of the parent's public composition (e.g. `Card` + `CardHeader`). Each sub-component lives in its own nested kebab folder under the parent and follows blueprints A or B for its own files.
+**Use this only for custom ROTRA components that expose a public composition. Never use this for shadcn-origin components — those use Blueprint F.**
+
+When sub-components are part of a custom component's public composition (e.g. a bespoke `PlayerRow` exposing `PlayerRowAvatar` + `PlayerRowMeta`), each sub-component lives in its own nested kebab folder under the parent and follows blueprints A or B for its own files.
 
 ```text
 <component-name>/
@@ -203,6 +205,77 @@ The parent folder does not re-export sub-components. Consumers import each sub-c
 
 ---
 
+## Blueprint F — shadcn-origin compound (single file, no sub-folders)
+
+**Use this whenever the component came from a shadcn registry** — i.e. the user passed a `[shadcn link]`, said it is a shadcn primitive in `[instructions]`, or named a component that `npx shadcn@latest add` would produce (e.g. `Pagination`, `Card`, `Select`, `Dialog`, `DropdownMenu`, `Tabs`, `AlertDialog`, `Sheet`, `Drawer`, `Form`, `InputOTP`, `Breadcrumb`, `NavigationMenu`).
+
+Mirror shadcn's source layout: **one** `.tsx` file with every sub-component co-located. **No** nested kebab folders. **One** `.variants.ts` containing every cva recipe used by that file (if cva is needed at all). **One** stories file covering the whole compound.
+
+```text
+<component-name>/
+├── <ComponentName>.tsx              # parent + every sub-component, all exported
+├── <ComponentName>.stories.tsx      # one file covering the compound
+└── <ComponentName>.variants.ts      # only if any sub-part uses cva; one file for all
+```
+
+### `<ComponentName>.tsx` (shadcn-origin compound)
+
+```tsx
+"use client";
+
+import * as React from "react";
+import { cn } from "@/lib/utils";
+// Import every cva recipe from the single .variants.ts (only if cva is used).
+// import { <componentName>LinkVariants } from "./<ComponentName>.variants";
+
+export type <ComponentName>Props = React.ComponentProps<"nav">;
+
+export const <ComponentName> = ({ className, ...props }: <ComponentName>Props) => (
+  <nav
+    aria-label="<aria-label>"
+    className={cn("...rotra-tokens...", className)}
+    {...props}
+  />
+);
+
+export type <ComponentName>ContentProps = React.ComponentProps<"ul">;
+
+export const <ComponentName>Content = ({
+  className,
+  ...props
+}: <ComponentName>ContentProps) => (
+  <ul className={cn("...rotra-tokens...", className)} {...props} />
+);
+
+export type <ComponentName>ItemProps = React.ComponentProps<"li">;
+
+export const <ComponentName>Item = ({
+  className,
+  ...props
+}: <ComponentName>ItemProps) => (
+  <li className={cn("...rotra-tokens...", className)} {...props} />
+);
+
+// ...repeat for every sub-component shadcn ships with this primitive.
+// All exports live in this single file. No nested folders.
+```
+
+Hard rules for this blueprint:
+
+- All sub-components are **named exports** in the same file. Do not split them.
+- If the upstream shadcn source uses cva, extract every recipe into `<ComponentName>.variants.ts` and import them here. Do not inline cva in the `.tsx` (this matches the rest of the skill).
+- If shadcn's source has no cva, skip the `.variants.ts` file entirely.
+- Each sub-component still uses `cn` and ROTRA tokens. Replace any raw hex / shadcn theme classes (`bg-background`, `text-muted-foreground`, etc.) with ROTRA tokens (`bg-bg-base`, `text-text-secondary`, etc.) per [docs/techstack/05_coding_design_system.md §4.4](../../../../docs/techstack/05_coding_design_system.md#44-shadcnui-component-overrides).
+- Stories file ([Blueprint D](#blueprint-d--stories-file-always-required)) covers the whole compound. Add at least one story that renders the realistic composition (parent + sub-parts together), not one story per sub-component.
+
+This blueprint implements the "Shadcn-Origin Exception" in [docs/techstack/12_component_creation_guidelines.md](../../../../docs/techstack/12_component_creation_guidelines.md). The guidelines doc remains authoritative.
+
+### Concrete reference
+
+The current [apps/client/src/components/ui/pagination/](../../../../apps/client/src/components/ui/pagination/) folder is an **anti-example** of this blueprint — it splits each shadcn sub-part into its own folder. New shadcn-origin components must collapse that layout into a single `.tsx` per this blueprint.
+
+---
+
 ## Pre-write checklist
 
 Before calling `Write` for any file, confirm:
@@ -211,6 +284,8 @@ Before calling `Write` for any file, confirm:
 - [ ] All filenames are `<ComponentName>.<suffix>` (PascalCase + dotted lowercase suffix).
 - [ ] Props type is named `<ComponentName>Props` and lives in `<ComponentName>.tsx`.
 - [ ] `cva` recipe (if any) lives in `<ComponentName>.variants.ts`, not inline in the `.tsx`.
+- [ ] **For shadcn-origin compounds:** every sub-component is co-located in `<ComponentName>.tsx`. No nested kebab folders for sub-parts.
+- [ ] **For non-shadcn compounds:** sub-components live in nested kebab folders per Blueprint E.
 - [ ] No `index.ts` is being created.
 - [ ] No raw hex values appear in any class string.
 - [ ] `cn` is imported from `@/lib/utils`.

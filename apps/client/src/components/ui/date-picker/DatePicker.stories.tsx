@@ -38,7 +38,7 @@ function DatePickerDemo() {
 }
 
 const meta: Meta<typeof DatePickerDemo> = {
-	title: "shadcn/DatePicker",
+	title: "UI/DatePicker",
 	component: DatePickerDemo,
 	tags: ["autodocs"],
 };

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Pill } from "./Pill";
 
 const meta: Meta<typeof Pill> = {
-	title: "shadcn/Pill",
+	title: "UI/Pill",
 	component: Pill,
 	tags: ["autodocs"],
 	argTypes: {

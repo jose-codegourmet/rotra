@@ -13,7 +13,7 @@ import {
 } from "./Select";
 
 const meta: Meta<typeof Select> = {
-	title: "shadcn/Select",
+	title: "UI/Select",
 	component: Select,
 	tags: ["autodocs"],
 };

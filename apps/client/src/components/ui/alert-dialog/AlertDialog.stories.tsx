@@ -15,7 +15,7 @@ import {
 } from "./AlertDialog";
 
 const meta: Meta<typeof AlertDialog> = {
-	title: "shadcn/AlertDialog",
+	title: "UI/AlertDialog",
 	component: AlertDialog,
 	tags: ["autodocs"],
 };

@@ -12,7 +12,7 @@ import {
 } from "./Field";
 
 const meta: Meta<typeof Field> = {
-	title: "shadcn/Field",
+	title: "UI/Field",
 	component: Field,
 	tags: ["autodocs"],
 };

@@ -11,7 +11,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "./RadioGroup";
 
 const meta: Meta<typeof RadioGroup> = {
-	title: "shadcn/RadioGroup",
+	title: "UI/RadioGroup",
 	component: RadioGroup,
 	tags: ["autodocs"],
 };
