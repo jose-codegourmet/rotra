@@ -1,8 +1,8 @@
 import type { ApplicationRejectionReason } from "@rotra/db";
 import { bulkRejectClubApplications, db } from "@rotra/db";
 import { NextResponse } from "next/server";
-
 import { getAdminActorProfileId } from "@/lib/admin-actor";
+import { AdminSessionError } from "@/lib/auth/admin-session";
 
 export const runtime = "nodejs";
 
@@ -18,17 +18,6 @@ const REJECTION_REASONS: ApplicationRejectionReason[] = [
 ];
 
 export async function POST(request: Request) {
-	const adminId = getAdminActorProfileId(request);
-	if (!adminId) {
-		return NextResponse.json(
-			{
-				error:
-					"Missing admin actor: set header X-Rotra-Admin-Profile-Id or env ROTRA_ADMIN_ACTOR_PROFILE_ID.",
-			},
-			{ status: 400 },
-		);
-	}
-
 	let body: {
 		applicationIds?: string[];
 		reason?: string;
@@ -56,14 +45,26 @@ export async function POST(request: Request) {
 		);
 	}
 
-	const results = await bulkRejectClubApplications(db, {
-		applicationIds: ids,
-		adminProfileId: adminId,
-		reason,
-		...(body.reviewNote != null && body.reviewNote !== ""
-			? { reviewNote: body.reviewNote }
-			: {}),
-	});
+	try {
+		const adminId = await getAdminActorProfileId();
+		const results = await bulkRejectClubApplications(db, {
+			applicationIds: ids,
+			adminProfileId: adminId,
+			reason,
+			...(body.reviewNote != null && body.reviewNote !== ""
+				? { reviewNote: body.reviewNote }
+				: {}),
+		});
 
-	return NextResponse.json({ results });
+		return NextResponse.json({ results });
+	} catch (e) {
+		if (e instanceof AdminSessionError) {
+			return NextResponse.json({ error: e.message }, { status: e.status });
+		}
+		console.error("[admin club-applications bulk-reject]", e);
+		return NextResponse.json(
+			{ error: "Failed to reject applications." },
+			{ status: 500 },
+		);
+	}
 }

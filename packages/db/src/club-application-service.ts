@@ -350,7 +350,10 @@ function applicationSnapshot(app: {
 	};
 }
 
-export async function expireStalePendingClubApplications(db: PrismaClient) {
+export async function expireStalePendingClubApplications(
+	db: PrismaClient,
+	systemActor: string,
+) {
 	const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
 	const stale = await db.clubApplication.findMany({
 		where: {
@@ -362,13 +365,6 @@ export async function expireStalePendingClubApplications(db: PrismaClient) {
 
 	if (stale.length === 0) {
 		return { count: 0, ids: [] as string[] };
-	}
-
-	const systemActor = process.env.ROTRA_SLA_ACTOR_PROFILE_ID;
-	if (!systemActor) {
-		throw new Error(
-			"ROTRA_SLA_ACTOR_PROFILE_ID must be set to run SLA auto-reject (profiles.id used for admin_action_log).",
-		);
 	}
 
 	for (const row of stale) {
