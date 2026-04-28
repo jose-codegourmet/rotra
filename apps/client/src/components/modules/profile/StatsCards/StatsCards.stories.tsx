@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react";
-
-import { MOCK_PLAYER } from "@/constants/mock-player";
-
 import { StatsCards } from "./StatsCards";
+
+const MOCK_USER = {
+	id: "user-1",
+	name: "Alex Chen",
+	avatarUrl: null,
+};
 
 const meta: Meta<typeof StatsCards> = {
 	title: "profile/StatsCards",
 	component: StatsCards,
 	tags: ["autodocs"],
 	argTypes: {
-		player: { control: "object" },
+		user: { control: "object" },
 	},
 };
 
@@ -18,33 +21,24 @@ type Story = StoryObj<typeof StatsCards>;
 
 export const Default: Story = {
 	args: {
-		player: MOCK_PLAYER,
+		user: MOCK_USER,
 	},
 };
 
 export const NoAccentStats: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
-			stats: MOCK_PLAYER.stats.map((s) => ({ ...s, accent: false })),
-		},
+		user: { ...MOCK_USER, name: "No Accent User" },
 	},
 };
 
 export const AllAccentStats: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
-			stats: MOCK_PLAYER.stats.map((s) => ({ ...s, accent: true })),
-		},
+		user: { ...MOCK_USER, name: "All Accent User" },
 	},
 };
 
 export const NoSubText: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
-			stats: MOCK_PLAYER.stats.map(({ sub: _sub, ...s }) => s),
-		},
+		user: { ...MOCK_USER, name: "No Subtext User" },
 	},
 };

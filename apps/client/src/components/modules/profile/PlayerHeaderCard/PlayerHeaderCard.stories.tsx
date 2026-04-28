@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react";
-
-import { MOCK_PLAYER } from "@/constants/mock-player";
-
 import { PlayerHeaderCard } from "./PlayerHeaderCard";
+
+const MOCK_USER = {
+	id: "user-1",
+	name: "Alex Chen",
+	avatarUrl: null,
+};
 
 const meta: Meta<typeof PlayerHeaderCard> = {
 	title: "profile/PlayerHeaderCard",
 	component: PlayerHeaderCard,
 	tags: ["autodocs"],
 	argTypes: {
-		player: { control: "object" },
+		user: { control: "object" },
 	},
 };
 
@@ -18,32 +21,25 @@ type Story = StoryObj<typeof PlayerHeaderCard>;
 
 export const Default: Story = {
 	args: {
-		player: MOCK_PLAYER,
+		user: MOCK_USER,
 	},
 };
 
 export const BeginnerPlayer: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
+		user: {
+			...MOCK_USER,
 			name: "Sam Lee",
-			initials: "SL",
-			level: "Beginner",
-			tier: "Novice 1",
-			tierPips: { filled: 1, total: 3 },
 		},
 	},
 };
 
 export const AdvancedPlayer: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
+		user: {
+			...MOCK_USER,
 			name: "Elena Reyes",
-			initials: "ER",
-			level: "Advanced",
-			tier: "Legend 3",
-			tierPips: { filled: 5, total: 5 },
+			avatarUrl: "https://example.com/avatar-er.png",
 		},
 	},
 };

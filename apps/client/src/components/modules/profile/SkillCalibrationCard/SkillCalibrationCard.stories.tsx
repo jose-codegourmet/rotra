@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react";
-
-import { MOCK_PLAYER } from "@/constants/mock-player";
-
 import { SkillCalibrationCard } from "./SkillCalibrationCard";
+
+const MOCK_USER = {
+	id: "user-1",
+	name: "Alex Chen",
+	avatarUrl: null,
+};
 
 const meta: Meta<typeof SkillCalibrationCard> = {
 	title: "profile/SkillCalibrationCard",
 	component: SkillCalibrationCard,
 	tags: ["autodocs"],
 	argTypes: {
-		player: { control: "object" },
+		user: { control: "object" },
 	},
 };
 
@@ -18,24 +21,18 @@ type Story = StoryObj<typeof SkillCalibrationCard>;
 
 export const Default: Story = {
 	args: {
-		player: MOCK_PLAYER,
+		user: MOCK_USER,
 	},
 };
 
 export const HighSkill: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
-			skillOverall: 9.8,
-		},
+		user: { ...MOCK_USER, name: "Elena Reyes" },
 	},
 };
 
 export const LowSkill: Story = {
 	args: {
-		player: {
-			...MOCK_PLAYER,
-			skillOverall: 4.2,
-		},
+		user: { ...MOCK_USER, name: "Sam Lee" },
 	},
 };

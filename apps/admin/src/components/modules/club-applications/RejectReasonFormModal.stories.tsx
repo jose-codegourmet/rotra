@@ -15,7 +15,8 @@ export const Default: Story = {
 	args: {
 		open: true,
 		onOpenChange: () => {},
-		busy: false,
-		onSubmit: () => {},
+		mutationTarget: { type: "single", applicationId: "application-123" },
+		onSuccess: () => {},
+		onError: () => {},
 	},
 };

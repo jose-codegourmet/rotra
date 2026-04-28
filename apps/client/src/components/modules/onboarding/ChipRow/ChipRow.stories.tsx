@@ -18,15 +18,23 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+type ChipValue = (typeof OPTIONS)[number]["v"] | "";
 
 export const Interactive: Story = {
+	args: {
+		value: "doubles",
+		onChange: () => {},
+		options: [...OPTIONS],
+	},
 	render: () => {
-		const [value, setValue] = useState<(typeof OPTIONS)[number]["v"] | "">(
-			"doubles",
-		);
+		const [value, setValue] = useState<ChipValue>("doubles");
 		return (
 			<div className="w-[320px]">
-				<ChipRow value={value} onChange={setValue} options={OPTIONS} />
+				<ChipRow
+					value={value}
+					onChange={(next) => setValue(next as ChipValue)}
+					options={[...OPTIONS]}
+				/>
 			</div>
 		);
 	},
