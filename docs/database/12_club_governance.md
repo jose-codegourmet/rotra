@@ -101,7 +101,14 @@ CREATE TYPE admin_action_enum AS ENUM (
   'kill_switch_toggled',
   'platform_config_updated',
   'club_manual_archived',
-  'club_manual_demoted'
+  'club_manual_demoted',
+  'admin_invited',
+  'admin_invite_resent',
+  'admin_activated',
+  'admin_deactivated',
+  'admin_reactivated',
+  'admin_role_changed',
+  'admin_force_signed_out'
 );
 
 CREATE TYPE admin_action_entity_enum AS ENUM (
@@ -112,7 +119,8 @@ CREATE TYPE admin_action_entity_enum AS ENUM (
   'kill_switch',
   'platform_config',
   'club',
-  'profile'
+  'profile',
+  'admin_user'
 );
 ```
 

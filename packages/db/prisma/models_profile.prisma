@@ -13,6 +13,15 @@ model Profile {
   // Never write this field directly — it is computed from facebook_id + email_verified + onboarding_completed.
   isVerified Boolean @default(false) @map("is_verified")
 
+  // Admin-only lifecycle fields (null role means regular player profile).
+  adminRole          AdminRole? @map("admin_role")
+  adminIsActive      Boolean    @default(false) @map("admin_is_active")
+  adminInvitedById   String?    @map("admin_invited_by") @db.Uuid
+  adminInvitedAt     DateTime?  @map("admin_invited_at") @db.Timestamptz(6)
+  adminActivatedAt   DateTime?  @map("admin_activated_at") @db.Timestamptz(6)
+  adminDeactivatedAt DateTime?  @map("admin_deactivated_at") @db.Timestamptz(6)
+  adminDeactivatedById String?  @map("admin_deactivated_by") @db.Uuid
+
   playingLevel     PlayingLevel?     @map("playing_level")
   formatPreference FormatPreference? @map("format_preference")
   courtPosition    CourtPosition?    @map("court_position")
@@ -66,12 +75,20 @@ model Profile {
   platformConfigsUpdated      PlatformConfig[]            @relation("PlatformConfigUpdatedBy")
   moderationFlagsReported     ModerationFlag[]            @relation("ModerationReporter")
   moderationFlagsReviewed     ModerationFlag[]            @relation("ModerationReviewedBy")
+  adminNotifications          AdminNotification[]         @relation("AdminNotificationRecipient")
+  adminInvitationsSent        AdminInvitation[]           @relation("AdminInvitationInvitedBy")
+  adminInvitationsAccepted    AdminInvitation[]           @relation("AdminInvitationAcceptedBy")
+  adminUsersInvited           Profile[]                   @relation("AdminProfileInvitedBy")
+  adminInvitedBy              Profile?                    @relation("AdminProfileInvitedBy", fields: [adminInvitedById], references: [id], onDelete: SetNull)
+  adminUsersDeactivated       Profile[]                   @relation("AdminProfileDeactivatedBy")
+  adminDeactivatedBy          Profile?                    @relation("AdminProfileDeactivatedBy", fields: [adminDeactivatedById], references: [id], onDelete: SetNull)
   emailInvitationsCreated     EmailInvitation[]           @relation("InvitedBy")
   emailInvitationsAccepted    EmailInvitation[]           @relation("AcceptedBy")
 
   @@index([facebookId], map: "idx_profiles_facebook_id")
   @@index([email], map: "idx_profiles_email")
   @@index([isVerified], map: "idx_profiles_is_verified")
+  @@index([adminRole], map: "idx_profiles_admin_role")
   @@map("profiles")
 }
 

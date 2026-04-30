@@ -32,6 +32,8 @@ CREATE TYPE racket_balance_enum AS ENUM ('head_heavy', 'head_light', 'even_balan
 CREATE TYPE shoe_fit_enum AS ENUM ('wide', 'narrow', 'standard');
 
 CREATE TYPE invitation_status_enum AS ENUM ('pending', 'accepted', 'expired', 'revoked');
+
+CREATE TYPE admin_role_enum AS ENUM ('super_admin', 'admin');
 ```
 
 ---
@@ -64,6 +66,15 @@ CREATE TABLE profiles (
                                     AND email_verified
                                     AND onboarding_completed
                                   ) STORED,
+
+  -- Admin account lifecycle (null role = regular player profile)
+  admin_role                      admin_role_enum,
+  admin_is_active                 bool NOT NULL DEFAULT false,
+  admin_invited_by                uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  admin_invited_at                timestamptz,
+  admin_activated_at              timestamptz,
+  admin_deactivated_at            timestamptz,
+  admin_deactivated_by            uuid REFERENCES profiles(id) ON DELETE SET NULL,
 
   -- Self-declared level (separate from computed skill rating)
   playing_level                   playing_level_enum,
@@ -116,6 +127,9 @@ CREATE TABLE profiles (
 | `tournament_wins_last_year` | Self-reported snapshot at registration. Not auto-recalculated. |
 | `exp_total` and `mmr` | Cached aggregates from `exp_transactions` / `mmr_transactions`. Updated by trigger only; never written directly by the client. |
 | `onboarding_completed` | Gates access. Any authenticated user with this `false` is redirected to `/onboarding` on every app open. |
+| `admin_role` | Nullable. Non-null marks the row as an Admin-app account (`super_admin` or `admin`). |
+| `admin_is_active` | Access gate for admin routes. Inactive admins cannot perform Admin-app actions even with a valid auth session. |
+| `admin_invited_by`, `admin_invited_at`, `admin_activated_at`, `admin_deactivated_at`, `admin_deactivated_by` | Admin provisioning/audit lifecycle columns used by the Users module. |
 
 ### Trigger: auto-create profile on signup
 
@@ -146,6 +160,7 @@ CREATE TRIGGER on_auth_user_created
 CREATE INDEX idx_profiles_facebook_id ON profiles(facebook_id);
 CREATE INDEX idx_profiles_email       ON profiles(email);
 CREATE INDEX idx_profiles_is_verified ON profiles(is_verified);
+CREATE INDEX idx_profiles_admin_role  ON profiles(admin_role) WHERE admin_role IS NOT NULL;
 ```
 
 ---
@@ -198,6 +213,33 @@ CREATE UNIQUE INDEX idx_email_invitations_pending_email
 CREATE INDEX idx_email_invitations_token  ON email_invitations(token);
 CREATE INDEX idx_email_invitations_email  ON email_invitations(email);
 CREATE INDEX idx_email_invitations_status ON email_invitations(status);
+```
+
+---
+
+## Table: `admin_invitations`
+
+Tracks admin-user invitation lifecycle separately from player invitations.
+
+```sql
+CREATE TABLE admin_invitations (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email         text NOT NULL,
+  role          admin_role_enum NOT NULL,
+  invited_by    uuid NOT NULL REFERENCES profiles(id),
+  status        invitation_status_enum NOT NULL DEFAULT 'pending',
+  accepted_by   uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  accepted_at   timestamptz,
+  expires_at    timestamptz NOT NULL DEFAULT now() + interval '7 days',
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_admin_invitations_pending_email
+  ON admin_invitations(email)
+  WHERE status = 'pending';
+
+CREATE INDEX idx_admin_invitations_email  ON admin_invitations(email);
+CREATE INDEX idx_admin_invitations_status ON admin_invitations(status);
 ```
 
 ---

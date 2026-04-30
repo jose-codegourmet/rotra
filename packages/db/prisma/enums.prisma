@@ -362,6 +362,13 @@ enum AdminAction {
   platform_config_updated
   club_manual_archived
   club_manual_demoted
+  admin_invited
+  admin_invite_resent
+  admin_activated
+  admin_deactivated
+  admin_reactivated
+  admin_role_changed
+  admin_force_signed_out
 
   @@map("admin_action_enum")
 }
@@ -375,8 +382,25 @@ enum AdminActionEntity {
   platform_config
   club
   profile
+  admin_user
 
   @@map("admin_action_entity_enum")
+}
+
+enum AdminRole {
+  super_admin
+  admin
+
+  @@map("admin_role_enum")
+}
+
+enum AdminNotificationType {
+  new_club_application
+  new_demotion_request
+  new_complaint
+  new_moderation_flag
+
+  @@map("admin_notification_type_enum")
 }
 
 enum ModerationEntity {

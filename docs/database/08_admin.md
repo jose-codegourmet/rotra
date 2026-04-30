@@ -227,23 +227,17 @@ CREATE INDEX idx_moderation_created    ON moderation_flags(created_at DESC);
 
 ## Admin Role
 
-The Admin role is not stored in a `profiles` column for MVP. Instead, Admin access is controlled via Supabase's built-in custom claims:
+Admin access is gated by both auth claims and `profiles` admin columns:
 
-```sql
--- Set on the JWT via a Supabase Auth Hook or Edge Function
--- custom_claims: { "role": "admin" }
-```
+1. JWT claim `app_metadata.role = 'admin'` (or equivalent user metadata fallback).
+2. `profiles.admin_role IS NOT NULL` (`admin_role_enum`: `super_admin` | `admin`).
+3. `profiles.admin_is_active = true`.
 
-RLS policies on all admin tables check for this claim:
+`admin_role` / `admin_is_active` live on `profiles` and are the DB source of truth for role type and activation status. The full admin lifecycle columns and `admin_invitations` table are documented in [`01_users_and_profiles.md`](01_users_and_profiles.md).
 
-```sql
--- Example pattern used across admin tables
-CREATE POLICY "admin_only" ON kill_switches
-  FOR ALL
-  USING (auth.jwt() ->> 'role' = 'admin');
-```
+RLS policies on admin tables still enforce the JWT admin claim, while API routes and server actions additionally enforce profile-level role/active checks.
 
-See `09_rls_and_realtime.md` for the full RLS configuration.
+See `09_rls_and_realtime.md` for policy patterns.
 
 ---
 

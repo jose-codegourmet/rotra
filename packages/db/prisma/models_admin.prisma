@@ -19,6 +19,42 @@ model AdminActionLog {
   @@map("admin_action_log")
 }
 
+model AdminInvitation {
+  id          String @id @default(uuid()) @db.Uuid
+  email       String
+  role        AdminRole
+  invitedById String @map("invited_by") @db.Uuid
+  status      InvitationStatus @default(pending)
+  acceptedById String? @map("accepted_by") @db.Uuid
+  acceptedAt   DateTime? @map("accepted_at") @db.Timestamptz(6)
+  expiresAt    DateTime @default(dbgenerated("(now() + '7 days'::interval)")) @map("expires_at") @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  invitedBy Profile @relation("AdminInvitationInvitedBy", fields: [invitedById], references: [id])
+  acceptedBy Profile? @relation("AdminInvitationAcceptedBy", fields: [acceptedById], references: [id], onDelete: SetNull)
+
+  @@index([email], map: "idx_admin_invitations_email")
+  @@index([status], map: "idx_admin_invitations_status")
+  @@map("admin_invitations")
+}
+
+model AdminNotification {
+  id        String @id @default(uuid()) @db.Uuid
+  adminId   String @map("admin_id") @db.Uuid
+  type      AdminNotificationType
+  targetUrl String @map("target_url")
+  title     String
+  body      String?
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  admin Profile @relation("AdminNotificationRecipient", fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, readAt], map: "idx_admin_notif_admin_unread")
+  @@index([createdAt(sort: Desc)], map: "idx_admin_notif_created")
+  @@map("admin_notifications")
+}
+
 model KillSwitch {
   id          String @id @default(uuid()) @db.Uuid
   key         String
