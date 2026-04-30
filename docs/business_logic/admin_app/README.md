@@ -8,9 +8,11 @@ The Admin App is an internal operations dashboard used exclusively by the platfo
 
 | User | Role |
 |------|------|
-| **Platform Admin** | Internal team member with full platform authority |
+| **Founding Super Admin** | Platform owner; seeded directly in the database; cannot be deactivated, demoted, or removed by any UI flow |
+| **Super Admin** | Senior internal team member; can manage other admins (invite, role change, deactivate) |
+| **Platform Admin** | Internal team member with full platform authority but read-only on the Users module |
 
-Admin accounts are created manually at the system level — there is no self-registration flow.
+All admin accounts are provisioned through the Super-Admin-driven invitation flow described in [`08_user_management.md`](./08_user_management.md). There is no self-registration, and all roles are stored on `profiles.admin_role`.
 
 ---
 
@@ -25,6 +27,7 @@ Admin accounts are created manually at the system level — there is no self-reg
 | Platform configuration | Manage gamification parameters, skill dimensions, system constants |
 | MMR & skills management | Configure MMR asymmetry, match EXP awarding behavior, and MMR calibration parameters for competitive sessions |
 | Platform analytics | Monitor active clubs, session volume, player retention, and health metrics |
+| Admin user management | Invite, deactivate, role-change, and audit other admin accounts (Super Admin only) |
 
 ---
 
@@ -39,6 +42,7 @@ Admin accounts are created manually at the system level — there is no self-reg
 | [05_platform_config.md](./05_platform_config.md) | Global constants — EXP rates, tier thresholds, skill dimensions |
 | [06_platform_analytics.md](./06_platform_analytics.md) | Platform health dashboard and metrics |
 | [07_mmr_and_skills_management.md](./07_mmr_and_skills_management.md) | MMR and match EXP governance, guardrails, and operational workflows |
+| [08_user_management.md](./08_user_management.md) | Inviting, deactivating, role-changing, and auditing admin user accounts |
 
 ---
 

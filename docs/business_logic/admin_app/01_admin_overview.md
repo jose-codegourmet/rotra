@@ -13,7 +13,7 @@ The Admin App is intentionally separate from the Client App to:
 
 ## Admin User
 
-There is a single admin role at the platform level. Admin accounts are created directly in the system — there is no registration, invite, or self-service flow.
+Admin accounts are created **only** through the invitation flow run by a Super Admin from the Admin App's Users module — there is no public registration or self-service flow. See [`08_user_management.md`](./08_user_management.md) for the full lifecycle (invite → activation → deactivation → role change → audit) and the underlying schema.
 
 ### Capabilities
 
@@ -38,10 +38,13 @@ There is a single admin role at the platform level. Admin accounts are created d
 
 ## Access Model
 
-| Level | Who | How |
-|-------|-----|-----|
-| Super Admin | Platform owner | Created at system level; cannot be deleted |
-| Admin | Internal team member | Created by Super Admin; can be revoked |
+| Level | DB value | Who | How |
+|-------|----------|-----|-----|
+| Founding Super Admin | `profiles.admin_role = 'super_admin'`, id matches `FOUNDING_SUPER_ADMIN_ID` | Platform owner | Seeded directly in the database; cannot be deactivated, demoted, or removed by any UI flow |
+| Super Admin | `profiles.admin_role = 'super_admin'` | Senior internal team member | Invited by another Super Admin; can be deactivated or demoted |
+| Admin | `profiles.admin_role = 'admin'` | Internal team member | Invited by a Super Admin; can be deactivated, reactivated, or promoted |
+
+Inviting, deactivating, role-changing, and force-signing-out other admins is **Super Admin only**. Regular Admins have read-only access to the Users module. Full lifecycle and guards (founding-Super-Admin protection, last-active-Super-Admin guard) are documented in [`08_user_management.md`](./08_user_management.md).
 
 All admin actions are logged in **`admin_action_log`** with:
 - Timestamp
@@ -55,11 +58,15 @@ Logs are append-only — no admin can edit or delete rows (future cron may prune
 
 ## Auth & Security
 
-- Admin App is hosted at a separate URL (not the same domain as the Client App)
-- Login is email + password with mandatory 2FA (TOTP)
-- Sessions expire after 4 hours of inactivity
-- All Admin App traffic is IP-restricted to the internal team by default (configurable)
-- Failed login attempts are rate-limited and logged
+- Admin App is hosted at a separate URL (not the same domain as the Client App).
+- Login is **email + Supabase email-OTP only**. There is no password, no Facebook OAuth, no social provider, and no public sign-up.
+- The OTP request endpoint is called with `shouldCreateUser: false`, so OTPs are only delivered to email addresses that already exist as admin auth users — and the only path that creates such a user is the Super-Admin-driven invitation flow in [`08_user_management.md`](./08_user_management.md). Requests for unknown emails return the same generic success message (no enumeration leak).
+- Every authenticated request must satisfy all three of: JWT claim `app_metadata.role = 'admin'`, `profiles.admin_role IS NOT NULL`, and `profiles.admin_is_active = true`.
+- Sessions expire after 4 hours of inactivity.
+- All Admin App traffic is IP-restricted to the internal team by default (configurable).
+- Failed login attempts are rate-limited and logged.
+
+> TOTP / second-factor auth is **out of scope for MVP**. The view doc `docs/views/admin_app/login.md` describes a password + TOTP UI that pre-dates the OTP-only implementation; this file is authoritative for the auth flow.
 
 ---
 
