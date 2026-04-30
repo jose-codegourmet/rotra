@@ -83,9 +83,9 @@ If the admin has never written a row to `admin_action_log`, last active is shown
 
 | State | profile shape | Login? |
 |-------|---------------|--------|
-| `invited` | `admin_role` set, `admin_is_active = false`, an open `admin_invitations` row exists | OTP can be sent (Supabase `auth.users` row exists) but `requireAdminSession` rejects with 403 because `admin_is_active = false` |
+| `invited` | `admin_role` set, `admin_is_active = false`, an open `admin_invitations` row exists | Password onboarding link can be sent, but `requireAdminSession` rejects with 403 because `admin_is_active = false` |
 | `active` | `admin_role` set, `admin_is_active = true` | Yes |
-| `inactive` | `admin_role` set, `admin_is_active = false`, no open invitation | OTP send is allowed by Supabase but `requireAdminSession` returns 403; UI is fully gated |
+| `inactive` | `admin_role` set, `admin_is_active = false`, no open invitation | Sign-in attempt can authenticate at Supabase but `requireAdminSession` returns 403; UI is fully gated |
 
 There is no soft-delete and no hard-delete UI flow. An admin who should no longer have access is **deactivated**. The row stays in `profiles` for audit reasons.
 
@@ -101,18 +101,18 @@ Triggered from the directory page via `Add user`.
    - Email is not already an admin profile.
    - There is no open admin invitation for that email (status `pending`).
 3. Server, in a single transaction:
-   - Creates a Supabase `auth.users` row via the service role with `app_metadata.role = 'admin'` (this is what makes the email eligible to receive an OTP later — see [Login](#login-recap-from-01_admin_overviewmd)).
+   - Creates a Supabase `auth.users` row via the service role with `app_metadata.role = 'admin'` (this is what allows middleware/admin-session checks after sign-in — see [Login](#login-recap-from-01_admin_overviewmd)).
    - Inserts a `profiles` row with `admin_role = <chosen>`, `admin_is_active = false`, `admin_invited_by = <super admin>`, `admin_invited_at = now()`.
    - Inserts an `admin_invitations` row with status `pending` (see schema below).
-   - Sends the OTP-style invite email — the same Supabase magic-code email used for sign-in.
+   - Sends the Supabase invite email with a redirect to the Admin App `set-password` flow.
    - Writes an `admin_action_log` entry: `action = 'admin_invited'`.
-4. Recipient receives the email and enters the code on `/login`.
-5. On the first successful `verify-otp`:
+4. Recipient receives the email and sets a password via the invite link callback.
+5. On the first successful password setup/sign-in:
    - `admin_invitations.status` flips to `accepted`, `accepted_at = now()`, `accepted_by = <profile id>`.
    - `profiles.admin_is_active` is set to `true`, `admin_activated_at = now()`.
    - `admin_action_log` entry: `action = 'admin_activated'`.
 
-Until step 5 happens, the invited admin can complete the OTP exchange but every server action returns 403, because `admin_is_active = false`.
+Until step 5 happens, the invited admin cannot complete onboarding and every server action returns 403, because `admin_is_active = false`.
 
 ### `admin_invitations`
 
@@ -149,11 +149,11 @@ A `Resend invite` action revokes any existing `pending` row, inserts a fresh one
 
 ## Login (recap from `01_admin_overview.md`)
 
-The Admin App authenticates with **email + Supabase email-OTP only**. There is no password, no Facebook OAuth, no social provider, and no public sign-up. This is the entire flow for MVP.
+The Admin App authenticates with **email + password**. There is no Facebook OAuth, no social provider, and no public sign-up. This is the canonical MVP flow.
 
-The implementation in `apps/admin/src/app/api/auth/request-otp/route.ts` calls Supabase with `shouldCreateUser: false`. Combined with the invitation flow above, this means OTPs can only be delivered to email addresses that the Super Admin has invited (because that flow is the only place that creates an `auth.users` row with `role = 'admin'`). Requests for unknown emails return the same generic success message — there is no enumeration leak.
+The invitation flow creates an `auth.users` account, sets `app_metadata.role = 'admin'`, then sends an invite link that routes to password setup. Existing accounts can use email + password directly once activated.
 
-After `verify-otp` succeeds, the middleware in `apps/admin/src/middleware.ts` and `requireAdminSession()` enforce **all three** of the following on every authenticated request:
+After sign-in succeeds, the middleware in `apps/admin/src/middleware.ts` and `requireAdminSession()` enforce **all three** of the following on every authenticated request:
 
 1. `app_metadata.role === 'admin'` (or `user_metadata.role === 'admin'`).
 2. `profiles.admin_role IS NOT NULL`.
@@ -161,7 +161,7 @@ After `verify-otp` succeeds, the middleware in `apps/admin/src/middleware.ts` an
 
 Any failure redirects to `/login?error=forbidden` for page requests, or returns 403 for API requests.
 
-> The older view doc `docs/views/admin_app/login.md` describes a two-step password + TOTP UI. That description pre-dates the OTP-only implementation. **This file (and `01_admin_overview.md`) are authoritative for the auth flow.** TOTP is out of scope for MVP and will be reflected here when added.
+> OTP endpoints may remain in code as dormant fallback paths, but password-based login is the supported default for internal operations.
 
 ---
 

@@ -4,9 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-type VerifyOtpBody = {
+type SignInBody = {
 	email?: string;
-	token?: string;
+	password?: string;
 };
 
 function normalizeEmail(email: string | undefined): string | null {
@@ -16,17 +16,16 @@ function normalizeEmail(email: string | undefined): string | null {
 	return value;
 }
 
-function normalizeToken(token: string | undefined): string | null {
-	const value = token?.trim();
+function normalizePassword(password: string | undefined): string | null {
+	const value = password?.trim();
 	if (!value) return null;
-	if (!/^\d{6}$/.test(value)) return null;
 	return value;
 }
 
 export async function POST(request: Request) {
-	let body: VerifyOtpBody;
+	let body: SignInBody;
 	try {
-		body = (await request.json()) as VerifyOtpBody;
+		body = (await request.json()) as SignInBody;
 	} catch {
 		return NextResponse.json(
 			{ ok: false, code: "INVALID_BODY", message: "Invalid request body." },
@@ -35,13 +34,13 @@ export async function POST(request: Request) {
 	}
 
 	const email = normalizeEmail(body.email);
-	const token = normalizeToken(body.token);
-	if (!email || !token) {
+	const password = normalizePassword(body.password);
+	if (!email || !password) {
 		return NextResponse.json(
 			{
 				ok: false,
 				code: "INVALID_INPUT",
-				message: "Enter a valid email and 6-digit one-time code.",
+				message: "Enter a valid email and password.",
 			},
 			{ status: 400 },
 		);
@@ -49,12 +48,10 @@ export async function POST(request: Request) {
 
 	try {
 		const supabase = await createClient();
-		const { error } = await supabase.auth.verifyOtp({
+		const { error } = await supabase.auth.signInWithPassword({
 			email,
-			token,
-			type: "email",
+			password,
 		});
-
 		if (error) {
 			const authError = error as Error & { status?: number };
 			if (authError.status === 429) {
@@ -75,17 +72,17 @@ export async function POST(request: Request) {
 				return NextResponse.json(
 					{
 						ok: false,
-						code: "INVALID_OTP",
-						message: "Invalid or expired one-time code.",
+						code: "INVALID_CREDENTIALS",
+						message: "Incorrect email or password.",
 					},
-					{ status: 400 },
+					{ status: 401 },
 				);
 			}
 			return NextResponse.json(
 				{
 					ok: false,
-					code: "VERIFY_FAILED",
-					message: "Unable to verify code right now.",
+					code: "SIGNIN_FAILED",
+					message: "Unable to sign in right now.",
 				},
 				{ status: 500 },
 			);
@@ -103,12 +100,12 @@ export async function POST(request: Request) {
 			message: "Signed in successfully.",
 		});
 	} catch (error) {
-		console.error("[admin auth verify-otp]", error);
+		console.error("[admin auth sign-in]", error);
 		return NextResponse.json(
 			{
 				ok: false,
-				code: "VERIFY_FAILED",
-				message: "Unable to verify code right now.",
+				code: "SIGNIN_FAILED",
+				message: "Unable to sign in right now.",
 			},
 			{ status: 500 },
 		);

@@ -1,13 +1,9 @@
 "use client";
 
 import { ADMIN_APP_DISPLAY_NAME } from "@/constants/admin";
-import { AdminLoginForm } from "../AdminLoginForm/AdminLoginForm";
+import { AdminSetPasswordForm } from "../AdminSetPasswordForm/AdminSetPasswordForm";
 
-type AdminLoginCardProps = {
-	nextPath: string;
-};
-
-export function AdminLoginCard({ nextPath }: AdminLoginCardProps) {
+export function AdminSetPasswordCard() {
 	return (
 		<div className="w-full max-w-md rounded-xl border border-border bg-bg-surface p-6 shadow-modal sm:p-8">
 			<header className="space-y-2">
@@ -15,11 +11,11 @@ export function AdminLoginCard({ nextPath }: AdminLoginCardProps) {
 					{ADMIN_APP_DISPLAY_NAME}
 				</h2>
 				<p className="text-body text-text-secondary">
-					Sign in with your admin email and password.
+					Set a password for your admin account before continuing.
 				</p>
 			</header>
 
-			<AdminLoginForm nextPath={nextPath} />
+			<AdminSetPasswordForm />
 
 			<p className="mt-6 text-center text-micro uppercase tracking-wider text-text-disabled">
 				Internal use only — sessions expire after 4 hours idle
@@ -28,4 +24,4 @@ export function AdminLoginCard({ nextPath }: AdminLoginCardProps) {
 	);
 }
 
-AdminLoginCard.displayName = "AdminLoginCard";
+AdminSetPasswordCard.displayName = "AdminSetPasswordCard";

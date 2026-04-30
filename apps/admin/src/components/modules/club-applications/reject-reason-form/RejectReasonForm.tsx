@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input/Input";
 import {
 	NativeSelect,
 	NativeSelectOption,
-} from "@/components/ui/native-select";
+} from "@/components/ui/native-select/NativeSelect";
 import {
 	APPLICATION_REJECTION_REASONS,
 	applicationRejectionReasonLabel,
@@ -25,7 +25,6 @@ import {
 	bulkRejectClubApplicationsRequest,
 	rejectClubApplicationRequest,
 } from "@/hooks/useClubApplications/server";
-
 import { rejectReasonFormDefault } from "./default";
 import { type RejectReasonFormValues, rejectReasonFormSchema } from "./schema";
 

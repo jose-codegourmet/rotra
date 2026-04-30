@@ -59,14 +59,18 @@ Logs are append-only — no admin can edit or delete rows (future cron may prune
 ## Auth & Security
 
 - Admin App is hosted at a separate URL (not the same domain as the Client App).
-- Login is **email + Supabase email-OTP only**. There is no password, no Facebook OAuth, no social provider, and no public sign-up.
-- The OTP request endpoint is called with `shouldCreateUser: false`, so OTPs are only delivered to email addresses that already exist as admin auth users — and the only path that creates such a user is the Super-Admin-driven invitation flow in [`08_user_management.md`](./08_user_management.md). Requests for unknown emails return the same generic success message (no enumeration leak).
+- Login is **email + password**. Admin users are created through invitation by a Super Admin and complete onboarding by setting their password from a Supabase invite link.
+- There is no Facebook OAuth, no social provider, and no public sign-up.
 - Every authenticated request must satisfy all three of: JWT claim `app_metadata.role = 'admin'`, `profiles.admin_role IS NOT NULL`, and `profiles.admin_is_active = true`.
 - Sessions expire after 4 hours of inactivity.
 - All Admin App traffic is IP-restricted to the internal team by default (configurable).
 - Failed login attempts are rate-limited and logged.
 
-> TOTP / second-factor auth is **out of scope for MVP**. The view doc `docs/views/admin_app/login.md` describes a password + TOTP UI that pre-dates the OTP-only implementation; this file is authoritative for the auth flow.
+> OTP/TOTP remains optional future work. The MVP path is password-based sign-in to avoid dependency on OTP email quotas for daily internal operations.
+
+### One-time migration note (existing admin accounts)
+
+Admins created during the OTP-only phase may not have a password yet. For those accounts, set a password once via Supabase dashboard (Auth -> Users -> Reset password / update user) or via admin API before first password login. Example known case: `b5890af7-2c66-4f9b-8ecf-8bd65b34e2c1`.
 
 ---
 

@@ -12,49 +12,51 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog/Dialog";
-import type {
-	AdminUserRow,
-	AdminUserStatus,
-} from "@/constants/mock-admin-users";
+import type { AdminUserRole } from "../users.types";
 
 const inputClassName =
 	"h-11 w-full rounded-md border border-border bg-bg-elevated px-3 text-body text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-1 focus:ring-accent";
 
 export function AddUserDialog({
-	onUserAdded,
+	onInvite,
 }: {
-	onUserAdded: (user: AdminUserRow) => void;
+	onInvite: (payload: {
+		name: string;
+		email: string;
+		role: AdminUserRole;
+	}) => Promise<void>;
 }) {
 	const [open, setOpen] = React.useState(false);
 	const [name, setName] = React.useState("");
 	const [email, setEmail] = React.useState("");
-	const [role, setRole] = React.useState("Admin");
-	const [status, setStatus] = React.useState<AdminUserStatus>("active");
+	const [role, setRole] = React.useState<AdminUserRole>("admin");
+	const [submitting, setSubmitting] = React.useState(false);
+	const [error, setError] = React.useState<string | null>(null);
 
 	function resetForm() {
 		setName("");
 		setEmail("");
-		setRole("Admin");
-		setStatus("active");
+		setRole("admin");
+		setSubmitting(false);
+		setError(null);
 	}
 
-	function handleSubmit(e: React.FormEvent) {
+	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		const trimmedName = name.trim();
-		const trimmedEmail = email.trim();
+		const trimmedEmail = email.trim().toLowerCase();
 		if (!trimmedName || !trimmedEmail) return;
-
-		const today = new Date().toISOString().slice(0, 10);
-		onUserAdded({
-			id: crypto.randomUUID(),
-			name: trimmedName,
-			email: trimmedEmail,
-			role,
-			status,
-			lastActive: today,
-		});
-		resetForm();
-		setOpen(false);
+		setSubmitting(true);
+		setError(null);
+		try {
+			await onInvite({ name: trimmedName, email: trimmedEmail, role });
+			resetForm();
+			setOpen(false);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Failed to invite admin.");
+		} finally {
+			setSubmitting(false);
+		}
 	}
 
 	return (
@@ -73,7 +75,7 @@ export function AddUserDialog({
 					<DialogHeader>
 						<DialogTitle>Add platform admin</DialogTitle>
 						<DialogDescription>
-							Creates a mock row in this directory only — no API yet.
+							Invite a new admin account with role and email.
 						</DialogDescription>
 					</DialogHeader>
 
@@ -112,25 +114,13 @@ export function AddUserDialog({
 							<select
 								className={inputClassName}
 								value={role}
-								onChange={(ev) => setRole(ev.target.value)}
+								onChange={(ev) => setRole(ev.target.value as AdminUserRole)}
 							>
-								<option value="Admin">Admin</option>
-								<option value="Super admin">Super admin</option>
+								<option value="admin">Admin</option>
+								<option value="super_admin">Super admin</option>
 							</select>
 						</label>
-						<label className="flex flex-col gap-1">
-							<span className="text-label uppercase text-text-secondary">
-								Status
-							</span>
-							<select
-								className={inputClassName}
-								value={status}
-								onChange={(ev) => setStatus(ev.target.value as AdminUserStatus)}
-							>
-								<option value="active">Active</option>
-								<option value="inactive">Inactive</option>
-							</select>
-						</label>
+						{error ? <p className="text-small text-danger">{error}</p> : null}
 					</div>
 
 					<DialogFooter>
@@ -139,7 +129,9 @@ export function AddUserDialog({
 								Cancel
 							</Button>
 						</DialogClose>
-						<Button type="submit">Save user</Button>
+						<Button type="submit" disabled={submitting}>
+							{submitting ? "Sending invite..." : "Send invite"}
+						</Button>
 					</DialogFooter>
 				</form>
 			</DialogContent>
