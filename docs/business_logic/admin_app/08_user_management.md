@@ -1,10 +1,23 @@
-# Admin App — 08 User Management
+# Admin App — 08 Admin User Management
 
 ## Overview
 
-The User Management module is where Super Admins provision, deactivate, and audit other admin accounts. It is the **only** entry point for new admin users — there is no self-registration, no public sign-up, and no Supabase OAuth path on the Admin App.
+The Admin User Management module is where Super Admins provision, deactivate, and audit other **admin** accounts (the platform team). It is the **only** entry point for new admin users — there is no self-registration, no public sign-up, and no Supabase OAuth path on the Admin App.
 
-User Management is exposed at `/users` in the Admin App. Every admin can open the directory, but only **Super Admins** can mutate it.
+Admin User Management is exposed at `/admin/admins` in the Admin App. Every admin can open the directory, but only **Super Admins** can mutate it. The UI is documented in [`../../views/admin_app/admins.md`](../../views/admin_app/admins.md).
+
+### Single `profiles` table; tags, not duplicate entities
+
+There is **no separate table for “admins” vs “players”.** Every person is represented by **one row** in [`profiles`](../../database/01_users_and_profiles.md). **Everyone is a player** in product terms; platform Admin / Super Admin is expressed by **`profiles.admin_role`** (non-null). Club owner and que master are **derived tags** from clubs / memberships (see **Roles & tags derivation** in that doc), not separate identity tables.
+
+The Admin App exposes **two filtered lenses** over the same table:
+
+| Lens | Filter | Doc |
+|------|--------|-----|
+| Player directory | `admin_role IS NULL` | [`../../views/admin_app/users.md`](../../views/admin_app/users.md) |
+| Admin directory (this module) | `admin_role IS NOT NULL` | [`../../views/admin_app/admins.md`](../../views/admin_app/admins.md) |
+
+> The player directory at `/admin/users` lists and inspects **non-admin** profiles (read-oriented). Enforcement on players routes through [`./04_approvals_and_moderation.md`](./04_approvals_and_moderation.md). Granting someone platform admin access does not create a second row — it sets `admin_role` on their existing `profiles` row; they then appear under `/admin/admins` and typically **not** in the `/admin/users` directory list.
 
 ---
 
@@ -13,7 +26,7 @@ User Management is exposed at `/users` in the Admin App. Every admin can open th
 | Role | DB value | Capabilities |
 |------|---|---|
 | Super Admin | `profiles.admin_role = 'super_admin'` | Everything below + manage other admin accounts |
-| Admin | `profiles.admin_role = 'admin'` | Read-only on `/users`. Cannot invite, deactivate, change role, or force sign-out other admins. |
+| Admin | `profiles.admin_role = 'admin'` | Read-only on `/admin/admins`. Cannot invite, deactivate, change role, or force sign-out other admins. |
 
 There is exactly one **founding Super Admin**, seeded directly in the database at deploy time. The founding Super Admin cannot be deactivated, demoted, or removed by any UI flow — it is the platform's safety floor. Every other admin (including additional Super Admins) can be created, demoted, or deactivated through this module.
 
@@ -93,7 +106,7 @@ There is no soft-delete and no hard-delete UI flow. An admin who should no longe
 
 ## Inviting an Admin (Super Admin only)
 
-Triggered from the directory page via `Add user`.
+Triggered from the directory page via `Add admin`.
 
 1. Super Admin enters **email**, **name**, and **role** (`Admin` or `Super admin`).
 2. Server validates:
@@ -116,7 +129,9 @@ Until step 5 happens, the invited admin cannot complete onboarding and every ser
 
 ### `admin_invitations`
 
-Admin invitations live in a **separate table** from `email_invitations` (which is for players). Isolating the audit trail lets us evolve admin invites independently and keeps RLS simple.
+`admin_invitations` is a **process / lifecycle** table (pending token, expiry, status transitions) — same idea as [`email_invitations`](../../database/01_users_and_profiles.md) for player email flows. It does **not** duplicate a person entity: the invited user still becomes **one** `profiles` row linked to `auth.users`.
+
+Admin invitations live in a **separate table** from `email_invitations` (which covers player invitation paths). Isolating the audit trail lets us evolve admin invites independently and keeps RLS simple.
 
 ```sql
 CREATE TABLE admin_invitations (
@@ -188,11 +203,11 @@ Notes:
 
 ## Page Permissions
 
-| User | `/users` directory | `/users/[id]` detail | Mutations |
-|------|--------------------|----------------------|-----------|
+| User | `/admin/admins` directory | `/admin/admins/[id]` detail | Mutations |
+|------|---------------------------|------------------------------|-----------|
 | Super Admin (active) | View all | View all | All operations above (subject to founding-Super-Admin and last-Super-Admin guards) |
-| Admin (active) | View all | View all (read-only) | None — `Add user` button is hidden, and all row actions other than `Copy email` and `View details` are hidden |
-| Inactive admin | Cannot reach `/users` (blocked by middleware) | — | — |
+| Admin (active) | View all | View all (read-only) | None — `Add admin` button is hidden, and all row actions other than `Copy email` and `View details` are hidden |
+| Inactive admin | Cannot reach `/admin/admins` (blocked by middleware) | — | — |
 
 The page-level gate is enforced in three independent places, and **all three** must agree:
 
@@ -204,7 +219,7 @@ The page-level gate is enforced in three independent places, and **all three** m
 
 ## API Routes (target shape)
 
-These are not yet implemented — the Users module today is mock-only (`apps/admin/src/constants/mock-admin-users.ts`). When wired up, the routes follow the existing admin API conventions (per-route admin actor resolution via `getAdminActorProfileId()` in `apps/admin/src/lib/admin-actor.ts`):
+These are not yet implemented — the Admins module today is mock-only (`apps/admin/src/constants/mock-admin-users.ts`). When wired up, the routes follow the existing admin API conventions (per-route admin actor resolution via `getAdminActorProfileId()` in `apps/admin/src/lib/admin-actor.ts`):
 
 | Route | Method | Caller | Purpose |
 |-------|--------|--------|---------|
@@ -258,11 +273,11 @@ The detail page renders two panels off this single table:
 
 ## MVP Scope vs Today
 
-The current implementation under `apps/admin/src/components/modules/users/` is **mock-only**:
+The current implementation under `apps/admin/src/components/modules/users/` is **mock-only**, and is currently routed at `/users` in the codebase. The target structure renames the route to `/admin/admins` (this module) and frees `/admin/users` for the **player directory** documented in [`../../views/admin_app/users.md`](../../views/admin_app/users.md):
 
 | Layer | Status |
 |-------|--------|
-| Directory UI (`AdminUsersTable`, `UsersView`) | Built, mock data |
+| Directory UI (`AdminUsersTable`, `UsersView`) | Built, mock data; sits under `apps/admin/src/components/modules/users/` — to be moved/renamed under an `admins/` module folder when wired up for real |
 | Add User dialog | Built, no API call |
 | User detail page | Built, mock data |
 | `admin_role` and `admin_is_active` columns | Not yet in `profiles` |
@@ -271,14 +286,17 @@ The current implementation under `apps/admin/src/components/modules/users/` is *
 | `admin_action_enum` / `admin_action_entity_enum` extensions | Not yet applied |
 | Force sign-out via service role | Not yet implemented |
 | `FOUNDING_SUPER_ADMIN_ID` env constant | Not yet wired |
+| Player directory at `/admin/users` (separate page, `admin_role IS NULL` lens) | Not yet implemented; documented in [`../../views/admin_app/users.md`](../../views/admin_app/users.md) |
 
-The mock distinguishes `Admin` vs `Super admin` as a free-text role string and treats `active`/`inactive` as a UI badge. This document describes the **target** shape — replace mocks with the model above when User Management is implemented for real.
+The mock distinguishes `Admin` vs `Super admin` as a free-text role string and treats `active`/`inactive` as a UI badge. This document describes the **target** shape — replace mocks with the model above when Admin User Management is implemented for real, and rename the route to `/admin/admins` at the same time.
 
 ---
 
 ## Relationship to Other Docs
 
 - [`01_admin_overview.md`](./01_admin_overview.md) — Admin role and access summary; auth flow is described there at a glance and elaborated here.
+- [`../../views/admin_app/admins.md`](../../views/admin_app/admins.md) — UI for this module (`/admin/admins`).
+- [`../../views/admin_app/users.md`](../../views/admin_app/users.md) — Player directory (`/admin/users`). Same `profiles` table; UI lens `admin_role IS NULL` only.
 - [`docs/database/12_club_governance.md`](../../database/12_club_governance.md) — `admin_action_log` schema and the `admin_action_enum` / `admin_action_entity_enum` definitions extended above.
 - [`docs/database/08_admin.md`](../../database/08_admin.md) — Admin role JWT-claim model and platform-wide RLS pattern.
 - [`docs/database/01_users_and_profiles.md`](../../database/01_users_and_profiles.md) — The `profiles` table that admin rows live in.

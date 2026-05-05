@@ -22,11 +22,7 @@ export async function POST(
 			select: { email: true },
 		});
 		if (target?.email) {
-			const callbackUrl = new URL(
-				"/auth/callback?next=/set-password",
-				request.url,
-			);
-			await sendAdminPasswordResetLink(target.email, callbackUrl.toString());
+			await sendAdminPasswordResetLink(target.email, request);
 		}
 		return NextResponse.json({ ok: true });
 	} catch (error) {

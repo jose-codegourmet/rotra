@@ -7,14 +7,14 @@ import {
 import { PageSection } from "@/components/admin-ui/PageSection/PageSection";
 import { AdminUsersTable } from "@/components/modules/users/AdminUsersTable/AdminUsersTable";
 import type { AdminUserRow } from "@/components/modules/users/users.types";
-import { adminUsersQueryKey } from "@/hooks/useAdminUsers/client";
+import { adminUsersQueryKey } from "@/hooks/useAdminUsers/queryKey";
 import { requireAdminSession } from "@/lib/auth/admin-session";
 
 function toIsoOrNull(value: Date | null): string | null {
 	return value ? value.toISOString() : null;
 }
 
-export default async function UsersPage() {
+export default async function AdminsPage() {
 	const [session, users] = await Promise.all([
 		requireAdminSession(),
 		listAdminUsers(db),
@@ -51,7 +51,7 @@ export default async function UsersPage() {
 					title="Platform admins"
 					description="Directory of internal admin accounts with role and status controls."
 				>
-					<div className="flex flex-wrap gap-4">
+					<div className="flex flex-wrap gap-4 w-full">
 						<div className="rounded-lg border border-border bg-bg-surface px-4 py-3">
 							<p className="text-label uppercase text-text-secondary">Total</p>
 							<p className="mt-1 text-heading text-text-primary">

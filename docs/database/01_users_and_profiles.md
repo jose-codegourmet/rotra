@@ -129,7 +129,25 @@ CREATE TABLE profiles (
 | `onboarding_completed` | Gates access. Any authenticated user with this `false` is redirected to `/onboarding` on every app open. |
 | `admin_role` | Nullable. Non-null marks the row as an Admin-app account (`super_admin` or `admin`). |
 | `admin_is_active` | Access gate for admin routes. Inactive admins cannot perform Admin-app actions even with a valid auth session. |
-| `admin_invited_by`, `admin_invited_at`, `admin_activated_at`, `admin_deactivated_at`, `admin_deactivated_by` | Admin provisioning/audit lifecycle columns used by the Users module. |
+| `admin_invited_by`, `admin_invited_at`, `admin_activated_at`, `admin_deactivated_at`, `admin_deactivated_by` | Admin provisioning/audit lifecycle columns used by the Admins module (see [`../business_logic/admin_app/08_user_management.md`](../business_logic/admin_app/08_user_management.md)). |
+
+### Roles & tags derivation (Admin App)
+
+There is **one row per person** in `profiles`. The Admin App does not use separate tables for “admins” vs “players”. **Product roles** (regular player, club owner, que master, platform admin) are expressed as **columns and joins**, rendered as **tag pills** in the UI (see [`../views/admin_app/users.md`](../views/admin_app/users.md) and [`../views/admin_app/admins.md`](../views/admin_app/admins.md)).
+
+| Tag / concept | Meaning | Derivation |
+|---------------|---------|------------|
+| **Everyone is a player** | Baseline | Every `profiles` row is a player identity for the Client App. |
+| **Club owner** | Owns at least one club | `EXISTS (SELECT 1 FROM clubs c WHERE c.owner_id = profiles.id)` |
+| **Que master** | Active que master membership | `EXISTS (SELECT 1 FROM club_members m WHERE m.player_id = profiles.id AND m.role = 'que_master' AND m.status = 'active')` |
+| **Admin** | Platform admin (non-super) | `profiles.admin_role = 'admin'` |
+| **Super admin** | Platform super admin | `profiles.admin_role = 'super_admin'` |
+| **Deactivated** | Account cannot fully use the product / admin app per current rules | **Player:** active moderation suspension or deleted account state as recorded in [`admin_action_log`](./12_club_governance.md) / Moderation (implementation reads the canonical suspension pipeline). **Platform admin:** additionally `profiles.admin_is_active = false` revokes Admin App access even when `admin_role` is set. |
+
+**Admin App directory lenses** (same table, different `WHERE`):
+
+- **`/admin/users`** — `profiles.admin_role IS NULL` (player directory; club owner / que master tags still apply).
+- **`/admin/admins`** — `profiles.admin_role IS NOT NULL` (platform team directory; Role column shows Admin vs Super admin; same Club owner / Que master / Deactivated tags when applicable).
 
 ### Trigger: auto-create profile on signup
 

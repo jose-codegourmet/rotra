@@ -13,7 +13,9 @@ The Admin App is intentionally separate from the Client App to:
 
 ## Admin User
 
-Admin accounts are created **only** through the invitation flow run by a Super Admin from the Admin App's Users module — there is no public registration or self-service flow. See [`08_user_management.md`](./08_user_management.md) for the full lifecycle (invite → activation → deactivation → role change → audit) and the underlying schema.
+Admin accounts are created **only** through the invitation flow run by a Super Admin from the Admin App's **Admins** module at `/admin/admins` — there is no public registration or self-service flow. See [`08_user_management.md`](./08_user_management.md) for the full lifecycle (invite → activation → deactivation → role change → audit) and the underlying schema, and [`../../views/admin_app/admins.md`](../../views/admin_app/admins.md) for the UI.
+
+> The Admin App also exposes a **Users** directory at `/admin/users` for inspecting **player** profiles that do not have platform admin access (`admin_role IS NULL`) — see [`../../views/admin_app/users.md`](../../views/admin_app/users.md). Players are not provisioned from the Admin App; they self-register on the Client App via Facebook OAuth. The **Admins** and **Users** directories are two lenses over the same `profiles` table: `admin_role IS NOT NULL` vs `IS NULL`.
 
 ### Capabilities
 
@@ -44,7 +46,7 @@ Admin accounts are created **only** through the invitation flow run by a Super A
 | Super Admin | `profiles.admin_role = 'super_admin'` | Senior internal team member | Invited by another Super Admin; can be deactivated or demoted |
 | Admin | `profiles.admin_role = 'admin'` | Internal team member | Invited by a Super Admin; can be deactivated, reactivated, or promoted |
 
-Inviting, deactivating, role-changing, and force-signing-out other admins is **Super Admin only**. Regular Admins have read-only access to the Users module. Full lifecycle and guards (founding-Super-Admin protection, last-active-Super-Admin guard) are documented in [`08_user_management.md`](./08_user_management.md).
+Inviting, deactivating, role-changing, and force-signing-out other admins is **Super Admin only**. Regular Admins have read-only access to the Admins module. Full lifecycle and guards (founding-Super-Admin protection, last-active-Super-Admin guard) are documented in [`08_user_management.md`](./08_user_management.md).
 
 All admin actions are logged in **`admin_action_log`** with:
 - Timestamp

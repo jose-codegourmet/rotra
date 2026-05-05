@@ -32,6 +32,18 @@ function createSupabaseAnonClient() {
 	});
 }
 
+/**
+ * Origin used in password-reset emails (`redirectTo` → `{{ .RedirectTo }}` in the Supabase template).
+ * Set `NEXT_PUBLIC_ADMIN_APP_URL` when the public URL differs from `request.url` (e.g. reverse proxy).
+ */
+export function resolveAdminAppOrigin(request: Request): string {
+	const fromEnv = process.env.NEXT_PUBLIC_ADMIN_APP_URL?.trim();
+	if (fromEnv) {
+		return fromEnv.replace(/\/$/, "");
+	}
+	return new URL(request.url).origin;
+}
+
 export async function inviteAdminAuthUser(input: {
 	email: string;
 	name: string;
@@ -66,14 +78,13 @@ export async function inviteAdminAuthUser(input: {
 
 export async function sendAdminPasswordResetLink(
 	email: string,
-	redirectTo: string,
+	request: Request,
 ): Promise<void> {
 	const anonSupabase = createSupabaseAnonClient();
+	const redirectTo = resolveAdminAppOrigin(request);
 	const { error } = await anonSupabase.auth.resetPasswordForEmail(
 		email.trim().toLowerCase(),
-		{
-			redirectTo,
-		},
+		{ redirectTo },
 	);
 	if (error) {
 		throw new Error(error.message);

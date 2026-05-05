@@ -38,11 +38,7 @@ export async function POST(request: Request) {
 	}
 
 	try {
-		const callbackUrl = new URL(
-			"/auth/callback?next=/set-password",
-			request.url,
-		);
-		await sendAdminPasswordResetLink(email, callbackUrl.toString());
+		await sendAdminPasswordResetLink(email, request);
 		return NextResponse.json({
 			ok: true,
 			message: "If your admin account exists, we sent a password reset link.",

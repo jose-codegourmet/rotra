@@ -32,9 +32,11 @@ Three-region shell: persistent left sidebar, narrow top environment bar, scrolla
 │  [▪] Environments   │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────┐  │
 │  [▪] Approvals   3  │  │ Active   │ │Connected │ │Error     │ │Queue   │  │
 │  [▪] Moderation  2  │  │ Sessions │ │ Users    │ │ Rate     │ │ Depth  │  │
-│  [▪] Platform       │  │  ● 14    │ │  ● 87    │ │  ● 0.2%  │ │  ● 3   │  │
-│       Config        │  │  GREEN   │ │  GREEN   │ │  GREEN   │ │ GREEN  │  │
-│  [▪] Analytics      │  └──────────┘ └──────────┘ └──────────┘ └────────┘  │
+│  [▪] Users          │  │  ● 14    │ │  ● 87    │ │  ● 0.2%  │ │  ● 3   │  │
+│  [▪] Admins         │  │  GREEN   │ │  GREEN   │ │  GREEN   │ │ GREEN  │  │
+│  [▪] Platform       │  └──────────┘ └──────────┘ └──────────┘ └────────┘  │
+│       Config        │                                                      │
+│  [▪] Analytics      │                                                      │
 │                     │                                                      │
 │  ───────────────    │  ── Attention Required ────────────────────────────  │
 │  Jose B.            │  ┌──────────────────────────┐ ┌────────────────────┐ │
@@ -79,7 +81,9 @@ Shared shell component present on all authenticated Admin App views.
   - Active item: `color-text-primary` label + `color-accent` icon, `color-accent-subtle` background, `radius-md`
   - Hover: `color-bg-elevated` background, `radius-md`
   - Badge (attention count): right-aligned pill — `color-warning` background, white `text-micro`, shows count of items requiring attention (`Approvals` shows pending count, `Moderation` shows pending flag count)
-- **Nav items (top to bottom):** Dashboard · Kill Switches · Environments · Approvals · Moderation · Platform Config · Analytics
+- **Nav items (top to bottom):** Dashboard · Kill Switches · Environments · Approvals · Moderation · Users · Admins · Platform Config · Analytics
+  - **Users** — player directory (`admin_role IS NULL` lens); see [`./users.md`](./users.md)
+  - **Admins** — platform team management (Super Admin only mutates); see [`./admins.md`](./admins.md)
 - **Bottom divider:** 1px `color-border`
 - **User row:** `space-4` padding, flex row
   - Avatar: 32×32px circle, initials-based (`color-accent-subtle` bg, `color-accent` text), `radius-full`

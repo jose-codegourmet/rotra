@@ -12,10 +12,9 @@ import {
 	reactivateAdminUserRequest,
 	resendAdminInviteRequest,
 } from "@/hooks/useAdminUsers/server";
+import { adminUsersQueryKey } from "./queryKey";
 
-export function adminUsersQueryKey() {
-	return ["admin", "users"] as const;
-}
+export { adminUsersQueryKey };
 
 export function useAdminUsersQuery(options?: {
 	initialData?: ListAdminUsersResponse;

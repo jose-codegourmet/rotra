@@ -22,7 +22,7 @@ export async function generateMetadata({
 	return {
 		title: user?.adminRole
 			? `${user.name} — ROTRA Admin`
-			: "User — ROTRA Admin",
+			: "Admin — ROTRA Admin",
 	};
 }
 
@@ -84,7 +84,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
 		<div className="mx-auto max-w-6xl space-y-8">
 			<div>
 				<Link
-					href={ROUTES.USERS}
+					href={ROUTES.ADMINS}
 					className="text-small text-accent hover:underline"
 				>
 					← Back to directory

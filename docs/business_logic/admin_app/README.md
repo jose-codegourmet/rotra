@@ -10,7 +10,7 @@ The Admin App is an internal operations dashboard used exclusively by the platfo
 |------|------|
 | **Founding Super Admin** | Platform owner; seeded directly in the database; cannot be deactivated, demoted, or removed by any UI flow |
 | **Super Admin** | Senior internal team member; can manage other admins (invite, role change, deactivate) |
-| **Platform Admin** | Internal team member with full platform authority but read-only on the Users module |
+| **Platform Admin** | Internal team member with full platform authority but read-only on the Admins module |
 
 All admin accounts are provisioned through the Super-Admin-driven invitation flow described in [`08_user_management.md`](./08_user_management.md). There is no self-registration, and all roles are stored on `profiles.admin_role`.
 
@@ -27,7 +27,8 @@ All admin accounts are provisioned through the Super-Admin-driven invitation flo
 | Platform configuration | Manage gamification parameters, skill dimensions, system constants |
 | MMR & skills management | Configure MMR asymmetry, match EXP awarding behavior, and MMR calibration parameters for competitive sessions |
 | Platform analytics | Monitor active clubs, session volume, player retention, and health metrics |
-| Admin user management | Invite, deactivate, role-change, and audit other admin accounts (Super Admin only) |
+| Admin user management | Invite, deactivate, role-change, and audit other **admin** accounts (Super Admin only) — UI at `/admin/admins` |
+| Player directory | Read + lookup of profiles with `admin_role IS NULL` — UI at `/admin/users`; enforcement actions route through Moderation |
 
 ---
 
@@ -42,7 +43,7 @@ All admin accounts are provisioned through the Super-Admin-driven invitation flo
 | [05_platform_config.md](./05_platform_config.md) | Global constants — EXP rates, tier thresholds, skill dimensions |
 | [06_platform_analytics.md](./06_platform_analytics.md) | Platform health dashboard and metrics |
 | [07_mmr_and_skills_management.md](./07_mmr_and_skills_management.md) | MMR and match EXP governance, guardrails, and operational workflows |
-| [08_user_management.md](./08_user_management.md) | Inviting, deactivating, role-changing, and auditing admin user accounts |
+| [08_user_management.md](./08_user_management.md) | **Admin** user management (`/admin/admins`) — inviting, deactivating, role-changing, and auditing platform admin accounts. The player directory at `/admin/users` (`admin_role IS NULL` lens) is read-oriented; see [`../../views/admin_app/users.md`](../../views/admin_app/users.md). |
 
 ---
 

@@ -89,4 +89,13 @@ export {
 	type AdminDirectoryUser,
 	type AdminUserDetail,
 } from "./admin-user-service";
+export {
+	CustomerProfileError,
+	getCustomerProfileDetail,
+	listCustomerProfiles,
+	type CustomerDirectoryRow,
+	type CustomerProfileDetail,
+	type ListCustomerProfilesInput,
+	type ListCustomerProfilesResult,
+} from "./customer-profile-service";
 export type { Database, Json } from "./supabase-database.types";

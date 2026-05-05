@@ -10,7 +10,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu/DropdownMenu";
-import { adminUserDetailPath } from "@/constants/admin";
+import { adminDirectoryDetailPath } from "@/constants/admin";
 import {
 	useDeactivateAdminUserMutation,
 	useDemoteSuperAdminToAdminMutation,
@@ -159,7 +159,7 @@ export function AdminUserTableCellActions({
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">
 					<DropdownMenuItem asChild>
-						<Link href={adminUserDetailPath(user.id)}>View details</Link>
+						<Link href={adminDirectoryDetailPath(user.id)}>View details</Link>
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						onClick={() => {
