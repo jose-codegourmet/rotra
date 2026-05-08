@@ -10,6 +10,8 @@ const pillVariants = cva(
 				accent: "border-transparent bg-accent/15 text-accent",
 				muted: "border-transparent bg-bg-elevated text-text-disabled",
 				outline: "border-border bg-transparent text-text-secondary",
+				superAdmin: "border-transparent bg-accent/20 text-accent font-semibold",
+				platformAdmin: "border-border bg-bg-elevated/80 text-text-secondary",
 			},
 		},
 		defaultVariants: {

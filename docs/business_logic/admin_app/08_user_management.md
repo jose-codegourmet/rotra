@@ -178,6 +178,8 @@ Any failure redirects to `/login?error=forbidden` for page requests, or returns 
 
 > OTP endpoints may remain in code as dormant fallback paths, but password-based login is the supported default for internal operations.
 
+**Client app:** Active admins can also sign into the **player** app at `/login-admin` (gate password + same email/password) to use the client dashboard with an on-screen **Super admin** / **Admin** pill. Provisioning is unchanged: invites and role changes still happen only through this Admin module and Supabase; the client path is an additional entry point for the same `profiles` row.
+
 ---
 
 ## Operations on Existing Admins

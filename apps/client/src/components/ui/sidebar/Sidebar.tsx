@@ -1,5 +1,6 @@
 "use client";
 
+import type { AdminRole } from "@prisma/client";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -10,7 +11,11 @@ import { cn } from "@/lib/utils";
 
 export type { NavItemId };
 
-export function Sidebar() {
+type SidebarProps = {
+	adminRole?: AdminRole | null;
+};
+
+export function Sidebar({ adminRole = null }: SidebarProps) {
 	const pathname = usePathname();
 	const activeItem =
 		NAV_ITEMS.find(
@@ -61,7 +66,7 @@ export function Sidebar() {
 			</div>
 
 			{/* User section */}
-			<SidebarUserMenu />
+			<SidebarUserMenu adminRole={adminRole} />
 		</aside>
 	);
 }

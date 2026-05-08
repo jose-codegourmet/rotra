@@ -8,7 +8,7 @@ const meta: Meta<typeof Pill> = {
 	argTypes: {
 		variant: {
 			control: "select",
-			options: ["accent", "muted", "outline"],
+			options: ["accent", "muted", "outline", "superAdmin", "platformAdmin"],
 		},
 	},
 };
@@ -49,6 +49,15 @@ export const MemberStatus: Story = {
 		<div className="flex flex-wrap items-center gap-3">
 			<Pill variant="accent">active</Pill>
 			<Pill variant="muted">inactive</Pill>
+		</div>
+	),
+};
+
+export const PlatformAdminRoles: Story = {
+	render: () => (
+		<div className="flex flex-wrap items-center gap-3">
+			<Pill variant="superAdmin">Super admin</Pill>
+			<Pill variant="platformAdmin">Admin</Pill>
 		</div>
 	),
 };
