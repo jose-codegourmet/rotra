@@ -15,6 +15,8 @@ const ERROR_MESSAGES: Record<string, string> = {
 		"Your account is authenticated, but no admin role is assigned yet.",
 	admin_inactive:
 		"Your admin account is currently inactive. Please contact a Super Admin.",
+	invite_invalid:
+		"This invite link is no longer valid (expired or already used). Ask a Super Admin to resend the invitation.",
 	auth_unavailable:
 		"We could not validate your admin session right now. Please try again.",
 };

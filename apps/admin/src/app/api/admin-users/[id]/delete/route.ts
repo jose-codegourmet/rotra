@@ -1,6 +1,7 @@
-import { db, deactivateAdminUser, deleteAuthSessionsForUser } from "@rotra/db";
+import { db, deleteAdminUser } from "@rotra/db";
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/auth/admin-session";
+import { deleteAdminAuthUser } from "@/lib/supabase/admin";
 import { adminUserErrorResponse } from "../../route-helpers";
 
 export const runtime = "nodejs";
@@ -12,14 +13,21 @@ export async function POST(
 	const { id } = await context.params;
 	try {
 		const session = await requireAdminSession();
-		await deactivateAdminUser(db, {
+		const { auditLogId } = await deleteAdminUser(db, {
 			actorProfileId: session.profileId,
 			targetProfileId: id,
 			foundingSuperAdminId: process.env.FOUNDING_SUPER_ADMIN_ID ?? null,
 		});
-		await deleteAuthSessionsForUser(db, id);
+		try {
+			await deleteAdminAuthUser(id);
+		} catch (err) {
+			await db.adminActionLog
+				.delete({ where: { id: auditLogId } })
+				.catch(() => undefined);
+			throw err;
+		}
 		return NextResponse.json({ ok: true });
 	} catch (error) {
-		return adminUserErrorResponse(error, "[admin-users deactivate]");
+		return adminUserErrorResponse(error, "[admin-users delete]");
 	}
 }

@@ -13,6 +13,7 @@ import {
 import { adminDirectoryDetailPath } from "@/constants/admin";
 import {
 	useDeactivateAdminUserMutation,
+	useDeleteAdminUserMutation,
 	useDemoteSuperAdminToAdminMutation,
 	useForceSignOutAdminUserMutation,
 	usePromoteAdminToSuperAdminMutation,
@@ -27,7 +28,8 @@ export type AdminUserAction =
 	| "reactivate"
 	| "promote-super-admin"
 	| "demote-admin"
-	| "force-signout";
+	| "force-signout"
+	| "delete";
 
 const ADMIN_USER_ACTION = {
 	RESEND_INVITE: "resend-invite",
@@ -36,6 +38,7 @@ const ADMIN_USER_ACTION = {
 	PROMOTE_SUPER_ADMIN: "promote-super-admin",
 	DEMOTE_ADMIN: "demote-admin",
 	FORCE_SIGNOUT: "force-signout",
+	DELETE: "delete",
 } as const satisfies Record<string, AdminUserAction>;
 
 type AdminUserTableCellActionsProps = {
@@ -58,6 +61,7 @@ export function AdminUserTableCellActions({
 	const promoteMutation = usePromoteAdminToSuperAdminMutation();
 	const demoteMutation = useDemoteSuperAdminToAdminMutation();
 	const forceSignOutMutation = useForceSignOutAdminUserMutation();
+	const deleteMutation = useDeleteAdminUserMutation();
 
 	const actionOptions = React.useMemo(
 		() =>
@@ -104,6 +108,13 @@ export function AdminUserTableCellActions({
 					errorMessage: "Failed to demote admin.",
 					run: (userId: string) => demoteMutation.mutateAsync(userId),
 				},
+				{
+					id: ADMIN_USER_ACTION.DELETE,
+					label: "Delete user",
+					visible: user.adminRole === "admin",
+					errorMessage: "Failed to delete admin.",
+					run: (userId: string) => deleteMutation.mutateAsync(userId),
+				},
 			] as Array<{
 				id: AdminUserAction;
 				label: string;
@@ -113,6 +124,7 @@ export function AdminUserTableCellActions({
 			}>,
 		[
 			deactivateMutation,
+			deleteMutation,
 			demoteMutation,
 			forceSignOutMutation,
 			promoteMutation,
@@ -171,15 +183,31 @@ export function AdminUserTableCellActions({
 					{canManageUsers &&
 						actionOptions
 							.filter((option) => option.visible)
-							.map((option) => (
-								<DropdownMenuItem
-									key={option.id}
-									disabled={actionInFlight === user.id}
-									onClick={() => void runAction(option.id)}
-								>
-									{option.label}
-								</DropdownMenuItem>
-							))}
+							.map((option) => {
+								const isDestructive = option.id === ADMIN_USER_ACTION.DELETE;
+								return (
+									<DropdownMenuItem
+										key={option.id}
+										disabled={actionInFlight === user.id}
+										className={
+											isDestructive
+												? "text-danger focus:text-danger"
+												: undefined
+										}
+										onClick={() => {
+											if (isDestructive) {
+												const ok = window.confirm(
+													`Delete ${user.name}? This permanently removes their account and sign-in. Their past audit-log entries may show as '[deleted admin]' for the actor. This cannot be undone.`,
+												);
+												if (!ok) return;
+											}
+											void runAction(option.id);
+										}}
+									>
+										{option.label}
+									</DropdownMenuItem>
+								);
+							})}
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>

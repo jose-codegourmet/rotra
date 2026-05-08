@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageSection } from "@/components/admin-ui/PageSection/PageSection";
+import { CountCard } from "@/components/custom/cards/count-card/CountCard";
 import { ADMIN_NAV_ITEMS, ROUTES } from "@/constants/admin";
 import {
 	MOCK_APPROVALS,
@@ -13,6 +14,22 @@ export default function DashboardPage() {
 		(a) => a.status === "pending",
 	).length;
 	const openFlags = MOCK_MODERATION.filter((m) => m.status === "open").length;
+	const attentionCards = [
+		{
+			title: "Pending owner approvals",
+			count: pendingApprovals,
+			tone: "accent" as const,
+			href: ROUTES.APPROVALS,
+			linkLabel: "Open approvals",
+		},
+		{
+			title: "Open moderation items",
+			count: openFlags,
+			tone: "warning" as const,
+			href: ROUTES.MODERATION,
+			linkLabel: "Open moderation",
+		},
+	];
 
 	return (
 		<div className="mx-auto max-w-5xl space-y-10">
@@ -22,16 +39,15 @@ export default function DashboardPage() {
 			>
 				<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 					{MOCK_DASHBOARD_KPIS.map((kpi) => (
-						<div
+						<CountCard
 							key={kpi.id}
-							className="rounded-lg border border-border bg-bg-surface p-5 shadow-card"
-						>
-							<p className="text-label uppercase text-text-secondary">
-								{kpi.label}
-							</p>
-							<p className="mt-2 text-display text-text-primary">{kpi.value}</p>
-							<p className="mt-1 text-small text-text-disabled">{kpi.hint}</p>
-						</div>
+							title={kpi.label}
+							count={kpi.value}
+							layout="kpi"
+							subLabel={
+								<p className="text-small text-text-disabled">{kpi.hint}</p>
+							}
+						/>
 					))}
 				</div>
 			</PageSection>
@@ -42,30 +58,24 @@ export default function DashboardPage() {
 					description="Counts derived from the same mock lists used on Approvals and Moderation."
 				>
 					<div className="grid gap-3 sm:grid-cols-2">
-						<div className="rounded-lg border border-border bg-bg-surface p-4">
-							<p className="text-label uppercase text-text-secondary">
-								Pending owner approvals
-							</p>
-							<p className="mt-2 text-title text-accent">{pendingApprovals}</p>
-							<Link
-								href={ROUTES.APPROVALS}
-								className="mt-2 inline-block text-small text-text-secondary underline-offset-2 hover:text-text-primary hover:underline"
-							>
-								Open approvals
-							</Link>
-						</div>
-						<div className="rounded-lg border border-border bg-bg-surface p-4">
-							<p className="text-label uppercase text-text-secondary">
-								Open moderation items
-							</p>
-							<p className="mt-2 text-title text-warning">{openFlags}</p>
-							<Link
-								href={ROUTES.MODERATION}
-								className="mt-2 inline-block text-small text-text-secondary underline-offset-2 hover:text-text-primary hover:underline"
-							>
-								Open moderation
-							</Link>
-						</div>
+						{attentionCards.map((card) => (
+							<CountCard
+								key={card.title}
+								title={card.title}
+								count={card.count}
+								layout="attention"
+								tone={card.tone}
+								animateCount
+								subLabel={
+									<Link
+										href={card.href}
+										className="inline-block text-small text-text-secondary underline-offset-2 hover:text-text-primary hover:underline"
+									>
+										{card.linkLabel}
+									</Link>
+								}
+							/>
+						))}
 					</div>
 				</PageSection>
 

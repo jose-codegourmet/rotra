@@ -128,11 +128,12 @@ Single full-width table. Read for everyone; row actions visible only to Super Ad
 |--------|------------|--------|
 | Copy email | Always | Copies email to clipboard; toast `"Email copied"` |
 | View details | Always | Navigates to `/admin/admins/[id]` |
-| Resend invite | `Status = Invited` (also when `pending` invite has expired) | Revokes any existing pending row, inserts a fresh one, re-issues the OTP/invite email; toast `"Invite resent"` |
+| Resend invite | `Status = Invited` (also when `pending` invite has expired) | Revokes any existing pending row, inserts a fresh one, re-issues the invite email; toast `"Invite resent"` |
 | Change role | Always (except founding Super Admin) | Opens **Change role** dialog |
 | Deactivate | `Status = Active` AND not founding AND not the only active Super Admin | Opens **Deactivate** confirm dialog; on confirm sets `admin_is_active = false` and force-revokes the target's Supabase sessions |
 | Reactivate | `Status = Inactive` AND no open invitation | Opens **Reactivate** confirm dialog; on confirm sets `admin_is_active = true` |
 | Force sign-out | `Status = Active` | Opens confirm dialog; on confirm revokes all Supabase sessions for the target without otherwise changing role or active status |
+| Delete user | `Role = Admin` AND not self | Opens **Delete user** confirm dialog; on confirm deletes the auth user (cascade removes `profiles`); row disappears from the directory (list joins `auth.users`) |
 
 Disabled actions are rendered greyed-out with a tooltip explaining the guard (e.g. `"Cannot demote the only active Super Admin."`).
 
@@ -241,6 +242,7 @@ All mutating actions go through a confirm dialog. Same shell as the Invite dialo
 | Deactivate | `Deactivate <name>?` | `"They will be signed out immediately and will not be able to sign back in until reactivated."` | `Deactivate` | `color-error` |
 | Reactivate | `Reactivate <name>?` | `"They will be able to sign in using their existing password."` | `Reactivate` | `color-accent` |
 | Force sign-out | `Force sign-out <name>?` | `"All active Admin App sessions for this account will end immediately. Their role and active status are unchanged."` | `Sign them out` | `color-error` |
+| Delete user | `Delete <name>?` | `"This permanently removes their account and sign-in. Past audit-log entries may show '[deleted admin]' for the actor. This cannot be undone."` | `Delete user` | `color-error` |
 
 All dialogs:
 - Disable the confirm button while the API call is in flight; show a small inline spinner inside the button
@@ -262,6 +264,7 @@ Full UI: `+ Add admin`, kebab menus, header action buttons all rendered.
 ### Founding Super Admin row
 - `★ Founding` badge next to name in the directory
 - Detail page shows `★ Founding Super Admin — protected` block in place of action buttons; tooltip on hover: `"This account is the platform's safety floor and cannot be modified through the UI."`
+- `Delete user` never appears for this row because deletion is limited to platform `Admin` rows only.
 
 ### Last active Super Admin
 - Any action that would leave zero active Super Admins is disabled with a tooltip: `"Cannot demote/deactivate the only active Super Admin."` — applies to `Change role` (when changing Super → Admin), `Deactivate`, and the Force sign-out action when applied to themselves

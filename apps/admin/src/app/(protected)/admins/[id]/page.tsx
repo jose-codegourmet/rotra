@@ -152,7 +152,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
 							{detail.activityOnThisAdmin.map((row) => (
 								<li key={row.id} className="px-6 py-4 text-small">
 									<p className="text-text-primary">
-										{row.action} by {row.admin.name}
+										{row.action} by {row.admin?.name ?? "[deleted admin]"}
 									</p>
 									<p className="text-text-secondary">
 										{new Date(row.createdAt).toLocaleString()}

@@ -47,7 +47,7 @@ function DialogDemo({ showCloseButton = true }: { showCloseButton?: boolean }) {
 }
 
 const meta: Meta<typeof Dialog> = {
-	title: "shadcn/Dialog",
+	title: "UI/Dialog",
 	component: Dialog,
 	tags: ["autodocs"],
 };

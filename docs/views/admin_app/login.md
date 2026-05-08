@@ -23,9 +23,10 @@ This screen is the only page accessible without a valid admin session. Authentic
 ## Invite onboarding flow
 
 1. Super Admin invites a new admin from [`/admin/admins`](./admins.md).
-2. Supabase sends an invite link that returns to `/auth/callback?next=/set-password`.
-3. Invitee sets password on `/set-password`.
-4. First successful setup/sign-in activates the admin account (`admin_is_active = true`) and marks invitation accepted.
+2. Supabase sends an invite email that links to `/auth/accept-invite`.
+3. Invitee clicks **Continue** on `/auth/accept-invite`, which routes through `/auth/callback?token_hash=...&type=invite&next=/set-password`.
+4. Invitee sets password on `/set-password`.
+5. First successful password setup activates the admin account (`admin_is_active = true`) and marks invitation accepted.
 
 > Player accounts are **not** created from the Admin App — players self-register on the [Client App](../client_app) via Facebook OAuth. The `/admin/users` view is read + lookup only (`admin_role IS NULL` lens). See [`./users.md`](./users.md).
 

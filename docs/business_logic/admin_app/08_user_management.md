@@ -100,7 +100,7 @@ If the admin has never written a row to `admin_action_log`, last active is shown
 | `active` | `admin_role` set, `admin_is_active = true` | Yes |
 | `inactive` | `admin_role` set, `admin_is_active = false`, no open invitation | Sign-in attempt can authenticate at Supabase but `requireAdminSession` returns 403; UI is fully gated |
 
-There is no soft-delete and no hard-delete UI flow. An admin who should no longer have access is **deactivated**. The row stays in `profiles` for audit reasons.
+Deactivate remains the default access-removal flow. Super Admins may additionally **Delete** an `admin` row (never another `super_admin`, never the founding Super Admin, never themselves): `auth.admin.deleteUser` removes the `auth.users` row; because `profiles.id` references `auth.users(id)` with `ON DELETE CASCADE`, the `profiles` row is removed as well. The directory lists only profiles that still have a matching `auth.users` row (`INNER JOIN`). Older `admin_action_log` rows that referenced the deleted profile as actor have `admin_id` set to `NULL` (`ON DELETE SET NULL`); the UI may show `[deleted admin]` for the actor.
 
 ---
 
@@ -158,7 +158,7 @@ CREATE INDEX idx_admin_invitations_email  ON admin_invitations(email);
 CREATE INDEX idx_admin_invitations_status ON admin_invitations(status);
 ```
 
-A `Resend invite` action revokes any existing `pending` row, inserts a fresh one, and re-issues the OTP email.
+A `Resend invite` action revokes any existing `pending` row, inserts a fresh one, and re-issues the invite email.
 
 ---
 
@@ -166,7 +166,7 @@ A `Resend invite` action revokes any existing `pending` row, inserts a fresh one
 
 The Admin App authenticates with **email + password**. There is no Facebook OAuth, no social provider, and no public sign-up. This is the canonical MVP flow.
 
-The invitation flow creates an `auth.users` account, sets `app_metadata.role = 'admin'`, then sends an invite link that routes to password setup. Existing accounts can use email + password directly once activated.
+The invitation flow creates an `auth.users` account, sets `app_metadata.role = 'admin'`, then sends an invite email that routes through `/auth/accept-invite` before password setup. Existing accounts can use email + password directly once activated.
 
 After sign-in succeeds, the middleware in `apps/admin/src/middleware.ts` and `requireAdminSession()` enforce **all three** of the following on every authenticated request:
 
@@ -186,16 +186,17 @@ All operations below are **Super Admin only**, except where noted, and **all** o
 
 | Action | Allowed when | Effect | `admin_action_log` action |
 |--------|--------------|--------|---------------------------|
-| Resend invite | target has `admin_is_active = false` AND has a `pending` or `expired` `admin_invitations` row | Revoke any open pending row, insert a fresh one, send a new OTP email | `admin_invite_resent` |
+| Resend invite | target has `admin_is_active = false` AND has a `pending` or `expired` `admin_invitations` row | Revoke any open pending row, insert a fresh one, send a new invite email | `admin_invite_resent` |
 | Deactivate | target is currently active **and** is not the founding Super Admin **and** is not the only remaining active Super Admin | Set `admin_is_active = false`, `admin_deactivated_at = now()`, `admin_deactivated_by = <super admin>`; revoke all Supabase sessions for the target (force sign-out) | `admin_deactivated` |
 | Reactivate | target has `admin_is_active = false` and no open invitation | Set `admin_is_active = true`, `admin_activated_at = now()` | `admin_reactivated` |
 | Change role | target is **not** the founding Super Admin AND (when demoting Super Admin → Admin) is not the only remaining active Super Admin | Update `profiles.admin_role`; revoke all Supabase sessions for the target so the new claim is re-fetched on next login | `admin_role_changed` (with `before_value` / `after_value`) |
 | Force sign-out | target is active | Revoke all Supabase sessions for that user via the service role | `admin_force_signed_out` |
+| Delete | target has `admin_role = 'admin'` AND `target.id != actor.id` | Revoke any pending invite; write `admin_deleted` log; then `auth.admin.deleteUser` cascades: `profiles` row removed; `admin_action_log.admin_id` / `admin_invitations.invited_by` (and similar author FKs) for that profile become `NULL` | `admin_deleted` |
 | View action log | any admin (read-only on the detail page) | Render two filtered timelines: actions **performed by** this admin (`admin_id = target.id`) and actions **performed on** this admin (`entity_type = 'admin_user' AND entity_id = target.id`) | (read; no log entry written) |
 
 Notes:
 
-- **No hard delete.** Once a row exists in `profiles` with a non-null `admin_role`, it is preserved. Reuse the email by reactivating instead of recreating.
+- **Delete is fully hard.** Deleting an admin removes `auth.users` and cascades to `profiles`. The directory hides them by joining `profiles` to `auth.users`. Audit rows survive with nullified author FKs where applicable.
 - The founding Super Admin guard rejects deactivate, role change, and (implicitly) anything that would lock them out, regardless of which Super Admin is calling.
 - Force sign-out is its own action so a Super Admin can log a target out without changing their role or active status (e.g. after credential exposure on the recipient's email).
 
@@ -231,8 +232,9 @@ These are not yet implemented — the Admins module today is mock-only (`apps/ad
 | `/api/admin-users/[id]/reactivate` | `POST` | Super Admin | Reactivate |
 | `/api/admin-users/[id]/role` | `PATCH` | Super Admin | Change `admin_role` |
 | `/api/admin-users/[id]/force-signout` | `POST` | Super Admin | Revoke all sessions for the target |
+| `/api/admin-users/[id]/delete` | `POST` | Super Admin | Write `admin_deleted` audit row in a DB transaction, then delete auth user (cascade removes profile) |
 
-Every mutating route writes one `admin_action_log` row in the same transaction as the data change.
+Most mutating routes write one `admin_action_log` row in the same transaction as the data change. **Delete** writes the log in a transaction first, then calls Supabase `auth.admin.deleteUser` outside that transaction; if auth delete fails, the audit row is rolled back.
 
 ---
 
@@ -250,6 +252,7 @@ ALTER TYPE admin_action_enum ADD VALUE 'admin_deactivated';
 ALTER TYPE admin_action_enum ADD VALUE 'admin_reactivated';
 ALTER TYPE admin_action_enum ADD VALUE 'admin_role_changed';
 ALTER TYPE admin_action_enum ADD VALUE 'admin_force_signed_out';
+ALTER TYPE admin_action_enum ADD VALUE 'admin_deleted';
 
 ALTER TYPE admin_action_entity_enum ADD VALUE 'admin_user';
 ```
@@ -258,11 +261,12 @@ ALTER TYPE admin_action_entity_enum ADD VALUE 'admin_user';
 |----------|---------------|-------------|-------|
 | `admin_invited` | `admin_user` | invited admin's `profiles.id` | `after_value` carries `{ email, role }` |
 | `admin_invite_resent` | `admin_user` | target `profiles.id` | |
-| `admin_activated` | `admin_user` | target `profiles.id` | Written by the verify-otp handler when an invite is consumed; `admin_id` is the target themselves (they activated their own account) |
+| `admin_activated` | `admin_user` | target `profiles.id` | Written when invite/password onboarding completes and `activateAdminIfNeeded` runs; `admin_id` is the target themselves (they activated their own account) |
 | `admin_deactivated` | `admin_user` | target `profiles.id` | |
 | `admin_reactivated` | `admin_user` | target `profiles.id` | |
 | `admin_role_changed` | `admin_user` | target `profiles.id` | `before_value` / `after_value` carry the role |
 | `admin_force_signed_out` | `admin_user` | target `profiles.id` | |
+| `admin_deleted` | `admin_user` | target `profiles.id` (at write time; profile is removed after cascade) | `before_value` captures admin profile lifecycle snapshot |
 
 The detail page renders two panels off this single table:
 
@@ -300,4 +304,4 @@ The mock distinguishes `Admin` vs `Super admin` as a free-text role string and t
 - [`docs/database/12_club_governance.md`](../../database/12_club_governance.md) — `admin_action_log` schema and the `admin_action_enum` / `admin_action_entity_enum` definitions extended above.
 - [`docs/database/08_admin.md`](../../database/08_admin.md) — Admin role JWT-claim model and platform-wide RLS pattern.
 - [`docs/database/01_users_and_profiles.md`](../../database/01_users_and_profiles.md) — The `profiles` table that admin rows live in.
-- [`docs/views/admin_app/login.md`](../../views/admin_app/login.md) — Login UI. The password + TOTP description there pre-dates the email-OTP-only implementation; this doc is authoritative for the auth flow.
+- [`docs/views/admin_app/login.md`](../../views/admin_app/login.md) — Login UI and invite onboarding flow.

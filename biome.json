@@ -33,7 +33,8 @@
       "!**/.next/**",
       "!**/dist/**",
       "!**/.turbo/**",
-      "!**/storybook-static/**"
+      "!**/storybook-static/**",
+      "!**/apps/admin/src/email-templates/**"
     ]
   }
 }

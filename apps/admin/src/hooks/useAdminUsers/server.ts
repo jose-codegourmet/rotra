@@ -142,3 +142,11 @@ export async function forceSignOutAdminUserRequest(
 		fallbackError: "Failed to force sign-out.",
 	});
 }
+
+export async function deleteAdminUserRequest(userId: string): Promise<void> {
+	await performAdminUserMutationRequest({
+		path: `/api/admin-users/${userId}/delete`,
+		method: "POST",
+		fallbackError: "Failed to delete admin.",
+	});
+}

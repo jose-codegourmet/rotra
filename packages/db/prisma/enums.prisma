@@ -369,6 +369,7 @@ enum AdminAction {
   admin_reactivated
   admin_role_changed
   admin_force_signed_out
+  admin_deleted
 
   @@map("admin_action_enum")
 }

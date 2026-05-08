@@ -1,7 +1,6 @@
-import { changeAdminRole, db } from "@rotra/db";
+import { changeAdminRole, db, deleteAuthSessionsForUser } from "@rotra/db";
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/auth/admin-session";
-import { revokeAdminUserSessions } from "@/lib/supabase/admin";
 import { adminUserErrorResponse, parseAdminRole } from "../../route-helpers";
 
 export const runtime = "nodejs";
@@ -33,7 +32,7 @@ export async function PATCH(
 			nextRole: role,
 			foundingSuperAdminId: process.env.FOUNDING_SUPER_ADMIN_ID ?? null,
 		});
-		await revokeAdminUserSessions(id);
+		await deleteAuthSessionsForUser(db, id);
 		return NextResponse.json({ ok: true });
 	} catch (error) {
 		return adminUserErrorResponse(error, "[admin-users role]");

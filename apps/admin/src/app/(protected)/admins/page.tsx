@@ -5,6 +5,7 @@ import {
 	QueryClient,
 } from "@tanstack/react-query";
 import { PageSection } from "@/components/admin-ui/PageSection/PageSection";
+import { CountCard } from "@/components/custom/cards/count-card/CountCard";
 import { AdminUsersTable } from "@/components/modules/users/AdminUsersTable/AdminUsersTable";
 import type { AdminUserRow } from "@/components/modules/users/users.types";
 import { adminUsersQueryKey } from "@/hooks/useAdminUsers/queryKey";
@@ -33,6 +34,12 @@ export default async function AdminsPage() {
 		(u) => u.status === "inactive",
 	).length;
 	const invited = serializedUsers.filter((u) => u.status === "invited").length;
+	const summaryCards = [
+		{ title: "Total", count: serializedUsers.length, tone: "primary" as const },
+		{ title: "Active", count: active, tone: "accent" as const },
+		{ title: "Invited", count: invited, tone: "muted" as const },
+		{ title: "Inactive", count: inactive, tone: "muted" as const },
+	];
 	const canManageUsers = session.adminRole === "super_admin";
 	const queryClient = new QueryClient();
 	queryClient.setQueryData(adminUsersQueryKey(), {
@@ -52,30 +59,15 @@ export default async function AdminsPage() {
 					description="Directory of internal admin accounts with role and status controls."
 				>
 					<div className="flex flex-wrap gap-4 w-full">
-						<div className="rounded-lg border border-border bg-bg-surface px-4 py-3">
-							<p className="text-label uppercase text-text-secondary">Total</p>
-							<p className="mt-1 text-heading text-text-primary">
-								{serializedUsers.length}
-							</p>
-						</div>
-						<div className="rounded-lg border border-border bg-bg-surface px-4 py-3">
-							<p className="text-label uppercase text-text-secondary">Active</p>
-							<p className="mt-1 text-heading text-accent">{active}</p>
-						</div>
-						<div className="rounded-lg border border-border bg-bg-surface px-4 py-3">
-							<p className="text-label uppercase text-text-secondary">
-								Invited
-							</p>
-							<p className="mt-1 text-heading text-text-secondary">{invited}</p>
-						</div>
-						<div className="rounded-lg border border-border bg-bg-surface px-4 py-3">
-							<p className="text-label uppercase text-text-secondary">
-								Inactive
-							</p>
-							<p className="mt-1 text-heading text-text-secondary">
-								{inactive}
-							</p>
-						</div>
+						{summaryCards.map((card) => (
+							<CountCard
+								key={card.title}
+								title={card.title}
+								count={card.count}
+								tone={card.tone}
+								animateCount
+							/>
+						))}
 					</div>
 				</PageSection>
 

@@ -1,7 +1,10 @@
 import { db, inviteAdminUser } from "@rotra/db";
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/auth/admin-session";
-import { inviteAdminAuthUser } from "@/lib/supabase/admin";
+import {
+	inviteAdminAuthUser,
+	resolveAdminAppOrigin,
+} from "@/lib/supabase/admin";
 import { adminUserErrorResponse, parseAdminRole } from "../route-helpers";
 
 export const runtime = "nodejs";
@@ -32,14 +35,11 @@ export async function POST(request: Request) {
 
 	try {
 		const session = await requireAdminSession();
-		const callbackUrl = new URL(
-			"/auth/callback?next=/set-password",
-			request.url,
-		);
+		const redirectTo = resolveAdminAppOrigin(request);
 		const { userId } = await inviteAdminAuthUser({
 			email,
 			name,
-			redirectTo: callbackUrl.toString(),
+			redirectTo,
 		});
 		const result = await inviteAdminUser(db, {
 			actorProfileId: session.profileId,

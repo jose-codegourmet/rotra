@@ -52,7 +52,7 @@ export type AdminActionTimelineEntry = {
 		id: string;
 		name: string;
 		email: string | null;
-	};
+	} | null;
 };
 
 export type AdminUserDetail = {
@@ -194,21 +194,33 @@ async function assertLastActiveSuperAdminGuard(
 	}
 }
 
+type AdminProfileJoinRow = {
+	id: string;
+	name: string;
+	email: string | null;
+	adminRole: AdminRole;
+	adminIsActive: boolean;
+	adminInvitedAt: Date | null;
+	adminActivatedAt: Date | null;
+	adminDeactivatedAt: Date | null;
+};
+
 export async function listAdminUsers(db: PrismaClient): Promise<AdminDirectoryUser[]> {
-	const admins = await db.profile.findMany({
-		where: { adminRole: { not: null } },
-		select: {
-			id: true,
-			name: true,
-			email: true,
-			adminRole: true,
-			adminIsActive: true,
-			adminInvitedAt: true,
-			adminActivatedAt: true,
-			adminDeactivatedAt: true,
-		},
-		orderBy: [{ adminRole: "asc" }, { name: "asc" }],
-	});
+	const admins = await db.$queryRaw<AdminProfileJoinRow[]>`
+		SELECT
+			p.id::text AS "id",
+			p.name AS "name",
+			p.email AS "email",
+			p.admin_role AS "adminRole",
+			p.admin_is_active AS "adminIsActive",
+			p.admin_invited_at AS "adminInvitedAt",
+			p.admin_activated_at AS "adminActivatedAt",
+			p.admin_deactivated_at AS "adminDeactivatedAt"
+		FROM public.profiles p
+		INNER JOIN auth.users u ON u.id = p.id
+		WHERE p.admin_role IS NOT NULL
+		ORDER BY p.admin_role ASC, p.name ASC
+	`;
 
 	const adminIds = admins.map((admin) => admin.id);
 	const emails = admins
@@ -698,7 +710,15 @@ export async function changeAdminRole(
 	});
 }
 
-export async function logAdminForceSignOut(
+/** Deletes Supabase Auth sessions for the user (profile.id === auth.users.id). Revokes refresh tokens via FK cascade. */
+export async function deleteAuthSessionsForUser(
+	client: DbClient,
+	userId: string,
+): Promise<void> {
+	await client.$executeRaw`DELETE FROM auth.sessions WHERE user_id = ${userId}::uuid`;
+}
+
+export async function forceSignOutAdminUser(
 	db: PrismaClient,
 	input: {
 		actorProfileId: string;
@@ -711,6 +731,7 @@ export async function logAdminForceSignOut(
 			targetProfileId: input.targetProfileId,
 			requireTargetActive: true,
 		});
+		await deleteAuthSessionsForUser(tx, target.id);
 		await tx.adminActionLog.create({
 			data: {
 				adminId: input.actorProfileId,
@@ -719,5 +740,55 @@ export async function logAdminForceSignOut(
 				entityId: target.id,
 			},
 		});
+	});
+}
+
+export async function deleteAdminUser(
+	db: PrismaClient,
+	input: {
+		actorProfileId: string;
+		targetProfileId: string;
+		foundingSuperAdminId?: string | null;
+	},
+): Promise<{ auditLogId: string }> {
+	return db.$transaction(async (tx) => {
+		const { target } = await assertTargetMutationAllowed(tx, {
+			actorProfileId: input.actorProfileId,
+			targetProfileId: input.targetProfileId,
+			foundingSuperAdminId: input.foundingSuperAdminId,
+		});
+		if (target.id === input.actorProfileId) {
+			throw new AdminUserError("forbidden", "You cannot delete your own account.");
+		}
+		if (target.adminRole !== "admin") {
+			throw new AdminUserError(
+				"forbidden",
+				"Only admin users can be deleted.",
+			);
+		}
+
+		const before = profileSnapshot(target);
+		if (target.email) {
+			await tx.adminInvitation.updateMany({
+				where: {
+					email: target.email,
+					status: "pending",
+				},
+				data: { status: "revoked" },
+			});
+		}
+
+		const log = await tx.adminActionLog.create({
+			data: {
+				adminId: input.actorProfileId,
+				action: "admin_deleted" as AdminAction,
+				entityType: "admin_user",
+				entityId: target.id,
+				beforeValue: before as object,
+			},
+			select: { id: true },
+		});
+
+		return { auditLogId: log.id };
 	});
 }

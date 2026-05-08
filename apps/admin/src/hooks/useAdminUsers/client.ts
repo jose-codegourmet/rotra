@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ListAdminUsersResponse } from "@/hooks/useAdminUsers/server";
 import {
 	deactivateAdminUserRequest,
+	deleteAdminUserRequest,
 	demoteSuperAdminToAdminRequest,
 	fetchAdminUsers,
 	forceSignOutAdminUserRequest,
@@ -106,6 +107,18 @@ export function useForceSignOutAdminUserMutation() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (userId: string) => forceSignOutAdminUserRequest(userId),
+		onSuccess: () => {
+			void queryClient.invalidateQueries({
+				queryKey: adminUsersQueryKey(),
+			});
+		},
+	});
+}
+
+export function useDeleteAdminUserMutation() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (userId: string) => deleteAdminUserRequest(userId),
 		onSuccess: () => {
 			void queryClient.invalidateQueries({
 				queryKey: adminUsersQueryKey(),

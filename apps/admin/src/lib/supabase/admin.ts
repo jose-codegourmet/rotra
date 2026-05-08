@@ -76,6 +76,39 @@ export async function inviteAdminAuthUser(input: {
 	return { userId: data.user.id };
 }
 
+export async function sendAdminInviteEmail(input: {
+	email: string;
+	name: string;
+	role: "admin" | "super_admin";
+	redirectTo: string;
+}): Promise<void> {
+	const adminSupabase = createSupabaseAdminClient();
+	const email = input.email.trim().toLowerCase();
+	const name = input.name.trim();
+	const { data, error } = await adminSupabase.auth.admin.inviteUserByEmail(
+		email,
+		{
+			data: { name },
+			redirectTo: input.redirectTo,
+		},
+	);
+	if (error) {
+		throw new Error(error.message);
+	}
+
+	if (!data?.user?.id) return;
+	const { error: updateError } = await adminSupabase.auth.admin.updateUserById(
+		data.user.id,
+		{
+			app_metadata: { role: input.role },
+			user_metadata: { name },
+		},
+	);
+	if (updateError) {
+		throw new Error(updateError.message);
+	}
+}
+
 export async function sendAdminPasswordResetLink(
 	email: string,
 	request: Request,
@@ -91,21 +124,10 @@ export async function sendAdminPasswordResetLink(
 	}
 }
 
-export async function revokeAdminUserSessions(userId: string): Promise<void> {
-	const { url, serviceRoleKey } = supabaseAdminEnv();
-	const endpoint = `${url}/auth/v1/admin/users/${userId}/logout`;
-	const response = await fetch(endpoint, {
-		method: "POST",
-		headers: {
-			apikey: serviceRoleKey,
-			Authorization: `Bearer ${serviceRoleKey}`,
-			"Content-Type": "application/json",
-		},
-	});
-	if (!response.ok) {
-		const body = await response.text();
-		throw new Error(
-			`Failed to revoke sessions: ${body || response.statusText}`,
-		);
+export async function deleteAdminAuthUser(userId: string): Promise<void> {
+	const adminSupabase = createSupabaseAdminClient();
+	const { error } = await adminSupabase.auth.admin.deleteUser(userId);
+	if (error) {
+		throw new Error(error.message);
 	}
 }

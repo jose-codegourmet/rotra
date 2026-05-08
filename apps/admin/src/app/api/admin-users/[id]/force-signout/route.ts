@@ -1,7 +1,6 @@
-import { db, logAdminForceSignOut } from "@rotra/db";
+import { db, forceSignOutAdminUser } from "@rotra/db";
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/auth/admin-session";
-import { revokeAdminUserSessions } from "@/lib/supabase/admin";
 import { adminUserErrorResponse } from "../../route-helpers";
 
 export const runtime = "nodejs";
@@ -13,8 +12,7 @@ export async function POST(
 	const { id } = await context.params;
 	try {
 		const session = await requireAdminSession();
-		await revokeAdminUserSessions(id);
-		await logAdminForceSignOut(db, {
+		await forceSignOutAdminUser(db, {
 			actorProfileId: session.profileId,
 			targetProfileId: id,
 		});

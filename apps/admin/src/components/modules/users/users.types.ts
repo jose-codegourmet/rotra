@@ -32,7 +32,7 @@ export type AdminActionTimelineRow = {
 		id: string;
 		name: string;
 		email: string | null;
-	};
+	} | null;
 };
 
 export type AdminUserDetail = {
