@@ -202,6 +202,8 @@ The Client App does **not** use TanStack Table — player-facing lists (leaderbo
 | **Husky** | Git hooks (`pre-commit`: lint; `pre-push`: lint + build) |
 | **commitlint** | Enforces Conventional Commits format on every commit message |
 
+For pinned Node/pnpm/Biome versions and the Vercel + Supabase runtime contract, see [`13_runtime_versions.md`](./13_runtime_versions.md).
+
 ---
 
 ### 3.9 Component Development — Storybook
