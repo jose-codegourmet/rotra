@@ -16,6 +16,7 @@ function copyCookies(from: NextResponse, to: NextResponse) {
 
 function isPublicPath(pathname: string): boolean {
 	if (pathname === "/login" || pathname.startsWith("/login/")) return true;
+	if (pathname === "/set-password") return true;
 	if (pathname === "/auth" || pathname.startsWith("/auth/")) return true;
 	if (pathname === "/api/auth" || pathname.startsWith("/api/auth/"))
 		return true;
@@ -84,7 +85,10 @@ export async function middleware(request: NextRequest) {
 		return redirect;
 	}
 
-	if (url.pathname.startsWith("/login") || url.pathname === "/") {
+	if (url.pathname === "/login" || url.pathname === "/") {
+		if (url.searchParams.has("error")) {
+			return response;
+		}
 		const redirect = NextResponse.redirect(new URL("/dashboard", request.url));
 		copyCookies(response, redirect);
 		return redirect;

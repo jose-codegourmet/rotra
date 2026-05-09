@@ -1,5 +1,6 @@
 import { PageSection } from "@/components/admin-ui/PageSection/PageSection";
 import { PageTable } from "@/components/admin-ui/PageTable/PageTable";
+import { ModerationPlayerFocusBanner } from "@/components/modules/moderation/moderation-player-focus-banner/ModerationPlayerFocusBanner";
 import { Button } from "@/components/ui/button/Button";
 import { MOCK_MODERATION } from "@/constants/mock-admin-pages";
 import { cn } from "@/lib/utils";
@@ -36,9 +37,31 @@ function StatusBadge({ s }: { s: "open" | "escalated" }) {
 	);
 }
 
-export default function ModerationPage() {
+function singleQueryParam(
+	value: string | string[] | undefined,
+): string | undefined {
+	if (typeof value === "string") return value;
+	if (Array.isArray(value) && value[0]) return value[0];
+	return undefined;
+}
+
+export default async function ModerationPage({
+	searchParams,
+}: {
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+	const sp = await searchParams;
+	const playerRaw = singleQueryParam(sp.player)?.trim() ?? "";
+	const tabRaw = singleQueryParam(sp.tab)?.trim() ?? "";
+
 	return (
 		<div className="mx-auto max-w-6xl space-y-8">
+			{playerRaw ? (
+				<ModerationPlayerFocusBanner
+					playerId={playerRaw}
+					tab={tabRaw || null}
+				/>
+			) : null}
 			<PageSection
 				title="Moderation queue"
 				description="Flagged reviews, accounts, and announcements. Static rows for layout only."

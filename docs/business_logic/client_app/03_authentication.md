@@ -2,7 +2,7 @@
 
 ## Overview
 
-Authentication is handled via two entry paths: **Facebook Login** (managed by Supabase OAuth) and **Email Invitation**. Facebook is the identity anchor for every account — regardless of which path a user enters through, a Facebook account must ultimately be connected before the user is considered verified.
+Authentication for **players** is handled via **Facebook Login** (Supabase OAuth) and **Email Invitation** (then Facebook). Facebook is the identity anchor for player verification. **Platform admins** additionally use **email + password** on the Admin app and may use a gated **`/login-admin`** path on the client app (see Path C below); that does not replace the player verification model for normal accounts.
 
 New users are **unverified by default** upon first sign-in. Verified status is a composite of three independently tracked conditions and unlocks full platform access.
 
@@ -71,6 +71,32 @@ New users are **unverified by default** upon first sign-in. Verified status is a
 
 ---
 
+### Path C — Admin sign-in (client app)
+
+| Property | Value |
+|---|---|
+| Route | `/login-admin` on the client app |
+| Preconditions | User must be an **active** platform admin (`profiles.admin_role` set, `profiles.admin_is_active = true`), provisioned via the Admin app invite flow |
+| Credentials | Shared **access password** (env `CLIENT_ADMIN_LOGIN_GATE_PASSWORD`) then **email + password** (Supabase) |
+
+**Flow:**
+
+```
+1. User opens /login-admin (URL not linked from player /login)
+2. User submits access password → POST /api/auth/admin-gate
+   → timing-safe compare to env; on success, short-lived httpOnly gate cookie
+3. User submits email + password → POST /api/auth/admin-sign-in
+   → Supabase signInWithPassword; then DB check admin_role + admin_is_active
+   → If not an active admin: sign out, 403 NOT_ADMIN
+   → If ok: clear gate cookie, session established, redirect /dashboard
+```
+
+**Onboarding:** Active admins skip the `/onboarding` redirect in the client protected layout so they can use the dashboard shell without completing the player wizard. They remain the same `profiles` row as in the Admin app (no duplicate identity).
+
+**UI:** Sidebar / mobile drawer show a `Pill` for **Super admin** or **Admin**. See [`../../views/client_app/common/login-admin.md`](../../views/client_app/common/login-admin.md).
+
+---
+
 ## 03.2 Account Verification Model
 
 New accounts are **unverified immediately after Facebook login**. An account becomes **verified** only when all three of the following conditions are simultaneously satisfied:
@@ -135,12 +161,13 @@ When `handle_new_user()` fires (first login via either path), the profile is see
 
 ## 03.5 Onboarding Redirect Guard
 
-Any authenticated user with `onboarding_completed = false` is redirected to `/onboarding` on every app open. The onboarding wizard is non-closeable and cannot be bypassed. See [`20_onboarding.md`](./20_onboarding.md) for the full wizard specification.
+Any authenticated user with `onboarding_completed = false` is redirected to `/onboarding` on every app open, **except** an **active platform admin** signed in via Path C (`/login-admin`), who may use the protected client shell without completing the player onboarding wizard. The onboarding wizard remains non-closeable for everyone else. See [`20_onboarding.md`](./20_onboarding.md) for the full wizard specification.
 
 | State | Redirect destination |
 |---|---|
 | Unauthenticated | `/login` |
-| Authenticated + `onboarding_completed = false` | `/onboarding` |
+| Authenticated + `onboarding_completed = false` (not an active admin) | `/onboarding` |
+| Authenticated + active admin (`admin_role` + `admin_is_active`) | Protected app (no forced `/onboarding`) |
 | Authenticated + `onboarding_completed = true` | `/home` |
 
 ---

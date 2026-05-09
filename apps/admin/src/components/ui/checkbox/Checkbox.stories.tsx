@@ -9,7 +9,7 @@ import {
 import { Checkbox } from "./Checkbox";
 
 const meta: Meta<typeof Checkbox> = {
-	title: "shadcn/Checkbox",
+	title: "UI/Checkbox",
 	component: Checkbox,
 	tags: ["autodocs"],
 };

@@ -42,14 +42,22 @@ export async function requireAdminSession() {
 
 	const profile = await db.profile.findUnique({
 		where: { id: user.id },
-		select: { id: true, email: true },
+		select: { id: true, email: true, adminRole: true, adminIsActive: true },
 	});
 	if (!profile?.id || !profile.email) {
 		throw new AdminSessionError(403, "Admin profile is not provisioned");
+	}
+	if (!profile.adminRole) {
+		throw new AdminSessionError(403, "Admin role is not provisioned");
+	}
+	if (!profile.adminIsActive) {
+		throw new AdminSessionError(403, "Admin account is inactive");
 	}
 
 	return {
 		profileId: profile.id,
 		email: profile.email,
+		adminRole: profile.adminRole,
+		adminIsActive: profile.adminIsActive,
 	};
 }

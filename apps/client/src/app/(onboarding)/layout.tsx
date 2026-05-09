@@ -12,6 +12,11 @@ export default async function OnboardingShellLayout({
 }) {
 	const profile = await getCurrentProfile();
 
+	const isAdmin = !!profile?.adminRole && profile.adminIsActive;
+	if (isAdmin) {
+		redirect("/dashboard");
+	}
+
 	if (profile?.onboardingCompleted) {
 		redirect("/home");
 	}

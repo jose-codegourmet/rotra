@@ -32,6 +32,8 @@ CREATE TYPE racket_balance_enum AS ENUM ('head_heavy', 'head_light', 'even_balan
 CREATE TYPE shoe_fit_enum AS ENUM ('wide', 'narrow', 'standard');
 
 CREATE TYPE invitation_status_enum AS ENUM ('pending', 'accepted', 'expired', 'revoked');
+
+CREATE TYPE admin_role_enum AS ENUM ('super_admin', 'admin');
 ```
 
 ---
@@ -64,6 +66,15 @@ CREATE TABLE profiles (
                                     AND email_verified
                                     AND onboarding_completed
                                   ) STORED,
+
+  -- Admin account lifecycle (null role = regular player profile)
+  admin_role                      admin_role_enum,
+  admin_is_active                 bool NOT NULL DEFAULT false,
+  admin_invited_by                uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  admin_invited_at                timestamptz,
+  admin_activated_at              timestamptz,
+  admin_deactivated_at            timestamptz,
+  admin_deactivated_by            uuid REFERENCES profiles(id) ON DELETE SET NULL,
 
   -- Self-declared level (separate from computed skill rating)
   playing_level                   playing_level_enum,
@@ -116,6 +127,27 @@ CREATE TABLE profiles (
 | `tournament_wins_last_year` | Self-reported snapshot at registration. Not auto-recalculated. |
 | `exp_total` and `mmr` | Cached aggregates from `exp_transactions` / `mmr_transactions`. Updated by trigger only; never written directly by the client. |
 | `onboarding_completed` | Gates access. Any authenticated user with this `false` is redirected to `/onboarding` on every app open. |
+| `admin_role` | Nullable. Non-null marks the row as an Admin-app account (`super_admin` or `admin`). |
+| `admin_is_active` | Access gate for admin routes. Inactive admins cannot perform Admin-app actions even with a valid auth session. |
+| `admin_invited_by`, `admin_invited_at`, `admin_activated_at`, `admin_deactivated_at`, `admin_deactivated_by` | Admin provisioning/audit lifecycle columns used by the Admins module (see [`../business_logic/admin_app/08_user_management.md`](../business_logic/admin_app/08_user_management.md)). |
+
+### Roles & tags derivation (Admin App)
+
+There is **one row per person** in `profiles`. The Admin App does not use separate tables for “admins” vs “players”. **Product roles** (regular player, club owner, que master, platform admin) are expressed as **columns and joins**, rendered as **tag pills** in the UI (see [`../views/admin_app/users.md`](../views/admin_app/users.md) and [`../views/admin_app/admins.md`](../views/admin_app/admins.md)).
+
+| Tag / concept | Meaning | Derivation |
+|---------------|---------|------------|
+| **Everyone is a player** | Baseline | Every `profiles` row is a player identity for the Client App. |
+| **Club owner** | Owns at least one club | `EXISTS (SELECT 1 FROM clubs c WHERE c.owner_id = profiles.id)` |
+| **Que master** | Active que master membership | `EXISTS (SELECT 1 FROM club_members m WHERE m.player_id = profiles.id AND m.role = 'que_master' AND m.status = 'active')` |
+| **Admin** | Platform admin (non-super) | `profiles.admin_role = 'admin'` |
+| **Super admin** | Platform super admin | `profiles.admin_role = 'super_admin'` |
+| **Deactivated** | Account cannot fully use the product / admin app per current rules | **Player:** active moderation suspension or deleted account state as recorded in [`admin_action_log`](./12_club_governance.md) / Moderation (implementation reads the canonical suspension pipeline). **Platform admin:** additionally `profiles.admin_is_active = false` revokes Admin App access even when `admin_role` is set. |
+
+**Admin App directory lenses** (same table, different `WHERE`):
+
+- **`/admin/users`** — `profiles.admin_role IS NULL` (player directory; club owner / que master tags still apply).
+- **`/admin/admins`** — `profiles.admin_role IS NOT NULL` (platform team directory; Role column shows Admin vs Super admin; same Club owner / Que master / Deactivated tags when applicable).
 
 ### Trigger: auto-create profile on signup
 
@@ -146,6 +178,7 @@ CREATE TRIGGER on_auth_user_created
 CREATE INDEX idx_profiles_facebook_id ON profiles(facebook_id);
 CREATE INDEX idx_profiles_email       ON profiles(email);
 CREATE INDEX idx_profiles_is_verified ON profiles(is_verified);
+CREATE INDEX idx_profiles_admin_role  ON profiles(admin_role) WHERE admin_role IS NOT NULL;
 ```
 
 ---
@@ -198,6 +231,33 @@ CREATE UNIQUE INDEX idx_email_invitations_pending_email
 CREATE INDEX idx_email_invitations_token  ON email_invitations(token);
 CREATE INDEX idx_email_invitations_email  ON email_invitations(email);
 CREATE INDEX idx_email_invitations_status ON email_invitations(status);
+```
+
+---
+
+## Table: `admin_invitations`
+
+Tracks admin-user invitation lifecycle separately from player invitations.
+
+```sql
+CREATE TABLE admin_invitations (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email         text NOT NULL,
+  role          admin_role_enum NOT NULL,
+  invited_by    uuid NOT NULL REFERENCES profiles(id),
+  status        invitation_status_enum NOT NULL DEFAULT 'pending',
+  accepted_by   uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  accepted_at   timestamptz,
+  expires_at    timestamptz NOT NULL DEFAULT now() + interval '7 days',
+  created_at    timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX idx_admin_invitations_pending_email
+  ON admin_invitations(email)
+  WHERE status = 'pending';
+
+CREATE INDEX idx_admin_invitations_email  ON admin_invitations(email);
+CREATE INDEX idx_admin_invitations_status ON admin_invitations(status);
 ```
 
 ---

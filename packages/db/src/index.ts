@@ -74,4 +74,30 @@ export {
 	rejectClubApplication,
 	updatePendingClubApplication,
 } from "./club-application-service";
+export {
+	activateAdminIfNeeded,
+	changeAdminRole,
+	deleteAdminUser,
+	deactivateAdminUser,
+	deleteAuthSessionsForUser,
+	forceSignOutAdminUser,
+	getAdminUserDetail,
+	inviteAdminUser,
+	listAdminUsers,
+	reactivateAdminUser,
+	resendAdminInvite,
+	AdminUserError,
+	type AdminDirectoryStatus,
+	type AdminDirectoryUser,
+	type AdminUserDetail,
+} from "./admin-user-service";
+export {
+	CustomerProfileError,
+	getCustomerProfileDetail,
+	listCustomerProfiles,
+	type CustomerDirectoryRow,
+	type CustomerProfileDetail,
+	type ListCustomerProfilesInput,
+	type ListCustomerProfilesResult,
+} from "./customer-profile-service";
 export type { Database, Json } from "./supabase-database.types";

@@ -15,7 +15,7 @@ export function AdminLoginCard({ nextPath }: AdminLoginCardProps) {
 					{ADMIN_APP_DISPLAY_NAME}
 				</h2>
 				<p className="text-body text-text-secondary">
-					Sign in with your admin email. We will send a one-time passcode.
+					Sign in with your admin email and password.
 				</p>
 			</header>
 

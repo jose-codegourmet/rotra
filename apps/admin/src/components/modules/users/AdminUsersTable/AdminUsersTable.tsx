@@ -8,24 +8,46 @@ import {
 	getFilteredRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-import Link from "next/link";
 import * as React from "react";
 
-import { Button } from "@/components/ui/button/Button";
+import { AddUserDialog } from "@/components/modules/users/AddUserDialog/AddUserDialog";
+import { AdminUsersTableFilters } from "@/components/modules/users/AdminUsersTable/AdminUsersTableFilters";
+import { AdminUserTableCellActions } from "@/components/modules/users/AdminUsersTable/AdminUserTableCellActions";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu/DropdownMenu";
-import { adminUserDetailPath } from "@/constants/admin";
-import type { AdminUserRow } from "@/constants/mock-admin-users";
+	useAdminUsersQuery,
+	useInviteAdminUserMutation,
+} from "@/hooks/useAdminUsers/client";
 import { cn } from "@/lib/utils";
+import type { AdminUserRow } from "../users.types";
 
 const columnHelper = createColumnHelper<AdminUserRow>();
 
-function buildColumns() {
+type AdminUsersTableProps = {
+	data: AdminUserRow[];
+	canManageUsers: boolean;
+};
+
+function roleLabel(role: AdminUserRow["adminRole"]): string {
+	return role === "super_admin" ? "Super admin" : "Admin";
+}
+
+function statusLabel(status: AdminUserRow["status"]): string {
+	return status === "invited"
+		? "Invited"
+		: status === "active"
+			? "Active"
+			: "Inactive";
+}
+
+function lastActiveLabel(lastActiveAt: string | null): string {
+	if (!lastActiveAt) return "Never";
+	return new Date(lastActiveAt).toLocaleString();
+}
+
+function buildColumns(input: {
+	canManageUsers: boolean;
+	onActionError: (message: string | null) => void;
+}) {
 	return [
 		columnHelper.accessor("name", {
 			header: "Name",
@@ -46,10 +68,12 @@ function buildColumns() {
 				<span className="text-text-secondary">{info.getValue()}</span>
 			),
 		}),
-		columnHelper.accessor("role", {
+		columnHelper.accessor("adminRole", {
 			header: "Role",
 			cell: (info) => (
-				<span className="text-text-secondary">{info.getValue()}</span>
+				<span className="text-text-secondary">
+					{roleLabel(info.row.original.adminRole)}
+				</span>
 			),
 		}),
 		columnHelper.accessor("status", {
@@ -69,15 +93,17 @@ function buildColumns() {
 								: "border border-border bg-bg-elevated text-text-secondary",
 						)}
 					>
-						{s}
+						{statusLabel(s)}
 					</span>
 				);
 			},
 		}),
-		columnHelper.accessor("lastActive", {
+		columnHelper.accessor("lastActiveAt", {
 			header: "Last active",
 			cell: (info) => (
-				<span className="text-text-secondary">{info.getValue()}</span>
+				<span className="text-text-secondary">
+					{lastActiveLabel(info.getValue())}
+				</span>
 			),
 		}),
 		columnHelper.display({
@@ -90,48 +116,65 @@ function buildColumns() {
 			cell: ({ row }) => {
 				const user = row.original;
 				return (
-					<div className="flex justify-end">
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon"
-									className="h-8 w-8 shrink-0"
-									aria-label="Row actions"
-								>
-									<MoreHorizontal className="size-4" strokeWidth={1.5} />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								<DropdownMenuItem asChild>
-									<Link href={adminUserDetailPath(user.id)}>View details</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									onClick={() => {
-										void navigator.clipboard.writeText(user.email);
-									}}
-								>
-									Copy email
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
+					<AdminUserTableCellActions
+						user={user}
+						canManageUsers={input.canManageUsers}
+						onActionError={input.onActionError}
+					/>
 				);
 			},
 		}),
 	];
 }
 
-export function AdminUsersTable({ data }: { data: AdminUserRow[] }) {
+export function AdminUsersTable({
+	data,
+	canManageUsers,
+}: AdminUsersTableProps) {
+	const [error, setError] = React.useState<string | null>(null);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
 		[],
 	);
 
-	const columns = React.useMemo(() => buildColumns(), []);
+	const {
+		data: adminUsersData,
+		error: queryError,
+		isFetching,
+	} = useAdminUsersQuery();
+
+	const inviteMutation = useInviteAdminUserMutation();
+
+	const users = adminUsersData?.users ?? data;
+
+	const inviteAdmin = React.useCallback(
+		async (payload: {
+			name: string;
+			email: string;
+			role: "admin" | "super_admin";
+		}) => {
+			try {
+				setError(null);
+				await inviteMutation.mutateAsync(payload);
+			} catch (err) {
+				setError(
+					err instanceof Error ? err.message : "Failed to invite admin.",
+				);
+			}
+		},
+		[inviteMutation],
+	);
+
+	const columns = React.useMemo(
+		() =>
+			buildColumns({
+				canManageUsers,
+				onActionError: setError,
+			}),
+		[canManageUsers],
+	);
 
 	const table = useReactTable({
-		data,
+		data: users,
 		columns,
 		state: { columnFilters },
 		onColumnFiltersChange: setColumnFilters,
@@ -147,40 +190,33 @@ export function AdminUsersTable({ data }: { data: AdminUserRow[] }) {
 
 	return (
 		<div className="space-y-4">
-			<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-				<label className="flex min-h-12 flex-1 flex-col gap-1 sm:max-w-xs">
-					<span className="text-label uppercase text-text-secondary">
-						Search
-					</span>
-					<input
-						type="search"
-						value={search}
-						onChange={(e) => nameCol?.setFilterValue(e.target.value)}
-						placeholder="Name or email"
-						className="h-12 w-full rounded-md border border-border bg-bg-elevated px-3 text-body text-text-primary placeholder:text-text-disabled focus:outline-none focus:ring-1 focus:ring-accent"
-					/>
-				</label>
-				<label className="flex min-h-12 flex-col gap-1 sm:w-48">
-					<span className="text-label uppercase text-text-secondary">
-						Status
-					</span>
-					<select
-						value={statusFilter === "" ? "all" : statusFilter}
-						onChange={(e) => {
-							const v = e.target.value;
-							statusCol?.setFilterValue(v === "all" ? undefined : v);
-						}}
-						className="h-12 w-full rounded-md border border-border bg-bg-elevated px-3 text-body text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
-					>
-						<option value="all">All users</option>
-						<option value="active">Active</option>
-						<option value="inactive">Inactive</option>
-					</select>
-				</label>
-				<p className="text-small text-text-secondary sm:ml-auto sm:self-end">
-					{table.getFilteredRowModel().rows.length} shown
-				</p>
+			<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+				{error || queryError ? (
+					<p className="text-small text-danger">
+						{error ??
+							(queryError instanceof Error
+								? queryError.message
+								: "Failed to load admin users.")}
+					</p>
+				) : (
+					<span />
+				)}
+				{canManageUsers ? <AddUserDialog onInvite={inviteAdmin} /> : null}
 			</div>
+			{isFetching ? (
+				<p className="text-small text-text-secondary">
+					Refreshing admin users...
+				</p>
+			) : null}
+			<AdminUsersTableFilters
+				search={search}
+				statusFilter={statusFilter}
+				shownCount={table.getFilteredRowModel().rows.length}
+				onSearchChange={(nextValue) => nameCol?.setFilterValue(nextValue)}
+				onStatusChange={(nextValue) =>
+					statusCol?.setFilterValue(nextValue === "all" ? undefined : nextValue)
+				}
+			/>
 
 			<div className="overflow-x-auto rounded-lg border border-border bg-bg-surface">
 				<table className="w-full min-w-[640px] text-left text-small">

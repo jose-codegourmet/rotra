@@ -136,6 +136,38 @@
 	animation: pulse-accent 400ms ease-out forwards;
 }
 
+/* Auth pages shared visuals */
+@keyframes auth-fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.auth-page-overlay {
+	background: rgba(0, 0, 0, 0.55);
+}
+
+.auth-page-accent-primary {
+	background: rgba(59, 130, 246, 0.05);
+}
+
+.auth-page-accent-secondary {
+	background: rgba(100, 120, 180, 0.04);
+}
+
+.animate-auth-fade-up {
+	animation: auth-fade-up 500ms ease-out both;
+}
+
+.animate-auth-fade-up-delayed {
+	animation: auth-fade-up 500ms 80ms ease-out both;
+}
+
 @font-face {
 	font-family: "Satoshi";
 	src: url("/fonts/Satoshi-Variable.woff2") format("woff2");

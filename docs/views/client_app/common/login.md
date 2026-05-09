@@ -1,7 +1,9 @@
 # View: Login
 
 ## Purpose
-The entry point to the ROTRA client app. Players authenticate exclusively via Facebook OAuth. This is the only screen accessible without a valid session token. There is no email/password, no registration form — a single CTA handles both new signups and returning logins.
+The entry point to the ROTRA client app for **players**. Players authenticate via Facebook OAuth. This screen is accessible without a valid session token. A single CTA handles both new signups and returning logins.
+
+Platform admins who need to use the client app sign in separately on [`login-admin.md`](./login-admin.md) (`/login-admin`); that flow is not linked from this page.
 
 ## Route
 `/login` — public, unauthenticated
@@ -24,8 +26,6 @@ Full-screen page. Background: `color-bg-base` (`#0B0B0C`). A single vertically a
 │  │                             │    │
 │  │  [ f  Continue with         │    │  ← Primary button (Facebook blue variant)
 │  │       Facebook ]            │    │
-│  │                             │    │
-│  │  ─────────────────────────  │    │  ← Thin divider, color-border
 │  │                             │    │
 │  │  By continuing, you agree   │    │  ← Legal copy, text-micro, color-text-disabled
 │  │  to our Terms of Service    │    │
@@ -75,7 +75,7 @@ Full-screen page. Background: `color-bg-base` (`#0B0B0C`). A single vertically a
 - Text: `By continuing, you agree to our Terms of Service and Privacy Policy.`
 - Style: `text-micro` (10px, Medium 500), `color-text-disabled`
 - "Terms of Service" and "Privacy Policy" are tappable links → `color-text-secondary`, underlined
-- Positioned below the divider with `space-3` (12px) top margin
+- Positioned below the primary button with `space-3` (12px) top margin
 
 ---
 
@@ -141,6 +141,12 @@ The login page becomes a **two-column layout** at desktop width:
 - Mobile: `calc(100% - 32px)`, max 360px
 - Tablet: 400px, centered
 - Desktop: 400px (right panel), no max-width constraint on panel itself
+
+---
+
+## See also
+
+- [Admin login (client app)](./login-admin.md) — `/login-admin`, for platform admins only.
 
 ---
 

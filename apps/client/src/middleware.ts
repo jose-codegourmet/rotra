@@ -17,7 +17,11 @@ function copyCookies(from: NextResponse, to: NextResponse) {
 
 /** Paths that do not require a Supabase session (everything else redirects to /login when logged out). */
 function isPublicPath(pathname: string): boolean {
-	if (pathname === "/login" || pathname.startsWith("/login/")) {
+	if (
+		pathname === "/login" ||
+		pathname.startsWith("/login/") ||
+		pathname === "/login-admin"
+	) {
 		return true;
 	}
 	if (pathname.startsWith("/auth")) {

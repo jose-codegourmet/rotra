@@ -1,16 +1,20 @@
 "use client";
 
+import type { AdminRole } from "@prisma/client";
 import { LogOut, MoreVertical, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-
 import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
-
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/store/hooks";
+import { SmallAdminUserCard } from "../../small-admin-user-card/SmallAdminUserCard";
 import { SmallUserCard } from "../../small-user-card/SmallUserCard";
 
-export function SidebarUserMenu() {
+type SidebarUserMenuProps = {
+	adminRole?: AdminRole | null;
+};
+
+export function SidebarUserMenu({ adminRole = null }: SidebarUserMenuProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const user = useAppSelector((s) => s.auth.user);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -29,7 +33,11 @@ export function SidebarUserMenu() {
 		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, []);
 
-	const profileHref = user ? `/profile/${user.id}` : "/profile";
+	const profileHref = adminRole
+		? "/profile"
+		: user
+			? `/profile/${user.id}`
+			: "/profile";
 
 	return (
 		<div
@@ -76,7 +84,11 @@ export function SidebarUserMenu() {
 						onClick={() => setIsOpen((prev) => !prev)}
 						className="w-full flex items-center gap-3 lg:bg-bg-surface lg:p-3 rounded-lg transition-colors duration-default hover:bg-bg-elevated cursor-pointer group min-h-[44px]"
 					>
-						<SmallUserCard user={user} isOwner={true} />
+						{adminRole ? (
+							<SmallAdminUserCard user={user} adminRole={adminRole} />
+						) : (
+							<SmallUserCard user={user} isOwner={true} />
+						)}
 
 						<MoreVertical
 							size={16}

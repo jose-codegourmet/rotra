@@ -30,9 +30,14 @@ export interface AdminShellProps {
 	pageTitle?: string;
 }
 
+const PREFIX_MATCH_ROUTES: readonly string[] = [
+	ROUTES.ADMINS,
+	ROUTES.CUSTOMERS,
+];
+
 function navItemIsActive(href: string, pathname: string): boolean {
-	if (href === ROUTES.USERS) {
-		return pathname === href || pathname.startsWith(`${ROUTES.USERS}/`);
+	if (PREFIX_MATCH_ROUTES.includes(href)) {
+		return pathname === href || pathname.startsWith(`${href}/`);
 	}
 	return pathname === href;
 }

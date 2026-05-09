@@ -5,7 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { ThemeToggle } from "./ThemeToggle";
 
 const meta: Meta<typeof ThemeToggle> = {
-	title: "shadcn/ThemeToggle",
+	title: "UI/ThemeToggle",
 	component: ThemeToggle,
 	tags: ["autodocs"],
 	decorators: [

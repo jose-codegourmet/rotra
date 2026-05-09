@@ -1,54 +1,22 @@
 "use client";
 
-import { LogOutIcon, X } from "lucide-react";
+import type { AdminRole } from "@prisma/client";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo/Logo";
+import { MobileDrawerUserSection } from "@/components/ui/mobile-drawer/MobileDrawerUserSection";
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle";
 import { NAV_ITEMS } from "@/constants/nav";
-import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeMobileDrawer } from "@/store/slices/uiSlice";
-import { SmallUserCard } from "../small-user-card/SmallUserCard";
 
-function MobileDrawerUserSection() {
-	const dispatch = useAppDispatch();
-	const user = useAppSelector((s) => s.auth.user);
-	const initialized = useAppSelector((s) => s.auth.initialized);
-	const loading = !initialized;
-	const { openDialog: openLogoutDialog } = useLogoutDialog();
+type MobileDrawerProps = {
+	adminRole?: AdminRole | null;
+};
 
-	return (
-		<div className="p-6 border-t border-border bg-bg-base">
-			<div className="flex items-center gap-3 p-3 bg-bg-surface rounded-lg border border-border/30">
-				{user && (
-					<SmallUserCard
-						user={user}
-						isOwner={true}
-						loading={loading}
-						isMobile
-						onAvatarClick={() => dispatch(closeMobileDrawer())}
-					/>
-				)}
-
-				<button
-					type="button"
-					aria-label="Open account options"
-					className="shrink-0 rounded-md p-2 text-text-disabled transition-colors duration-default hover:bg-bg-elevated hover:text-text-primary ml-auto"
-					onClick={() => {
-						dispatch(closeMobileDrawer());
-						openLogoutDialog();
-					}}
-				>
-					<LogOutIcon size={16} strokeWidth={1.5} />
-				</button>
-			</div>
-		</div>
-	);
-}
-
-export function MobileDrawer() {
+export function MobileDrawer({ adminRole = null }: MobileDrawerProps) {
 	const pathname = usePathname();
 	const activeItem =
 		NAV_ITEMS.find(
@@ -133,7 +101,7 @@ export function MobileDrawer() {
 					<ThemeToggle variant="row" />
 				</nav>
 
-				<MobileDrawerUserSection />
+				<MobileDrawerUserSection adminRole={adminRole} />
 			</aside>
 		</>
 	);

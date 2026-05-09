@@ -7,6 +7,20 @@ export const metadata: Metadata = {
 	title: "Login — ROTRA Admin",
 };
 
+const ERROR_MESSAGES: Record<string, string> = {
+	forbidden: "Your account is authenticated but not allowed to access admin.",
+	admin_profile_missing:
+		"Your account is authenticated, but your admin profile is not provisioned yet.",
+	admin_role_missing:
+		"Your account is authenticated, but no admin role is assigned yet.",
+	admin_inactive:
+		"Your admin account is currently inactive. Please contact a Super Admin.",
+	invite_invalid:
+		"This invite link is no longer valid (expired or already used). Ask a Super Admin to resend the invitation.",
+	auth_unavailable:
+		"We could not validate your admin session right now. Please try again.",
+};
+
 function getSafeNextPath(rawNext: string | undefined): string {
 	if (!rawNext) return ROUTES.DASHBOARD;
 	if (!rawNext.startsWith("/") || rawNext.startsWith("//")) {
@@ -22,14 +36,12 @@ export default async function LoginPage({
 }) {
 	const params = await searchParams;
 	const nextPath = getSafeNextPath(params.next);
-	const isForbidden = params.error === "forbidden";
+	const errorMessage = params.error ? ERROR_MESSAGES[params.error] : null;
 
 	return (
 		<AdminAuthBackgroundLayout tagline="Internal platform operations">
-			{isForbidden ? (
-				<p className="mb-4 text-small text-danger">
-					Your account is authenticated but not allowed to access admin.
-				</p>
+			{errorMessage ? (
+				<p className="mb-4 text-small text-danger">{errorMessage}</p>
 			) : null}
 			<AdminLoginCard nextPath={nextPath} />
 		</AdminAuthBackgroundLayout>

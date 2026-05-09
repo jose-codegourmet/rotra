@@ -11,6 +11,16 @@ const prismaTracingGlobs = [
 ];
 
 const nextConfig: NextConfig = {
+	async redirects() {
+		return [
+			{ source: "/users", destination: "/customers", permanent: true },
+			{
+				source: "/users/:id",
+				destination: "/customers/:id",
+				permanent: true,
+			},
+		];
+	},
 	outputFileTracingRoot: monorepoRoot,
 	outputFileTracingIncludes: {
 		"/*": prismaTracingGlobs,

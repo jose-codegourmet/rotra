@@ -9,6 +9,7 @@ import {
 	ShieldAlert,
 	SlidersHorizontal,
 	UserCheck,
+	UserCog,
 	Users,
 } from "lucide-react";
 
@@ -22,7 +23,9 @@ export const SESSION_IDLE_TIMEOUT_MS = 4 * 60 * 60 * 1000;
 export const ROUTES = {
 	LOGIN: "/login",
 	DASHBOARD: "/dashboard",
-	USERS: "/users",
+	ADMINS: "/admins",
+	/** Customer (player) directory — non-admin profiles only */
+	CUSTOMERS: "/customers",
 	KILL_SWITCHES: "/kill-switches",
 	ENVIRONMENTS: "/environments",
 	APPROVALS: "/approvals",
@@ -34,14 +37,19 @@ export const ROUTES = {
 	WAITLIST: "/waitlist",
 } as const;
 
-export function adminUserDetailPath(id: string): string {
-	return `${ROUTES.USERS}/${id}`;
+export function adminDirectoryDetailPath(id: string): string {
+	return `${ROUTES.ADMINS}/${id}`;
+}
+
+export function customerProfilePath(id: string): string {
+	return `${ROUTES.CUSTOMERS}/${id}`;
 }
 
 /** Header title per pathname (App Router paths). */
 export const ADMIN_PAGE_TITLES: Record<string, string> = {
 	[ROUTES.DASHBOARD]: "Dashboard",
-	[ROUTES.USERS]: "Users",
+	[ROUTES.ADMINS]: "Platform admins",
+	[ROUTES.CUSTOMERS]: "Customers",
 	[ROUTES.KILL_SWITCHES]: "Kill switches",
 	[ROUTES.ENVIRONMENTS]: "Environments",
 	[ROUTES.APPROVALS]: "Approvals",
@@ -56,7 +64,8 @@ export const ADMIN_PAGE_TITLES: Record<string, string> = {
 export function getAdminShellPageTitle(pathname: string): string {
 	const titled = ADMIN_PAGE_TITLES[pathname];
 	if (titled) return titled;
-	if (/^\/users\/[^/]+$/.test(pathname)) return "User details";
+	if (/^\/admins\/[^/]+$/.test(pathname)) return "Admin details";
+	if (/^\/customers\/[^/]+$/.test(pathname)) return "Customer details";
 	return "Admin";
 }
 
@@ -73,8 +82,13 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 		icon: LayoutDashboard,
 	},
 	{
-		label: "Users",
-		href: ROUTES.USERS,
+		label: "Admins",
+		href: ROUTES.ADMINS,
+		icon: UserCog,
+	},
+	{
+		label: "Customers",
+		href: ROUTES.CUSTOMERS,
 		icon: Users,
 	},
 	{

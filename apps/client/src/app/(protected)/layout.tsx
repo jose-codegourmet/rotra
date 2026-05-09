@@ -11,9 +11,17 @@ export default async function ProtectedLayout({
 }) {
 	const profile = await getCurrentProfile();
 
-	if (!profile?.onboardingCompleted) {
+	const isAdmin = !!profile?.adminRole && profile.adminIsActive;
+	if (!isAdmin && !profile?.onboardingCompleted) {
 		redirect("/onboarding");
 	}
 
-	return <DashboardLayout pageTitle="Dashboard">{children}</DashboardLayout>;
+	return (
+		<DashboardLayout
+			pageTitle="Dashboard"
+			adminRole={isAdmin && profile ? profile.adminRole : null}
+		>
+			{children}
+		</DashboardLayout>
+	);
 }

@@ -1,3 +1,4 @@
+import type { AdminRole } from "@prisma/client";
 import { db, Prisma } from "@rotra/db";
 import type { User } from "@supabase/supabase-js";
 
@@ -14,6 +15,8 @@ export type CurrentProfile = {
 	phone: string | null;
 	onboardingCompleted: boolean;
 	createdAt: Date;
+	adminRole: AdminRole | null;
+	adminIsActive: boolean;
 };
 
 const profileSelect = {
@@ -22,6 +25,8 @@ const profileSelect = {
 	phone: true,
 	onboardingCompleted: true,
 	createdAt: true,
+	adminRole: true,
+	adminIsActive: true,
 } as const;
 
 /**
