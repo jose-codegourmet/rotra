@@ -6,8 +6,8 @@ The badminton session platform. Turborepo monorepo with four Next.js 15 apps and
 
 ## Prerequisites
 
-- **Node.js** ≥ 20 — managed via [nvm](https://github.com/nvm-sh/nvm) (`.nvmrc` is included)
-- **pnpm** ≥ 10 — `npm install -g pnpm`
+- **Node.js** ≥ 24 — managed via [nvm](https://github.com/nvm-sh/nvm) (`.nvmrc` is included)
+- **pnpm** ≥ 11 — `corepack enable && corepack prepare pnpm@11.0.8 --activate`
 
 ---
 

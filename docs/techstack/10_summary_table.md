@@ -3,6 +3,7 @@
 | Concern | Technology | Notes |
 |---------|------------|-------|
 | Monorepo | Turborepo + pnpm | Parallel builds, remote caching, workspace packages |
+| Runtime | Node.js 24 LTS + pnpm 11 | Pinned via `.nvmrc` + root `packageManager`; see `13_runtime_versions.md` |
 | Framework | Next.js 15 (App Router) | All three apps |
 | Language | TypeScript 5 | Strict mode; shared types via `@rotra/db` |
 | Styling | Tailwind CSS 4 + shadcn/ui | Dark mode only; ROTRA tokens in shared config |
