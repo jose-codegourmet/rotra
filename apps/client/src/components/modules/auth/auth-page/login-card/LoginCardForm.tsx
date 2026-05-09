@@ -77,9 +77,9 @@ export function LoginCardForm({ onSuccess, onError }: LoginCardFormProps) {
 		},
 	});
 
-	const onSubmit = form.handleSubmit((values) => {
+	const onSubmit = form.handleSubmit(() => {
 		if (signInMutation.isPending) return;
-		signInMutation.mutate(values);
+		signInMutation.mutate();
 	});
 
 	return (

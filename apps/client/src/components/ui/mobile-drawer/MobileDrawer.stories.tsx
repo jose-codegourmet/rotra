@@ -30,19 +30,15 @@ const meta: Meta<typeof MobileDrawer> = {
 	parameters: {
 		layout: "fullscreen",
 	},
-	argTypes: {
-		activeItem: {
-			control: "select",
-			options: ["home", "clubs", "sessions", "profile"],
-		},
-	},
 };
 
 export default meta;
 type Story = StoryObj<typeof MobileDrawer>;
 
 export const Closed: Story = {
-	args: { activeItem: "home" },
+	parameters: {
+		nextjs: { navigation: { pathname: "/dashboard" } },
+	},
 	decorators: [
 		(Story) => (
 			<Provider store={makeStore(false)}>
@@ -53,7 +49,9 @@ export const Closed: Story = {
 };
 
 export const Open: Story = {
-	args: { activeItem: "home" },
+	parameters: {
+		nextjs: { navigation: { pathname: "/dashboard" } },
+	},
 	decorators: [
 		(Story) => (
 			<Provider store={makeStore(true)}>
@@ -64,7 +62,9 @@ export const Open: Story = {
 };
 
 export const OpenActiveClubs: Story = {
-	args: { activeItem: "clubs" },
+	parameters: {
+		nextjs: { navigation: { pathname: "/clubs" } },
+	},
 	decorators: [
 		(Story) => (
 			<Provider store={makeStore(true)}>
@@ -75,7 +75,9 @@ export const OpenActiveClubs: Story = {
 };
 
 export const OpenActiveSessions: Story = {
-	args: { activeItem: "sessions" },
+	parameters: {
+		nextjs: { navigation: { pathname: "/sessions" } },
+	},
 	decorators: [
 		(Story) => (
 			<Provider store={makeStore(true)}>

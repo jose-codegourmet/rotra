@@ -250,7 +250,7 @@ export async function listAdminUsers(db: PrismaClient): Promise<AdminDirectoryUs
 
 	const lastActiveMap = new Map<string, Date>();
 	for (const row of activityRows) {
-		if (row._max.createdAt) {
+		if (row.adminId && row._max.createdAt) {
 			lastActiveMap.set(row.adminId, row._max.createdAt);
 		}
 	}

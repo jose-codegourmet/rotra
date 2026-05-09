@@ -21,8 +21,8 @@ import {
 
 type LoginAdminCardFormProps = {
 	gateUnlockedInitially: boolean;
-	onSuccess?: (redirectTo: string) => void;
-	onError?: (error: unknown) => void;
+	onSuccess?: ((redirectTo: string) => void) | undefined;
+	onError?: ((error: unknown) => void) | undefined;
 };
 
 export function LoginAdminCardForm({

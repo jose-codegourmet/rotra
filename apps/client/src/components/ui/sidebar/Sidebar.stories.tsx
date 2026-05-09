@@ -8,37 +8,31 @@ const meta: Meta<typeof Sidebar> = {
 	parameters: {
 		layout: "fullscreen",
 	},
-	argTypes: {
-		activeItem: {
-			control: "select",
-			options: ["home", "clubs", "sessions", "profile"],
-		},
-	},
 };
 
 export default meta;
 type Story = StoryObj<typeof Sidebar>;
 
 export const Default: Story = {
-	args: {
-		activeItem: "home",
+	parameters: {
+		nextjs: { navigation: { pathname: "/dashboard" } },
 	},
 };
 
 export const ActiveClubs: Story = {
-	args: {
-		activeItem: "clubs",
+	parameters: {
+		nextjs: { navigation: { pathname: "/clubs" } },
 	},
 };
 
 export const ActiveSessions: Story = {
-	args: {
-		activeItem: "sessions",
+	parameters: {
+		nextjs: { navigation: { pathname: "/sessions" } },
 	},
 };
 
 export const ActiveProfile: Story = {
-	args: {
-		activeItem: "profile",
+	parameters: {
+		nextjs: { navigation: { pathname: "/profile" } },
 	},
 };
