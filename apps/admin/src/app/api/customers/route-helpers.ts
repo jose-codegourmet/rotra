@@ -1,11 +1,49 @@
-import { CustomerProfileError } from "@rotra/db";
+import type { PrismaClient } from "@prisma/client";
+import {
+	CustomerProfileError,
+	getCustomerProfileDetail,
+	ProfileTagError,
+} from "@rotra/db";
 import { NextResponse } from "next/server";
 import { AdminSessionError } from "@/lib/auth/admin-session";
+
+export function serializeCustomerProfileDetail(
+	detail: Awaited<ReturnType<typeof getCustomerProfileDetail>>,
+) {
+	return {
+		...detail,
+		createdAt: detail.createdAt.toISOString(),
+		updatedAt: detail.updatedAt.toISOString(),
+		tags: detail.tags.map((t) => ({
+			...t,
+			assignedAt: t.assignedAt.toISOString(),
+		})),
+	};
+}
+
+export async function jsonCustomerProfileDetail(
+	db: PrismaClient,
+	profileId: string,
+) {
+	const detail = await getCustomerProfileDetail(db, profileId);
+	return NextResponse.json({ profile: serializeCustomerProfileDetail(detail) });
+}
 
 export function customerProfileErrorResponse(error: unknown, context: string) {
 	if (error instanceof CustomerProfileError) {
 		const statusByCode: Record<CustomerProfileError["code"], number> = {
 			not_found: 404,
+		};
+		return NextResponse.json(
+			{ error: error.message, code: error.code },
+			{ status: statusByCode[error.code] },
+		);
+	}
+	if (error instanceof ProfileTagError) {
+		const statusByCode: Record<ProfileTagError["code"], number> = {
+			not_found: 404,
+			conflict: 409,
+			invalid_label: 400,
 		};
 		return NextResponse.json(
 			{ error: error.message, code: error.code },

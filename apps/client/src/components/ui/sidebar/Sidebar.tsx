@@ -7,15 +7,20 @@ import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo/Logo";
 import { SidebarUserMenu } from "@/components/ui/sidebar/SidebarUserMenu/SidebarUserMenu";
 import { NAV_ITEMS, type NavItemId } from "@/constants/nav";
+import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
 import { cn } from "@/lib/utils";
 
 export type { NavItemId };
 
 type SidebarProps = {
 	adminRole?: AdminRole | null;
+	currentProfile?: CurrentProfileDisplay | null;
 };
 
-export function Sidebar({ adminRole = null }: SidebarProps) {
+export function Sidebar({
+	adminRole = null,
+	currentProfile = null,
+}: SidebarProps) {
 	const pathname = usePathname();
 	const activeItem =
 		NAV_ITEMS.find(
@@ -66,7 +71,7 @@ export function Sidebar({ adminRole = null }: SidebarProps) {
 			</div>
 
 			{/* User section */}
-			<SidebarUserMenu adminRole={adminRole} />
+			<SidebarUserMenu adminRole={adminRole} currentProfile={currentProfile} />
 		</aside>
 	);
 }

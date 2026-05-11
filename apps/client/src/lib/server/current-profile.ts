@@ -9,32 +9,74 @@ import {
 } from "@/lib/auth/supabase-user-display";
 import { createClient } from "@/lib/supabase/server";
 
+export type CurrentProfileTag = {
+	id: string;
+	slug: string;
+	label: string;
+	assignedAt: Date;
+};
+
 export type CurrentProfile = {
 	id: string;
 	name: string;
+	avatarUrl: string | null;
 	phone: string | null;
 	onboardingCompleted: boolean;
 	createdAt: Date;
 	adminRole: AdminRole | null;
 	adminIsActive: boolean;
+	tags: CurrentProfileTag[];
 };
+
+/** Subset passed to the client shell (sidebar / drawer) for display name and avatar. */
+export type CurrentProfileDisplay = Pick<CurrentProfile, "name" | "avatarUrl">;
 
 const profileSelect = {
 	id: true,
 	name: true,
+	avatarUrl: true,
 	phone: true,
 	onboardingCompleted: true,
 	createdAt: true,
 	adminRole: true,
 	adminIsActive: true,
+	tagsAssigned: {
+		orderBy: { assignedAt: "desc" as const },
+		select: {
+			id: true,
+			slug: true,
+			label: true,
+			assignedAt: true,
+		},
+	},
 } as const;
+
+type ProfileSelectRow = {
+	id: string;
+	name: string;
+	avatarUrl: string | null;
+	phone: string | null;
+	onboardingCompleted: boolean;
+	createdAt: Date;
+	adminRole: AdminRole | null;
+	adminIsActive: boolean;
+	tagsAssigned: CurrentProfileTag[];
+};
+
+function mapProfileRowToCurrent(row: ProfileSelectRow): CurrentProfile {
+	const { tagsAssigned, ...rest } = row;
+	return {
+		...rest,
+		tags: tagsAssigned,
+	};
+}
 
 /**
  * Create a `profiles` row for a Supabase user when the DB trigger did not run.
  * `facebook_id` is required; we use provider metadata, with a last-resort
  * unique placeholder so the app can function (log in dev for follow-up).
  */
-async function ensureProfileRow(user: User) {
+async function ensureProfileRow(user: User): Promise<CurrentProfile> {
 	const fromMeta = facebookIdFromAuthUser(user);
 	const facebookId = fromMeta ?? `fallback_${user.id}`;
 	if (!fromMeta && process.env.NODE_ENV === "development") {
@@ -66,12 +108,12 @@ async function ensureProfileRow(user: User) {
 				where: { id: user.id },
 				select: profileSelect,
 			});
-			if (byId) return byId;
+			if (byId) return mapProfileRowToCurrent(byId);
 			const byFb = await db.profile.findUnique({
 				where: { facebookId },
 				select: profileSelect,
 			});
-			if (byFb) return byFb;
+			if (byFb) return mapProfileRowToCurrent(byFb);
 		}
 		throw e;
 	}
@@ -83,7 +125,7 @@ async function ensureProfileRow(user: User) {
 	if (!row) {
 		throw new Error("Profile insert succeeded but row was not found.");
 	}
-	return row;
+	return mapProfileRowToCurrent(row);
 }
 
 /**
@@ -100,7 +142,7 @@ export async function getCurrentProfile(): Promise<CurrentProfile | null> {
 			where: { id: devId },
 			select: profileSelect,
 		});
-		return p;
+		return p ? mapProfileRowToCurrent(p) : null;
 	}
 
 	let supabase: Awaited<ReturnType<typeof createClient>>;
@@ -115,15 +157,14 @@ export async function getCurrentProfile(): Promise<CurrentProfile | null> {
 	} = await supabase.auth.getUser();
 	if (!user) return null;
 
-	let profile = await db.profile.findUnique({
+	const existing = await db.profile.findUnique({
 		where: { id: user.id },
 		select: profileSelect,
 	});
-	if (profile) return profile;
+	if (existing) return mapProfileRowToCurrent(existing);
 
 	try {
-		profile = await ensureProfileRow(user);
-		return profile;
+		return await ensureProfileRow(user);
 	} catch (err) {
 		console.error("[getCurrentProfile] ensureProfileRow:", err);
 		return null;

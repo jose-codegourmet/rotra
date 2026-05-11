@@ -17,16 +17,22 @@ interface ProfileLeftColumnProps {
 }
 export function ProfileLeftColumn({ userId }: ProfileLeftColumnProps) {
 	const { user } = useAppSelector((s) => s.auth);
-	const { data: remoteProfile, isPending, isError } = useProfile(userId);
+	const effectiveUserId = userId ?? user?.id;
+	const {
+		data: remoteProfile,
+		isPending,
+		isError,
+	} = useProfile(effectiveUserId);
 
-	let player: ProfileViewUser | null = null;
-	if (userId) {
-		if (remoteProfile) player = publicProfileDtoToViewUser(remoteProfile);
-	} else if (user) {
-		player = user;
+	const player: ProfileViewUser | null = remoteProfile
+		? publicProfileDtoToViewUser(remoteProfile)
+		: null;
+
+	if (!effectiveUserId) {
+		return null;
 	}
 
-	if (userId && isPending) {
+	if (isPending) {
 		return (
 			<div
 				className={cn("@container/profile-left-column", "lg:w-[35%] shrink-0")}
@@ -36,7 +42,7 @@ export function ProfileLeftColumn({ userId }: ProfileLeftColumnProps) {
 		);
 	}
 
-	if (!player || (userId && isError)) return null;
+	if (!player || isError) return null;
 
 	return (
 		<div

@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import * as React from "react";
 import { Button } from "@/components/ui/button/Button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 import type { WaitlistApiResponse } from "@/lib/waitlist-shared";
 
 type WaitlistRow = WaitlistApiResponse["rows"][number];

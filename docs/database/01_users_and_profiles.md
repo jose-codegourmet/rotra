@@ -172,6 +172,8 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 ```
 
+**Runtime UI (Client App):** Player-facing display name and avatar must be read from **`profiles.name`** and **`profiles.avatar_url`**. Values in `auth.users.raw_user_meta_data` (Facebook) are only the **initial seed** for this trigger; after onboarding or settings edits, the database row is the source of truth and may diverge from OAuth metadata.
+
 ### Indexes
 
 ```sql
@@ -381,8 +383,42 @@ auth.users (Supabase managed)
             ├── player_self_assessments (1:many, one per dimension)
             │       └── skill_dimensions (many:1)
             ├── email_invitations as invited_by (1:many)
-            └── email_invitations as accepted_by (1:1 per accepted invite)
+            ├── email_invitations as accepted_by (1:1 per accepted invite)
+            └── profile_tags (1:many, admin-managed labels)
 ```
+
+---
+
+## Table: `profile_tags`
+
+Free-form **internal** labels attached to a player profile (`profiles.id` where `admin_role IS NULL`). Used for cohorts, beta programs, and admin-side filtering. Tags are **not** a product catalog: each row stores the display `label` and a derived `slug` (trim, lowercase, spaces → hyphens) unique per player.
+
+Exposed read-only to authenticated clients via `GET /api/profile/[userId]` and server `getCurrentProfile()` so the Client App can render pills or gate features (e.g. `tags.some((t) => t.slug === "beta-tester---scheduling")`).
+
+```sql
+CREATE TABLE profile_tags (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  slug         text NOT NULL,
+  label        text NOT NULL,
+  assigned_at  timestamptz NOT NULL DEFAULT now(),
+  assigned_by  uuid REFERENCES profiles(id) ON DELETE SET NULL,
+
+  UNIQUE (profile_id, slug)
+);
+
+CREATE INDEX profile_tags_slug_idx ON profile_tags (slug);
+```
+
+| Column | Notes |
+|--------|--------|
+| `profile_id` | Target player profile; cascades when the profile row is deleted. |
+| `slug` | Derived from `label` for stable keys in code (e.g. `"beta tester - scheduling"` → `beta-tester---scheduling`). |
+| `label` | Human-readable text shown in Admin and optionally in Client UI. |
+| `assigned_at` | When the tag was created. |
+| `assigned_by` | Admin `profiles.id` who added the tag; `NULL` if the admin profile was removed (`ON DELETE SET NULL`). |
+
+Writes are performed from the **Admin App** only (authenticated admin session + API routes).
 
 ---
 

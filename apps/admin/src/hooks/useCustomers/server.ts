@@ -22,8 +22,10 @@ export type CustomerProfileDetailSerialized = {
 	id: string;
 	name: string;
 	email: string | null;
+	phone: string | null;
 	avatarUrl: string | null;
 	isVerified: boolean;
+	emailVerified: boolean;
 	mmr: number;
 	mmrMatchesPlayed: number;
 	playingLevel: string | null;
@@ -32,6 +34,12 @@ export type CustomerProfileDetailSerialized = {
 	playMode: string | null;
 	onboardingCompleted: boolean;
 	expTotal: number;
+	tags: Array<{
+		id: string;
+		slug: string;
+		label: string;
+		assignedAt: string;
+	}>;
 	createdAt: string;
 	updatedAt: string;
 };

@@ -63,3 +63,44 @@ export function avatarUrlFromAuthUser(user: AuthUser): string | null {
 	}
 	return null;
 }
+
+/** Minimal profile fields for display; DB wins over auth metadata. */
+export type ProfileDisplaySource =
+	| { name?: string | null; avatarUrl?: string | null }
+	| null
+	| undefined;
+
+/**
+ * Display name: `profiles.name` when present, else Facebook / email from auth user.
+ */
+export function displayName({
+	profile,
+	user,
+	loading = false,
+}: {
+	profile?: ProfileDisplaySource;
+	user?: AuthUser | null;
+	loading?: boolean;
+}): string {
+	if (loading) return "…";
+	const fromProfile = profile?.name?.trim();
+	if (fromProfile) return fromProfile;
+	return user ? _getDisplayName(user) : "Player";
+}
+
+/**
+ * Avatar URL: `profiles.avatar_url` when a valid http(s) URL, else auth metadata.
+ */
+export function avatarUrl({
+	profile,
+	user,
+}: {
+	profile?: ProfileDisplaySource;
+	user?: AuthUser | null;
+}): string | null {
+	const fromProfile = profile?.avatarUrl;
+	if (typeof fromProfile === "string" && fromProfile.startsWith("http")) {
+		return fromProfile;
+	}
+	return user ? avatarUrlFromAuthUser(user) : null;
+}

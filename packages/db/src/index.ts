@@ -95,9 +95,18 @@ export {
 	CustomerProfileError,
 	getCustomerProfileDetail,
 	listCustomerProfiles,
+	updateCustomerIdentity,
+	updateCustomerSkills,
 	type CustomerDirectoryRow,
 	type CustomerProfileDetail,
 	type ListCustomerProfilesInput,
 	type ListCustomerProfilesResult,
 } from "./customer-profile-service";
+export {
+	addProfileTag,
+	removeProfileTag,
+	ProfileTagError,
+	slugifyTag,
+	type ProfileTagDto,
+} from "./profile-tag-service";
 export type { Database, Json } from "./supabase-database.types";

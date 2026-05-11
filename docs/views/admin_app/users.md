@@ -8,7 +8,7 @@ This lens shows **`profiles` where `admin_role IS NULL`**: regular players, club
 
 Platform admins use this view to look up a player, understand account state and tags at a glance, drill into match / club / review history, and jump into Moderation when enforcement is needed.
 
-This view is **read-oriented**. Mutating player accounts (warn, suspend, delete) is owned by [`./moderation.md`](./moderation.md) — the user detail page links into Moderation pre-filtered to the selected player rather than duplicating those forms here. Every irreversible player-facing action runs through one auditable code path.
+This view is **read-oriented** for enforcement: mutating player accounts (warn, suspend, delete) is owned by [`./moderation.md`](./moderation.md) — the directory and detail header link into Moderation pre-filtered to the selected player. **Profile field edits** (name, email, phone, onboarding enums) and **internal profile tags** are edited on the shipped customer detail route (see **Customer detail** below) via dialog forms and `/api/customers/[id]/*` routes; those writes are separate from Moderation’s suspension/delete flows.
 
 **Admins** live at [`./admins.md`](./admins.md) under a different lens; this view filters them out with `admin_role IS NULL`.
 
@@ -25,8 +25,10 @@ Tag derivations (same rules as [`../../database/01_users_and_profiles.md`](../..
 
 | Path | Purpose |
 |------|---------|
-| `/admin/users` | Player directory (non-admin profiles) |
-| `/admin/users/[id]` | User detail page — player-centric (profile + history + activity) |
+| `/admin/users` | Player directory (non-admin profiles) — product naming in wireframes |
+| `/customers` | **Shipped** player directory in the Admin App (`ROUTES.CUSTOMERS`) |
+| `/admin/users/[id]` | User detail page (wireframe) — player-centric (profile + history + activity) |
+| `/customers/[id]` | **Shipped** customer detail — sectioned profile, edit dialogs, tags (see below) |
 
 Deep-linkable filters (mirrored to query string so a row click can be reproduced from a URL):
 
@@ -176,9 +178,29 @@ Within `/users`, **Admin** and **Super admin** tags never appear — those profi
 
 ---
 
+## Customer detail (`/customers/[id]`)
+
+Shipped implementation: stacked **`PageSection`** blocks with read/write split.
+
+| Section | Content | Edit |
+|---------|---------|------|
+| Header | Player name, description, **Take action** (→ Moderation), **Open in Client App** | — |
+| Basic information | Player id, name, email, phone | **`[ Edit ]`** → dialog → `PATCH /api/customers/[id]/identity` |
+| Skills & preferences | Playing level, format, court position, play mode | **`[ Edit ]`** → dialog → `PATCH /api/customers/[id]/skills` |
+| Tags | Chips (label + **×** remove) | **`[ Add tag ]`** → dialog → `POST /api/customers/[id]/tags`; remove → `DELETE /api/customers/[id]/tags/[tagId]` |
+| Verification | `is_verified`, `email_verified`, onboarding | Read-only (Client/auth source of truth) |
+| Stats | MMR, matches played, EXP | Read-only |
+| Record | `created_at`, `updated_at` | Read-only |
+
+**Tags** are stored on `profile_tags` (see [`../../database/01_users_and_profiles.md`](../../database/01_users_and_profiles.md)). Slug = label trimmed, lowercased, spaces → hyphens; unique per player. All tags are returned on the Client App profile API for optional pills / feature flags.
+
+Business rules: [`../../business_logic/admin_app/customer-detail-and-tags.md`](../../business_logic/admin_app/customer-detail-and-tags.md).
+
+---
+
 ## User Detail Page
 
-Route `/admin/users/[id]`. Single-column information stack with a sticky **Actions** sidebar on the right. **404** if `profiles.admin_role IS NOT NULL` — deep-link to [`./admins.md`](./admins.md) for that id.
+Route `/admin/users/[id]` (wireframe / product target). Single-column information stack with a sticky **Actions** sidebar on the right. **404** if `profiles.admin_role IS NOT NULL` — deep-link to [`./admins.md`](./admins.md) for that id.
 
 ```
 ┌─────────────────────────────────────────────────────┬─────────────────────┐

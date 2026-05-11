@@ -1,7 +1,8 @@
 import type { AdminRole } from "@prisma/client";
 import { LogOutIcon } from "lucide-react";
 import { Button } from "@/components/ui/button/Button";
-import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
+import { useLogoutDialog } from "@/hooks/useLogoutDialog/client";
+import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeMobileDrawer } from "@/store/slices/uiSlice";
 import { SmallAdminUserCard } from "../small-admin-user-card/SmallAdminUserCard";
@@ -9,9 +10,11 @@ import { SmallUserCard } from "../small-user-card/SmallUserCard";
 
 interface MobileDrawerUserSectionProps {
 	adminRole?: AdminRole | null;
+	currentProfile?: CurrentProfileDisplay | null;
 }
 export function MobileDrawerUserSection({
 	adminRole = null,
+	currentProfile = null,
 }: MobileDrawerUserSectionProps) {
 	const dispatch = useAppDispatch();
 	const user = useAppSelector((s) => s.auth.user);
@@ -28,6 +31,7 @@ export function MobileDrawerUserSection({
 					<SmallAdminUserCard
 						user={user}
 						adminRole={adminRole}
+						currentProfile={currentProfile}
 						isMobile
 						onAvatarClick={() => dispatch(closeMobileDrawer())}
 					/>
@@ -35,6 +39,7 @@ export function MobileDrawerUserSection({
 					<SmallUserCard
 						user={user}
 						isOwner={true}
+						currentProfile={currentProfile}
 						loading={loading}
 						isMobile
 						onAvatarClick={() => dispatch(closeMobileDrawer())}

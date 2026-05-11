@@ -3,14 +3,16 @@ import { UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-	avatarUrlFromAuthUser,
-	displayNameFromAuthUser,
+	avatarUrl as resolvedAvatarUrl,
+	displayName as resolvedDisplayName,
 } from "@/lib/auth/supabase-user-display";
+import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
 import { cn } from "@/lib/utils";
 
 export interface SmallUserCardProps {
 	user: User;
 	isOwner: boolean;
+	currentProfile?: CurrentProfileDisplay | null;
 	loading?: boolean;
 	isMobile?: boolean;
 	onAvatarClick?: () => void;
@@ -19,11 +21,16 @@ export interface SmallUserCardProps {
 export function SmallUserCard({
 	user,
 	isOwner,
+	currentProfile = null,
+	loading = false,
 	isMobile,
 	onAvatarClick,
 }: SmallUserCardProps) {
 	const profileURL = isOwner ? `/profile` : `/profile/${user.id}`;
-	const avatarUrl = user ? avatarUrlFromAuthUser(user) : null;
+	const avatarSrc = resolvedAvatarUrl({
+		profile: currentProfile,
+		user,
+	});
 
 	return (
 		<div
@@ -39,9 +46,9 @@ export function SmallUserCard({
 			>
 				<div className="relative shrink-0">
 					<div className="relative w-10 h-10 rounded-full bg-bg-elevated border-2 border-accent overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform duration-default">
-						{avatarUrl ? (
+						{avatarSrc ? (
 							<Image
-								src={avatarUrl}
+								src={avatarSrc}
 								alt=""
 								fill
 								className="object-cover"
@@ -67,7 +74,11 @@ export function SmallUserCard({
 				)}
 			>
 				<span className="text-small font-black text-text-primary uppercase tracking-wider truncate">
-					{displayNameFromAuthUser({ user })}
+					{resolvedDisplayName({
+						profile: currentProfile,
+						user,
+						loading,
+					})}
 				</span>
 				<span className="text-xs font-bold text-accent uppercase tracking-wider truncate">
 					IRON 3

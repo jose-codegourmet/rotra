@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 
 import { PageSection } from "@/components/admin-ui/PageSection/PageSection";
 import { ROUTES } from "@/constants/admin";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 type PageProps = {
 	params: Promise<{ id: string }>;

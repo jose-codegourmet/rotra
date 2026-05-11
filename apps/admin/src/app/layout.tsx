@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Toaster } from "sonner";
 import { AuthSync } from "@/components/providers/AuthSync";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 import "./globals.css";
 
 const satoshi = localFont({
@@ -45,7 +46,10 @@ export default function RootLayout({
 				<ReduxProvider>
 					<AuthSync>
 						<QueryProvider>
-							<ThemeProvider>{children}</ThemeProvider>
+							<ThemeProvider>
+								{children}
+								<Toaster richColors closeButton />
+							</ThemeProvider>
 						</QueryProvider>
 					</AuthSync>
 				</ReduxProvider>

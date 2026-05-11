@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input/Input";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 export type CustomerDirectorySearchBarProps = {
 	id?: string;

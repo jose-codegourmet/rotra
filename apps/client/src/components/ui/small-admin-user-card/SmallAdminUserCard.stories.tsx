@@ -38,3 +38,25 @@ export const Mobile: Story = {
 		},
 	},
 };
+
+export const WithProfileFromDatabase: Story = {
+	args: {
+		user: {
+			...MOCK_AUTH_USER_WITH_NAME,
+			user_metadata: { full_name: "Facebook Display Name" },
+		},
+		adminRole: "admin",
+		currentProfile: {
+			name: "Jose Adrian GWAPO",
+			avatarUrl: null,
+		},
+	},
+};
+
+export const FacebookMetadataFallback: Story = {
+	args: {
+		user: MOCK_AUTH_USER_WITH_NAME,
+		adminRole: "admin",
+		currentProfile: null,
+	},
+};

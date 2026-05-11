@@ -1,4 +1,12 @@
 /** JSON returned by `GET /api/profile/[userId]` (serializable). */
+export type PublicProfileTagDto = {
+	id: string;
+	slug: string;
+	label: string;
+	assignedAt: string;
+};
+
+/** JSON returned by `GET /api/profile/[userId]` (serializable). */
 export type PublicProfileDto = {
 	id: string;
 	name: string;
@@ -10,6 +18,7 @@ export type PublicProfileDto = {
 	mmr: number;
 	expTotal: number;
 	onboardingCompleted: boolean;
+	tags: PublicProfileTagDto[];
 	createdAt: string;
 	updatedAt: string;
 };

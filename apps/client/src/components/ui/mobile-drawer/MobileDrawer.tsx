@@ -8,15 +8,20 @@ import { Logo } from "@/components/ui/logo/Logo";
 import { MobileDrawerUserSection } from "@/components/ui/mobile-drawer/MobileDrawerUserSection";
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle";
 import { NAV_ITEMS } from "@/constants/nav";
+import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeMobileDrawer } from "@/store/slices/uiSlice";
 
 type MobileDrawerProps = {
 	adminRole?: AdminRole | null;
+	currentProfile?: CurrentProfileDisplay | null;
 };
 
-export function MobileDrawer({ adminRole = null }: MobileDrawerProps) {
+export function MobileDrawer({
+	adminRole = null,
+	currentProfile = null,
+}: MobileDrawerProps) {
 	const pathname = usePathname();
 	const activeItem =
 		NAV_ITEMS.find(
@@ -101,7 +106,10 @@ export function MobileDrawer({ adminRole = null }: MobileDrawerProps) {
 					<ThemeToggle variant="row" />
 				</nav>
 
-				<MobileDrawerUserSection adminRole={adminRole} />
+				<MobileDrawerUserSection
+					adminRole={adminRole}
+					currentProfile={currentProfile}
+				/>
 			</aside>
 		</>
 	);
