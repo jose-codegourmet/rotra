@@ -12,6 +12,8 @@ import {
 import { LogoutConfirmDialog } from "@/components/modules/auth/LogoutConfirmDialog";
 import { createClient } from "@/lib/supabase/client";
 
+const POST_LOGOUT_REDIRECT_PATH = "/login" as const;
+
 type LogoutDialogContextValue = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
@@ -42,7 +44,7 @@ export function LogoutDialogProvider({ children }: { children: ReactNode }) {
 		setIsPending(true);
 		try {
 			await supabase.auth.signOut();
-			window.location.href = "/login";
+			window.location.href = POST_LOGOUT_REDIRECT_PATH;
 		} finally {
 			setIsPending(false);
 		}

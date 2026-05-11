@@ -3,7 +3,7 @@
 import { LogOut, Search, Settings } from "lucide-react";
 
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle";
-import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
+import { useLogoutDialog } from "@/hooks/useLogoutDialog/client";
 
 export interface NavbarProps {
 	pageTitle?: string;

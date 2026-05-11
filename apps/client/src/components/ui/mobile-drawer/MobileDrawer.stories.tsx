@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Provider } from "react-redux";
 import { MOCK_AUTH_USER_WITH_NAME } from "@/constants/mock-auth-user";
-import { LogoutDialogProvider } from "@/hooks/logoutDialogProvider";
+import { LogoutDialogProvider } from "@/hooks/useLogoutDialog/client";
 import authReducer from "@/store/slices/authSlice";
 import uiReducer from "@/store/slices/uiSlice";
 import { MobileDrawer } from "./MobileDrawer";

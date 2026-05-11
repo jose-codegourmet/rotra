@@ -4,7 +4,7 @@ import type { AdminRole } from "@prisma/client";
 import { LogOut, MoreVertical, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
+import { useLogoutDialog } from "@/hooks/useLogoutDialog/client";
 import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/store/hooks";

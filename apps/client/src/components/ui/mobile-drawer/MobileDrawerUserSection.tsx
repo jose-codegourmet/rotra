@@ -1,7 +1,7 @@
 import type { AdminRole } from "@prisma/client";
 import { LogOutIcon } from "lucide-react";
 import { Button } from "@/components/ui/button/Button";
-import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
+import { useLogoutDialog } from "@/hooks/useLogoutDialog/client";
 import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { closeMobileDrawer } from "@/store/slices/uiSlice";

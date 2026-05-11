@@ -4,7 +4,7 @@ import { MobileDrawer } from "@/components/ui/mobile-drawer/MobileDrawer";
 import { MobileHeader } from "@/components/ui/mobile-header/MobileHeader";
 import { Navbar } from "@/components/ui/navbar/Navbar";
 import { Sidebar } from "@/components/ui/sidebar/Sidebar";
-import { LogoutDialogProvider } from "@/hooks/logoutDialogProvider";
+import { LogoutDialogProvider } from "@/hooks/useLogoutDialog/client";
 import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
 
 interface DashboardLayoutProps {
