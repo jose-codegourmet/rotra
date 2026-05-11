@@ -28,7 +28,7 @@ All admin accounts are provisioned through the Super-Admin-driven invitation flo
 | MMR & skills management | Configure MMR asymmetry, match EXP awarding behavior, and MMR calibration parameters for competitive sessions |
 | Platform analytics | Monitor active clubs, session volume, player retention, and health metrics |
 | Admin user management | Invite, deactivate, role-change, and audit other **admin** accounts (Super Admin only) — UI at `/admin/admins` |
-| Player directory | Read + lookup of profiles with `admin_role IS NULL` — UI at `/admin/users`; enforcement actions route through Moderation |
+| Player directory | Read + lookup of profiles with `admin_role IS NULL` — UI at **`/customers`**; customer detail supports identity/skills/tags edits; enforcement actions still route through Moderation |
 
 ---
 
@@ -44,6 +44,7 @@ All admin accounts are provisioned through the Super-Admin-driven invitation flo
 | [06_platform_analytics.md](./06_platform_analytics.md) | Platform health dashboard and metrics |
 | [07_mmr_and_skills_management.md](./07_mmr_and_skills_management.md) | MMR and match EXP governance, guardrails, and operational workflows |
 | [08_user_management.md](./08_user_management.md) | **Admin** user management (`/admin/admins`) — inviting, deactivating, role-changing, and auditing platform admin accounts. The player directory at `/admin/users` (`admin_role IS NULL` lens) is read-oriented; see [`../../views/admin_app/users.md`](../../views/admin_app/users.md). |
+| [customer-detail-and-tags.md](./customer-detail-and-tags.md) | Customer (`/customers/[id]`) edits — identity, skills, and **profile tags**; slug rules and Client API exposure. |
 
 ---
 

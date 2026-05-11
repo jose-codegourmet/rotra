@@ -2,7 +2,7 @@
 
 import { type ComponentProps, useMemo } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 function Field({ className, ...props }: ComponentProps<"div">) {
 	return (

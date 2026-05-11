@@ -16,6 +16,15 @@ const publicSelect = {
 	onboardingCompleted: true,
 	createdAt: true,
 	updatedAt: true,
+	tagsAssigned: {
+		orderBy: { assignedAt: "desc" as const },
+		select: {
+			id: true,
+			slug: true,
+			label: true,
+			assignedAt: true,
+		},
+	},
 } as const;
 
 export async function GET(
@@ -58,6 +67,12 @@ export async function GET(
 		mmr: row.mmr,
 		expTotal: row.expTotal,
 		onboardingCompleted: row.onboardingCompleted,
+		tags: row.tagsAssigned.map((t) => ({
+			id: t.id,
+			slug: t.slug,
+			label: t.label,
+			assignedAt: t.assignedAt.toISOString(),
+		})),
 		createdAt: row.createdAt.toISOString(),
 		updatedAt: row.updatedAt.toISOString(),
 	});

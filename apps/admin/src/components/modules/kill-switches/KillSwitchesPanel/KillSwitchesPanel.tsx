@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button/Button";
 import type { KillSwitchRow } from "@/constants/mock-admin-pages";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 export function KillSwitchesPanel({
 	rows: initialRows,

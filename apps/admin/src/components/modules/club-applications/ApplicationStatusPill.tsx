@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 import type { ClubApplicationListRowDto } from "@/types/club-application-admin";
 
 const STATUS_STYLES: Record<ClubApplicationListRowDto["status"], string> = {

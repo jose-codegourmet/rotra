@@ -5,7 +5,7 @@ import Link from "next/link";
 import { PageTable } from "@/components/admin-ui/PageTable/PageTable";
 import { customerProfilePath } from "@/constants/admin";
 import type { CustomerDirectoryRowSerialized } from "@/hooks/useCustomers/server";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 export type CustomersTableProps = {
 	rows: CustomerDirectoryRowSerialized[];

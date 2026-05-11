@@ -11,7 +11,7 @@ import {
 	type PaginationLinkVariants,
 	paginationLinkVariants,
 } from "@/components/ui/pagination/Pagination.variants";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 export type PaginationProps = React.ComponentProps<"nav">;
 

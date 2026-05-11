@@ -20,6 +20,9 @@ export default async function ProtectedLayout({
 		<DashboardLayout
 			pageTitle="Dashboard"
 			adminRole={isAdmin && profile ? profile.adminRole : null}
+			currentProfile={
+				profile ? { name: profile.name, avatarUrl: profile.avatarUrl } : null
+			}
 		>
 			{children}
 		</DashboardLayout>

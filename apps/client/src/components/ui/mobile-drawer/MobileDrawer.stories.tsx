@@ -1,16 +1,20 @@
 import { configureStore } from "@reduxjs/toolkit";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Provider } from "react-redux";
+import { MOCK_AUTH_USER_WITH_NAME } from "@/constants/mock-auth-user";
 import { LogoutDialogProvider } from "@/hooks/logoutDialogProvider";
 import authReducer from "@/store/slices/authSlice";
 import uiReducer from "@/store/slices/uiSlice";
 import { MobileDrawer } from "./MobileDrawer";
 
-function makeStore(isMobileDrawerOpen: boolean) {
+function makeStore(
+	isMobileDrawerOpen: boolean,
+	user: typeof MOCK_AUTH_USER_WITH_NAME | null = null,
+) {
 	return configureStore({
 		reducer: { auth: authReducer, ui: uiReducer },
 		preloadedState: {
-			auth: { user: null, initialized: true },
+			auth: { user, initialized: true },
 			ui: { isMobileDrawerOpen },
 		},
 	});
@@ -81,6 +85,31 @@ export const OpenActiveSessions: Story = {
 	decorators: [
 		(Story) => (
 			<Provider store={makeStore(true)}>
+				<Story />
+			</Provider>
+		),
+	],
+};
+
+/** Drawer footer uses `profiles.name` when `currentProfile` is passed from the server shell. */
+export const OpenWithProfileFromDatabase: Story = {
+	args: {
+		currentProfile: {
+			name: "Jose Adrian GWAPO",
+			avatarUrl: null,
+		},
+	},
+	parameters: {
+		nextjs: { navigation: { pathname: "/dashboard" } },
+	},
+	decorators: [
+		(Story) => (
+			<Provider
+				store={makeStore(true, {
+					...MOCK_AUTH_USER_WITH_NAME,
+					user_metadata: { full_name: "Facebook Display Name" },
+				})}
+			>
 				<Story />
 			</Provider>
 		),

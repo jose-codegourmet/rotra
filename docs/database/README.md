@@ -27,7 +27,7 @@ The schema is designed for **Supabase** as the backend (PostgreSQL), with Prisma
 
 | File | Tables |
 |---|---|
-| [01_users_and_profiles.md](01_users_and_profiles.md) | `profiles`, `email_invitations`, `gear_items`, `gear_item_links`, `player_self_assessments` |
+| [01_users_and_profiles.md](01_users_and_profiles.md) | `profiles`, `profile_tags`, `email_invitations`, `gear_items`, `gear_item_links`, `player_self_assessments` |
 | [02_clubs.md](02_clubs.md) | `clubs`, `club_members`, `club_join_requests`, `club_blacklist`, `club_membership_audit_log` |
 | [03_queue_sessions.md](03_queue_sessions.md) | `queue_sessions`, `session_registrations` |
 | [04_matches.md](04_matches.md) | `matches`, `match_players` |
@@ -110,6 +110,15 @@ erDiagram
         int score
         int external_ratings_count
         timestamptz updated_at
+    }
+
+    profile_tags {
+        uuid id PK
+        uuid profile_id FK
+        text slug
+        text label
+        timestamptz assigned_at
+        uuid assigned_by FK
     }
 
     clubs {
@@ -345,6 +354,8 @@ erDiagram
 
     profiles ||--o{ gear_items : "owns"
     gear_items ||--o{ gear_item_links : "has"
+    profiles ||--o{ profile_tags : "has_tags"
+    profile_tags }o--o| profiles : "assigned_by"
     profiles ||--o{ player_self_assessments : "sets"
     skill_dimensions ||--o{ player_self_assessments : "assessed_on"
 

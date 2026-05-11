@@ -1,19 +1,12 @@
 import { db, getCustomerProfileDetail } from "@rotra/db";
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/auth/admin-session";
-import { customerProfileErrorResponse } from "../route-helpers";
+import {
+	customerProfileErrorResponse,
+	serializeCustomerProfileDetail,
+} from "../route-helpers";
 
 export const runtime = "nodejs";
-
-function serializeDetail(
-	detail: Awaited<ReturnType<typeof getCustomerProfileDetail>>,
-) {
-	return {
-		...detail,
-		createdAt: detail.createdAt.toISOString(),
-		updatedAt: detail.updatedAt.toISOString(),
-	};
-}
 
 export async function GET(
 	_req: Request,
@@ -23,7 +16,9 @@ export async function GET(
 		await requireAdminSession();
 		const { id } = await context.params;
 		const detail = await getCustomerProfileDetail(db, id);
-		return NextResponse.json({ profile: serializeDetail(detail) });
+		return NextResponse.json({
+			profile: serializeCustomerProfileDetail(detail),
+		});
 	} catch (error) {
 		return customerProfileErrorResponse(error, "[customers detail]");
 	}

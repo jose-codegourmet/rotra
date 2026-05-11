@@ -12,8 +12,8 @@ Seeded from Facebook on first login. Phone number and profile onboarding fields 
 
 | Field | Source | Editable | Visibility | Notes |
 |-------|--------|----------|------------|-------|
-| Display name | Facebook `name` (confirmed at onboarding) | Yes | Public | Shown in all queue and leaderboard views |
-| Profile photo | Facebook photo | Yes | Public | Can upload a custom photo |
+| Display name | `profiles.name` (seeded from Facebook at first login; confirmed/edited at onboarding) | Yes | Public | Shown in all queue and leaderboard views; runtime reads DB, not OAuth metadata |
+| Profile photo | `profiles.avatar_url` (seeded from Facebook at first login) | Yes | Public | Can upload a custom photo; runtime reads DB, not OAuth metadata |
 | Playing level | Self-set | Yes | Public | Beginner / Intermediate / Advanced |
 | Phone number | Collected at `/onboarding/phone` | Yes | Private | Required; not shown on public profile |
 | Age | Collected at `/onboarding/profile` | Yes | Private | Integer 13–99; never shown publicly |

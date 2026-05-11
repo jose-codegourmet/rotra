@@ -157,6 +157,8 @@ When `handle_new_user()` fires (first login via either path), the profile is see
 | `email_verified` | `false` | Becomes `true` on email link click |
 | `is_verified` | `false` (generated) | Becomes `true` once all 3 conditions met |
 
+**After seeding:** All product UI and APIs that expose the player’s name or photo should use **`profiles.name`** and **`profiles.avatar_url`**. Facebook fields in Supabase Auth metadata are not updated when the player renames themselves in ROTRA; they are only relevant for the initial `handle_new_user()` insert.
+
 ---
 
 ## 03.5 Onboarding Redirect Guard

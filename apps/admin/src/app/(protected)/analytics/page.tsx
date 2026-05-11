@@ -4,7 +4,7 @@ import {
 	MOCK_ANALYTICS_KPIS,
 	MOCK_TOP_CLUBS,
 } from "@/constants/mock-admin-pages";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 const SESSION_VOLUME_BARS = [
 	{ label: "Mon", pct: 42 },

@@ -166,6 +166,11 @@ When no active session: strip is fully unmounted (not hidden with CSS — no res
 - **Padding:** `space-4` horizontal, `space-4` vertical
 - **Tap on avatar or name** → navigates to `/profile`
 
+#### Data source
+
+- **Name:** `profiles.name` from the signed-in player’s profile row (passed into the shell from the server). If the profile payload is not yet available, the UI may fall back to Facebook `full_name` (or equivalent) from Supabase Auth `user_metadata` until the profile loads.
+- **Avatar:** `profiles.avatar_url` when set to a valid `http(s)` URL; otherwise fall back to Facebook `avatar_url` / `picture` from auth metadata.
+
 #### Logout
 - Below the avatar row, `space-2` top margin
 - `Logout` — `text-small` (13px), `color-text-secondary`, no background

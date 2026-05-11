@@ -1,5 +1,12 @@
-import type { FormatPreference, PlayingLevel, PlayMode, CourtPosition } from "@prisma/client";
+import type {
+	CourtPosition,
+	FormatPreference,
+	PlayingLevel,
+	PlayMode,
+} from "@prisma/client";
 import type { PrismaClient } from "@prisma/client";
+
+import type { ProfileTagDto } from "./profile-tag-service";
 
 export class CustomerProfileError extends Error {
 	constructor(
@@ -25,8 +32,10 @@ export type CustomerProfileDetail = {
 	id: string;
 	name: string;
 	email: string | null;
+	phone: string | null;
 	avatarUrl: string | null;
 	isVerified: boolean;
+	emailVerified: boolean;
 	mmr: number;
 	mmrMatchesPlayed: number;
 	playingLevel: PlayingLevel | null;
@@ -35,6 +44,7 @@ export type CustomerProfileDetail = {
 	playMode: PlayMode | null;
 	onboardingCompleted: boolean;
 	expTotal: number;
+	tags: ProfileTagDto[];
 	createdAt: Date;
 	updatedAt: Date;
 };
@@ -133,8 +143,10 @@ export async function getCustomerProfileDetail(
 			id: true,
 			name: true,
 			email: true,
+			phone: true,
 			avatarUrl: true,
 			isVerified: true,
+			emailVerified: true,
 			mmr: true,
 			mmrMatchesPlayed: true,
 			playingLevel: true,
@@ -146,6 +158,15 @@ export async function getCustomerProfileDetail(
 			createdAt: true,
 			updatedAt: true,
 			adminRole: true,
+			tagsAssigned: {
+				orderBy: { assignedAt: "desc" },
+				select: {
+					id: true,
+					slug: true,
+					label: true,
+					assignedAt: true,
+				},
+			},
 		},
 	});
 
@@ -153,12 +174,21 @@ export async function getCustomerProfileDetail(
 		throw new CustomerProfileError("not_found", "Customer profile not found.");
 	}
 
+	const tags: ProfileTagDto[] = profile.tagsAssigned.map((t) => ({
+		id: t.id,
+		slug: t.slug,
+		label: t.label,
+		assignedAt: t.assignedAt,
+	}));
+
 	return {
 		id: profile.id,
 		name: profile.name,
 		email: profile.email,
+		phone: profile.phone,
 		avatarUrl: profile.avatarUrl,
 		isVerified: profile.isVerified,
+		emailVerified: profile.emailVerified,
 		mmr: profile.mmr,
 		mmrMatchesPlayed: profile.mmrMatchesPlayed,
 		playingLevel: profile.playingLevel,
@@ -167,7 +197,70 @@ export async function getCustomerProfileDetail(
 		playMode: profile.playMode,
 		onboardingCompleted: profile.onboardingCompleted,
 		expTotal: profile.expTotal,
+		tags,
 		createdAt: profile.createdAt,
 		updatedAt: profile.updatedAt,
 	};
+}
+
+function normalizeOptionalString(value: string | null | undefined): string | null {
+	if (value == null) return null;
+	const t = value.trim();
+	return t.length === 0 ? null : t;
+}
+
+export async function updateCustomerIdentity(
+	db: PrismaClient,
+	input: {
+		profileId: string;
+		name: string;
+		email: string | null;
+		phone: string | null;
+	},
+): Promise<void> {
+	const existing = await db.profile.findUnique({
+		where: { id: input.profileId },
+		select: { id: true, adminRole: true },
+	});
+	if (!existing || existing.adminRole != null) {
+		throw new CustomerProfileError("not_found", "Customer profile not found.");
+	}
+
+	await db.profile.update({
+		where: { id: input.profileId },
+		data: {
+			name: input.name.trim(),
+			email: normalizeOptionalString(input.email),
+			phone: normalizeOptionalString(input.phone),
+		},
+	});
+}
+
+export async function updateCustomerSkills(
+	db: PrismaClient,
+	input: {
+		profileId: string;
+		playingLevel: PlayingLevel | null;
+		formatPreference: FormatPreference | null;
+		courtPosition: CourtPosition | null;
+		playMode: PlayMode | null;
+	},
+): Promise<void> {
+	const existing = await db.profile.findUnique({
+		where: { id: input.profileId },
+		select: { id: true, adminRole: true },
+	});
+	if (!existing || existing.adminRole != null) {
+		throw new CustomerProfileError("not_found", "Customer profile not found.");
+	}
+
+	await db.profile.update({
+		where: { id: input.profileId },
+		data: {
+			playingLevel: input.playingLevel,
+			formatPreference: input.formatPreference,
+			courtPosition: input.courtPosition,
+			playMode: input.playMode,
+		},
+	});
 }

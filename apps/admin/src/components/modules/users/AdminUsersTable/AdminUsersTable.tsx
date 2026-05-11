@@ -17,7 +17,7 @@ import {
 	useAdminUsersQuery,
 	useInviteAdminUserMutation,
 } from "@/hooks/useAdminUsers/client";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 import type { AdminUserRow } from "../users.types";
 
 const columnHelper = createColumnHelper<AdminUserRow>();

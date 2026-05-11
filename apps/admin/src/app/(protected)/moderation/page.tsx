@@ -3,7 +3,7 @@ import { PageTable } from "@/components/admin-ui/PageTable/PageTable";
 import { ModerationPlayerFocusBanner } from "@/components/modules/moderation/moderation-player-focus-banner/ModerationPlayerFocusBanner";
 import { Button } from "@/components/ui/button/Button";
 import { MOCK_MODERATION } from "@/constants/mock-admin-pages";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 function PriorityBadge({ p }: { p: "low" | "medium" | "high" }) {
 	return (

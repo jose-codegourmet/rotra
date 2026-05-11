@@ -84,12 +84,30 @@ model Profile {
   adminDeactivatedBy          Profile?                    @relation("AdminProfileDeactivatedBy", fields: [adminDeactivatedById], references: [id], onDelete: SetNull)
   emailInvitationsCreated     EmailInvitation[]           @relation("InvitedBy")
   emailInvitationsAccepted    EmailInvitation[]           @relation("AcceptedBy")
+  tagsAssigned                ProfileTag[]                @relation("ProfileTagsOnProfile")
+  tagsCreated                 ProfileTag[]                @relation("ProfileTagsAssignedBy")
 
   @@index([facebookId], map: "idx_profiles_facebook_id")
   @@index([email], map: "idx_profiles_email")
   @@index([isVerified], map: "idx_profiles_is_verified")
   @@index([adminRole], map: "idx_profiles_admin_role")
   @@map("profiles")
+}
+
+model ProfileTag {
+  id         String   @id @default(uuid()) @db.Uuid
+  profileId  String   @map("profile_id") @db.Uuid
+  slug       String
+  label      String
+  assignedAt DateTime @default(now()) @map("assigned_at") @db.Timestamptz(6)
+  assignedBy String?  @map("assigned_by") @db.Uuid
+
+  profile  Profile  @relation("ProfileTagsOnProfile", fields: [profileId], references: [id], onDelete: Cascade)
+  assigner Profile? @relation("ProfileTagsAssignedBy", fields: [assignedBy], references: [id], onDelete: SetNull)
+
+  @@unique([profileId, slug])
+  @@index([slug])
+  @@map("profile_tags")
 }
 
 model EmailInvitation {

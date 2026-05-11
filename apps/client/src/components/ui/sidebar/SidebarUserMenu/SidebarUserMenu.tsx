@@ -5,6 +5,7 @@ import { LogOut, MoreVertical, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLogoutDialog } from "@/hooks/logoutDialogProvider";
+import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/store/hooks";
 import { SmallAdminUserCard } from "../../small-admin-user-card/SmallAdminUserCard";
@@ -12,9 +13,13 @@ import { SmallUserCard } from "../../small-user-card/SmallUserCard";
 
 type SidebarUserMenuProps = {
 	adminRole?: AdminRole | null;
+	currentProfile?: CurrentProfileDisplay | null;
 };
 
-export function SidebarUserMenu({ adminRole = null }: SidebarUserMenuProps) {
+export function SidebarUserMenu({
+	adminRole = null,
+	currentProfile = null,
+}: SidebarUserMenuProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const user = useAppSelector((s) => s.auth.user);
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -85,9 +90,17 @@ export function SidebarUserMenu({ adminRole = null }: SidebarUserMenuProps) {
 						className="w-full flex items-center gap-3 lg:bg-bg-surface lg:p-3 rounded-lg transition-colors duration-default hover:bg-bg-elevated cursor-pointer group min-h-[44px]"
 					>
 						{adminRole ? (
-							<SmallAdminUserCard user={user} adminRole={adminRole} />
+							<SmallAdminUserCard
+								user={user}
+								adminRole={adminRole}
+								currentProfile={currentProfile}
+							/>
 						) : (
-							<SmallUserCard user={user} isOwner={true} />
+							<SmallUserCard
+								user={user}
+								isOwner={true}
+								currentProfile={currentProfile}
+							/>
 						)}
 
 						<MoreVertical

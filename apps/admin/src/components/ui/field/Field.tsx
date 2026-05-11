@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { Label } from "@/components/ui/label/Label";
 import { Separator } from "@/components/ui/separator/Separator";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
 	return (

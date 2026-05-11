@@ -22,7 +22,7 @@ import {
 	ROUTES,
 } from "@/constants/admin";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/tailwind";
 
 export interface AdminShellProps {
 	children: React.ReactNode;

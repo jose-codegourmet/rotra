@@ -5,12 +5,14 @@ import type { User } from "@supabase/supabase-js";
 import { UserIcon } from "lucide-react";
 import Link from "next/link";
 import { Pill } from "@/components/ui/pill/Pill";
-import { displayNameFromAuthUser } from "@/lib/auth/supabase-user-display";
+import { displayName as resolvedDisplayName } from "@/lib/auth/supabase-user-display";
+import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
 import { cn } from "@/lib/utils";
 
 export interface SmallAdminUserCardProps {
 	user: User;
 	adminRole: AdminRole;
+	currentProfile?: CurrentProfileDisplay | null;
 	isMobile?: boolean;
 	onAvatarClick?: () => void;
 }
@@ -25,6 +27,7 @@ function rolePill(adminRole: AdminRole) {
 export function SmallAdminUserCard({
 	user,
 	adminRole,
+	currentProfile = null,
 	isMobile,
 	onAvatarClick,
 }: SmallAdminUserCardProps) {
@@ -53,7 +56,7 @@ export function SmallAdminUserCard({
 				)}
 			>
 				<span className="text-small font-black text-text-primary uppercase tracking-wider truncate">
-					{displayNameFromAuthUser({ user })}
+					{resolvedDisplayName({ profile: currentProfile, user })}
 				</span>
 				{rolePill(adminRole)}
 			</div>

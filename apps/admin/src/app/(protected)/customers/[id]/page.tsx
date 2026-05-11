@@ -4,10 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageSection } from "@/components/admin-ui/PageSection/PageSection";
+import { CustomerAuditSection } from "@/components/modules/customers/customer-audit-section/CustomerAuditSection";
+import { CustomerBasicInfoSection } from "@/components/modules/customers/customer-basic-info-section/CustomerBasicInfoSection";
 import { CustomerDetailActions } from "@/components/modules/customers/customer-detail-actions/CustomerDetailActions";
+import { CustomerSkillsSection } from "@/components/modules/customers/customer-skills-section/CustomerSkillsSection";
+import { CustomerStatsSection } from "@/components/modules/customers/customer-stats-section/CustomerStatsSection";
+import { CustomerTagsSection } from "@/components/modules/customers/customer-tags-section/CustomerTagsSection";
+import { CustomerVerificationSection } from "@/components/modules/customers/customer-verification-section/CustomerVerificationSection";
 import { ROUTES } from "@/constants/admin";
 import { playerProfileUrl } from "@/lib/client-app-url";
-import { cn } from "@/lib/utils";
+import { serializeCustomerProfileForClient } from "@/types/customer-profile-serialized";
 
 type PageProps = {
 	params: Promise<{ id: string }>;
@@ -27,19 +33,6 @@ export async function generateMetadata({
 	}
 }
 
-function DetailField({ label, value }: { label: string; value: string }) {
-	return (
-		<div className="grid gap-1 sm:grid-cols-[minmax(0,10rem)_1fr] sm:gap-4">
-			<dt className="text-label uppercase text-text-secondary">{label}</dt>
-			<dd className="text-body text-text-primary">{value}</dd>
-		</div>
-	);
-}
-
-function optionalLabel(value: string | null): string {
-	return value ?? "—";
-}
-
 export default async function CustomerDetailPage({ params }: PageProps) {
 	const { id } = await params;
 
@@ -51,6 +44,7 @@ export default async function CustomerDetailPage({ params }: PageProps) {
 		throw error;
 	}
 
+	const serialized = serializeCustomerProfileForClient(profile);
 	const clientProfileUrl = playerProfileUrl(id);
 	const moderationHref = `${ROUTES.MODERATION}?tab=accounts&player=${encodeURIComponent(id)}`;
 
@@ -67,70 +61,22 @@ export default async function CustomerDetailPage({ params }: PageProps) {
 
 			<PageSection
 				title={profile.name}
-				description="Player profile (read-only). Verification and onboarding reflect Client App state."
+				description="Player profile. Basic info and preferences can be edited here; verification reflects Client App state."
 			>
 				<div className="space-y-6">
 					<CustomerDetailActions
 						moderationHref={moderationHref}
 						clientProfileUrl={clientProfileUrl}
 					/>
-					<dl className="space-y-4 rounded-lg border border-border bg-bg-surface p-6">
-						<DetailField label="Player ID" value={profile.id} />
-						<DetailField label="Email" value={optionalLabel(profile.email)} />
-						<div className="grid gap-1 sm:grid-cols-[minmax(0,10rem)_1fr] sm:gap-4">
-							<dt className="text-label uppercase text-text-secondary">
-								Verified
-							</dt>
-							<dd className="text-body text-text-primary">
-								<span
-									className={cn(
-										"inline-flex rounded-full px-2 py-0.5 text-micro font-bold uppercase tracking-widest",
-										profile.isVerified
-											? "border border-accent/40 bg-accent-subtle text-accent"
-											: "border border-border bg-bg-elevated text-text-secondary",
-									)}
-								>
-									{profile.isVerified ? "Yes" : "No"}
-								</span>
-							</dd>
-						</div>
-						<DetailField label="MMR" value={String(profile.mmr)} />
-						<DetailField
-							label="Matches played"
-							value={String(profile.mmrMatchesPlayed)}
-						/>
-						<DetailField
-							label="Playing level"
-							value={optionalLabel(profile.playingLevel)}
-						/>
-						<DetailField
-							label="Format"
-							value={optionalLabel(profile.formatPreference)}
-						/>
-						<DetailField
-							label="Court position"
-							value={optionalLabel(profile.courtPosition)}
-						/>
-						<DetailField
-							label="Play mode"
-							value={optionalLabel(profile.playMode)}
-						/>
-						<DetailField label="EXP total" value={String(profile.expTotal)} />
-						<DetailField
-							label="Onboarding"
-							value={profile.onboardingCompleted ? "Complete" : "Incomplete"}
-						/>
-						<DetailField
-							label="Joined"
-							value={profile.createdAt.toLocaleString()}
-						/>
-						<DetailField
-							label="Updated"
-							value={profile.updatedAt.toLocaleString()}
-						/>
-					</dl>
 				</div>
 			</PageSection>
+
+			<CustomerBasicInfoSection profile={serialized} />
+			<CustomerSkillsSection profile={serialized} />
+			<CustomerTagsSection profile={serialized} />
+			<CustomerVerificationSection profile={serialized} />
+			<CustomerStatsSection profile={serialized} />
+			<CustomerAuditSection profile={serialized} />
 		</div>
 	);
 }
