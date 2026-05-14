@@ -1,10 +1,11 @@
 "use client";
 
-import { LogOut, X } from "lucide-react";
+import { Bell, LogOut, X } from "lucide-react";
 import Link from "next/link";
 import { navItemIsActive } from "@/components/modules/admin-shell/admin-nav";
 import { Button } from "@/components/ui/button/Button";
 import { Logo } from "@/components/ui/logo/Logo";
+import { NotificationsBadge } from "@/components/ui/notifications-badge/NotificationsBadge";
 import {
 	ADMIN_APP_DISPLAY_NAME,
 	ADMIN_NAV_ITEMS,
@@ -15,6 +16,8 @@ import { cn } from "@/lib/utils/tailwind";
 export interface MobileSidebarProps {
 	open: boolean;
 	pathname: string;
+	/** Unread count for the notifications nav row badge */
+	unreadCount?: number;
 	onClose: () => void;
 	onRequestSignOut: () => void;
 }
@@ -22,9 +25,12 @@ export interface MobileSidebarProps {
 export function MobileSidebar({
 	open,
 	pathname,
+	unreadCount = 0,
 	onClose,
 	onRequestSignOut,
 }: MobileSidebarProps) {
+	const notificationsActive = navItemIsActive(ROUTES.NOTIFICATIONS, pathname);
+
 	return (
 		<aside
 			className={cn(
@@ -79,6 +85,20 @@ export function MobileSidebar({
 						</Link>
 					);
 				})}
+				<Link
+					href={ROUTES.NOTIFICATIONS}
+					onClick={onClose}
+					className={cn(
+						"flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2 text-body transition-colors duration-default",
+						notificationsActive
+							? "bg-accent-subtle text-accent"
+							: "text-text-secondary hover:bg-bg-elevated hover:text-text-primary",
+					)}
+				>
+					<Bell aria-hidden className="size-5 shrink-0" strokeWidth={1.5} />
+					<span className="min-w-0 flex-1">Notifications</span>
+					<NotificationsBadge count={unreadCount} size="md" />
+				</Link>
 			</nav>
 			<div className="border-t border-border p-3">
 				<Button

@@ -9,6 +9,10 @@ import { MobileNavbarHeader } from "@/components/modules/admin-shell/mobile-navb
 import { MobileSidebar } from "@/components/modules/admin-shell/mobile-sidebar/MobileSidebar";
 import { SignOutDialog } from "@/components/modules/admin-shell/sign-out-dialog/SignOutDialog";
 import { getAdminShellPageTitle, ROUTES } from "@/constants/admin";
+import {
+	countUnreadNotifications,
+	MOCK_NOTIFICATIONS,
+} from "@/constants/mock-notifications";
 import { createClient } from "@/lib/supabase/client";
 
 export interface AdminShellProps {
@@ -30,6 +34,7 @@ export function AdminShell({
 	const [signOutError, setSignOutError] = useState<string | null>(null);
 	const router = useRouter();
 	const supabase = useMemo(() => createClient(), []);
+	const notificationUnreadCount = countUnreadNotifications(MOCK_NOTIFICATIONS);
 
 	function openSignOutDialog() {
 		setMobileNavOpen(false);
@@ -69,6 +74,7 @@ export function AdminShell({
 			<MobileSidebar
 				open={mobileNavOpen}
 				pathname={pathname}
+				unreadCount={notificationUnreadCount}
 				onClose={() => setMobileNavOpen(false)}
 				onRequestSignOut={openSignOutDialog}
 			/>
@@ -82,6 +88,8 @@ export function AdminShell({
 				<DesktopNavbarHeader
 					pageTitle={pageTitle}
 					onRequestSignOut={openSignOutDialog}
+					notifications={MOCK_NOTIFICATIONS}
+					unreadCount={notificationUnreadCount}
 				/>
 				<main className="flex-1 p-4 md:p-6">{children}</main>
 			</div>

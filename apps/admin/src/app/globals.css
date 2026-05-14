@@ -105,6 +105,39 @@
 	animation: pulse-accent 400ms ease-out forwards;
 }
 
+/* Urgent notification row — flat error tint shifts through a gradient band (no box-shadow) */
+@keyframes notification-urgent-bg-shift {
+	0%,
+	100% {
+		background-position: 100% 50%;
+	}
+	50% {
+		background-position: 0% 50%;
+	}
+}
+
+.animate-notification-urgent-bg {
+	background-color: color-mix(in srgb, var(--color-error) 11%, transparent);
+	background-image: linear-gradient(
+		105deg,
+		color-mix(in srgb, var(--color-error) 1%, transparent) 0%,
+		color-mix(in srgb, var(--color-error) 8%, transparent) 38%,
+		color-mix(in srgb, var(--color-error) 16%, transparent) 52%,
+		color-mix(in srgb, var(--color-error) 2%, transparent) 100%
+	);
+	background-size: 280% 100%;
+	background-position: 100% 50%;
+	background-repeat: no-repeat;
+	animation: notification-urgent-bg-shift 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.animate-notification-urgent-bg {
+		animation: none;
+		background-position: 42% 50%;
+	}
+}
+
 @font-face {
 	font-family: "Satoshi";
 	src: url("/fonts/Satoshi-Variable.woff2") format("woff2");

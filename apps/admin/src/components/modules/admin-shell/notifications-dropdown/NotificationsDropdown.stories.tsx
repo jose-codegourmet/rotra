@@ -5,25 +5,30 @@ import {
 	countUnreadNotifications,
 	MOCK_NOTIFICATIONS,
 } from "@/constants/mock-notifications";
-import { DesktopNavbarHeader } from "./DesktopNavbarHeader";
+import { NotificationsDropdown } from "./NotificationsDropdown";
 
-const meta: Meta<typeof DesktopNavbarHeader> = {
-	title: "rotra/admin-shell/DesktopNavbarHeader",
-	component: DesktopNavbarHeader,
+const meta: Meta<typeof NotificationsDropdown> = {
+	title: "rotra/admin-shell/NotificationsDropdown",
+	component: NotificationsDropdown,
 	tags: ["autodocs"],
 	parameters: {
-		layout: "fullscreen",
+		layout: "centered",
 	},
 };
 
 export default meta;
-type Story = StoryObj<typeof DesktopNavbarHeader>;
+type Story = StoryObj<typeof NotificationsDropdown>;
 
 export const Default: Story = {
 	args: {
-		pageTitle: "Dashboard",
-		onRequestSignOut: () => {},
 		notifications: MOCK_NOTIFICATIONS,
 		unreadCount: countUnreadNotifications(MOCK_NOTIFICATIONS),
+	},
+};
+
+export const Empty: Story = {
+	args: {
+		notifications: [],
+		unreadCount: 0,
 	},
 };

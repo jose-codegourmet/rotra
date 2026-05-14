@@ -2,6 +2,10 @@
 
 import type { Meta, StoryObj } from "@storybook/react";
 import * as React from "react";
+import {
+	countUnreadNotifications,
+	MOCK_NOTIFICATIONS,
+} from "@/constants/mock-notifications";
 import { MobileSidebar } from "./MobileSidebar";
 
 const meta: Meta<typeof MobileSidebar> = {
@@ -36,6 +40,7 @@ function MobileSidebarDemo() {
 			<MobileSidebar
 				open={open}
 				pathname="/dashboard"
+				unreadCount={countUnreadNotifications(MOCK_NOTIFICATIONS)}
 				onClose={() => setOpen(false)}
 				onRequestSignOut={() => setOpen(false)}
 			/>
@@ -51,6 +56,7 @@ export const Closed: Story = {
 	args: {
 		open: false,
 		pathname: "/waitlist",
+		unreadCount: countUnreadNotifications(MOCK_NOTIFICATIONS),
 		onClose: () => {},
 		onRequestSignOut: () => {},
 	},
