@@ -3,6 +3,8 @@
 ## Purpose
 The primary navigation shell for the **Player** role on desktop (≥1024px). A fixed left sidebar that replaces the mobile bottom navigation bar entirely. Contains the ROTRA wordmark, all nav items, a conditional Live Session strip (when the player is in an active session), and a user identity footer.
 
+> **Client v1 (implemented):** The **Notifications** row shows an unread **badge** on the bell at the `md` icon rail, and a **right-aligned badge** next to the label at `lg`. See [`../common/notification_center.md`](../common/notification_center.md) § Implementation status (Client app v1).
+
 ## Breakpoint
 **Active at ≥1024px only.** At <1024px, navigation falls back to the bottom nav bar (see `navbar-player.md`).
 

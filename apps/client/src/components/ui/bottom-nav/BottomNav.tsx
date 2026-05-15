@@ -2,10 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { NotificationsBadge } from "@/components/ui/notifications-badge/NotificationsBadge";
 import { NAV_ITEMS } from "@/constants/nav";
 import { cn } from "@/lib/utils";
 
-export function BottomNav() {
+type BottomNavProps = {
+	unreadCount?: number;
+};
+
+export function BottomNav({ unreadCount = 0 }: BottomNavProps) {
 	const pathname = usePathname();
 	const activeItem =
 		NAV_ITEMS.find(
@@ -32,7 +37,14 @@ export function BottomNav() {
 						{isActive && (
 							<span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-accent rounded-full" />
 						)}
-						<Icon size={20} strokeWidth={isActive ? 2 : 1.5} />
+						<span className="relative inline-flex items-center justify-center">
+							<Icon size={20} strokeWidth={isActive ? 2 : 1.5} />
+							{id === "notifications" ? (
+								<span className="pointer-events-none absolute -right-2 -top-1 flex items-center justify-center">
+									<NotificationsBadge count={unreadCount} size="sm" />
+								</span>
+							) : null}
+						</span>
 					</Link>
 				);
 			})}

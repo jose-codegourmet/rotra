@@ -3,6 +3,8 @@
 ## Purpose
 The top navigation bar for the **Que Master** role. Extends the base Player navbar with a **Live Console shortcut** when the QM is actively managing a session. The Sessions tab gains a pulsing `LIVE` badge during an active managed session. On desktop, the QM Console has its own specialized header that fully replaces the standard top bar.
 
+> **Client v1:** Standard pages use the same Player shell notification surfaces as in [`../common/notification_center.md`](../common/notification_center.md) § Implementation status (Client app v1); QM Console header and LIVE session affordances remain spec-only until wired.
+
 > **Desktop-first note:** The sidebar (`sidebar-que-master.md`) is the primary navigation surface at ≥1024px, including the Live Console shortcut. This navbar covers the in-page top bar and mobile/tablet navigation.
 
 ## Roles

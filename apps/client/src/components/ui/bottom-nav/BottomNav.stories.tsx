@@ -14,7 +14,7 @@ const meta: Meta<typeof BottomNav> = {
 	argTypes: {
 		activeItem: {
 			control: "select",
-			options: ["home", "clubs", "sessions", "profile"],
+			options: ["home", "clubs", "sessions", "profile", "notifications"],
 		},
 	},
 };
@@ -25,23 +25,27 @@ type Story = StoryObj<typeof BottomNav>;
 export const Default: Story = {
 	args: {
 		activeItem: "home",
+		unreadCount: 8,
 	},
 };
 
 export const ActiveClubs: Story = {
 	args: {
 		activeItem: "clubs",
+		unreadCount: 8,
 	},
 };
 
 export const ActiveSessions: Story = {
 	args: {
 		activeItem: "sessions",
+		unreadCount: 8,
 	},
 };
 
 export const ActiveProfile: Story = {
 	args: {
 		activeItem: "profile",
+		unreadCount: 8,
 	},
 };

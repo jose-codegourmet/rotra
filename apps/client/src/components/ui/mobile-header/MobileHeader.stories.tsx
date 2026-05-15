@@ -22,4 +22,8 @@ const meta: Meta<typeof MobileHeader> = {
 export default meta;
 type Story = StoryObj<typeof MobileHeader>;
 
-export const Default: Story = {};
+export const Default: Story = {
+	args: {
+		unreadCount: 8,
+	},
+};
