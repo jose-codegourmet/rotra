@@ -3,6 +3,16 @@
 ## Purpose
 The in-app notification inbox. Shows all push and in-app notifications for the authenticated user — session reminders, club events, review prompts, EXP awards, match alerts, club application outcomes, and system messages. Serves as a fallback for users who denied OS push permissions (in-app only in that case).
 
+## Implementation status (Client app v1)
+
+The client app (`apps/client`) ships a **static mock** notification list for shell and page UI until the notifications API and Realtime wiring exist:
+
+- **Route:** `/notifications` — linear list with header title and a non-interactive **Mark all read** label when unread count &gt; 0 (no handler yet). Page: `apps/client/src/app/(protected)/notifications/page.tsx`.
+- **Desktop (≥1024px):** `apps/client/src/components/ui/navbar/Navbar.tsx` includes a bell **dropdown** — **5 most recent** rows + **View all** → `/notifications` (module: `apps/client/src/components/modules/notifications/`).
+- **Mobile header:** bell **deep-links** to `/notifications` (no dropdown); unread badge on the bell (`MobileHeader.tsx`).
+- **Bottom nav & sidebar:** fifth **Notifications** destination with unread badge on the bell tab / row.
+- **Not in v1:** Unread / All tabs, date grouping, swipe-to-dismiss, push-permission banner, per-row deep links, **Mark all as read** in the dropdown, and Realtime subscription (spec sections below remain the target).
+
 ## Navbar notification dropdown
 
 In addition to this full-page inbox, the **top bar / navbar** (or shell header) exposes a **dropdown** anchored to the bell icon:

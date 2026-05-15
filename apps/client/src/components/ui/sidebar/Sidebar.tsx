@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo/Logo";
+import { NotificationsBadge } from "@/components/ui/notifications-badge/NotificationsBadge";
 import { SidebarUserMenu } from "@/components/ui/sidebar/SidebarUserMenu/SidebarUserMenu";
 import { NAV_ITEMS, type NavItemId } from "@/constants/nav";
 import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
@@ -15,11 +16,13 @@ export type { NavItemId };
 type SidebarProps = {
 	adminRole?: AdminRole | null;
 	currentProfile?: CurrentProfileDisplay | null;
+	unreadCount?: number;
 };
 
 export function Sidebar({
 	adminRole = null,
 	currentProfile = null,
+	unreadCount = 0,
 }: SidebarProps) {
 	const pathname = usePathname();
 	const activeItem =
@@ -37,6 +40,7 @@ export function Sidebar({
 			<nav className="flex-1 space-y-1">
 				{NAV_ITEMS.map(({ id, label, Icon, href }) => {
 					const isActive = activeItem === id;
+					const showNotifBadge = id === "notifications";
 					return (
 						<Link
 							key={id}
@@ -48,9 +52,25 @@ export function Sidebar({
 									: "text-text-disabled hover:bg-bg-elevated hover:text-text-primary",
 							)}
 						>
-							<Icon size={20} strokeWidth={1.5} className="shrink-0 lg:mr-4" />
-							<span className="hidden lg:block text-label font-medium uppercase tracking-widest">
-								{label}
+							<span className="relative shrink-0 lg:mr-4">
+								<Icon size={20} strokeWidth={1.5} />
+								{showNotifBadge ? (
+									<span className="pointer-events-none absolute -right-1 -top-1 flex items-center justify-center lg:hidden">
+										<NotificationsBadge count={unreadCount} size="sm" />
+									</span>
+								) : null}
+							</span>
+							<span className="hidden min-w-0 flex-1 items-center justify-between gap-2 lg:flex">
+								<span className="text-label font-medium uppercase tracking-widest">
+									{label}
+								</span>
+								{showNotifBadge ? (
+									<NotificationsBadge
+										count={unreadCount}
+										size="sm"
+										className="shrink-0"
+									/>
+								) : null}
 							</span>
 						</Link>
 					);

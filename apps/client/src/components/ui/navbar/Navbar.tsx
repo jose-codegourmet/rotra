@@ -2,17 +2,23 @@
 
 import { LogOut, Search, Settings } from "lucide-react";
 
+import { NotificationsDropdown } from "@/components/modules/notifications/notifications-dropdown/NotificationsDropdown";
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle";
+import type { Notification } from "@/constants/mock-notifications";
 import { useLogoutDialog } from "@/hooks/useLogoutDialog/client";
 
 export interface NavbarProps {
 	pageTitle?: string;
 	pageSubtitle?: string;
+	notifications: Notification[];
+	unreadCount: number;
 }
 
 export function Navbar({
 	pageTitle = "Dashboard",
 	pageSubtitle = "ROTRA",
+	notifications,
+	unreadCount,
 }: NavbarProps) {
 	const { openDialog: openLogoutDialog } = useLogoutDialog();
 
@@ -32,6 +38,10 @@ export function Navbar({
 			{/* Right: actions */}
 			<div className="flex items-center gap-6">
 				<ThemeToggle />
+				<NotificationsDropdown
+					notifications={notifications}
+					unreadCount={unreadCount}
+				/>
 				<button
 					type="button"
 					className="text-text-disabled hover:text-accent transition-colors duration-default"

@@ -1,6 +1,11 @@
-import { CalendarClock, Gauge, Trophy, User } from "lucide-react";
+import { Bell, CalendarClock, Gauge, Trophy, User } from "lucide-react";
 
-export type NavItemId = "home" | "clubs" | "sessions" | "profile";
+export type NavItemId =
+	| "home"
+	| "clubs"
+	| "sessions"
+	| "profile"
+	| "notifications";
 
 export const NAV_ITEMS = [
 	{ id: "home" as NavItemId, label: "Home", Icon: Gauge, href: "/dashboard" },
@@ -16,5 +21,11 @@ export const NAV_ITEMS = [
 		label: "Profile",
 		Icon: User,
 		href: "/profile",
+	},
+	{
+		id: "notifications" as NavItemId,
+		label: "Notifications",
+		Icon: Bell,
+		href: "/notifications",
 	},
 ];

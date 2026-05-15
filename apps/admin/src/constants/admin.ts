@@ -35,6 +35,7 @@ export const ROUTES = {
 	SKILLS_MANAGEMENT: "/skills-management",
 	ANALYTICS: "/analytics",
 	WAITLIST: "/waitlist",
+	NOTIFICATIONS: "/notifications",
 } as const;
 
 export function adminDirectoryDetailPath(id: string): string {
@@ -59,6 +60,7 @@ export const ADMIN_PAGE_TITLES: Record<string, string> = {
 	[ROUTES.SKILLS_MANAGEMENT]: "Skills management",
 	[ROUTES.ANALYTICS]: "Analytics",
 	[ROUTES.WAITLIST]: "Waitlist",
+	[ROUTES.NOTIFICATIONS]: "Notifications",
 };
 
 export function getAdminShellPageTitle(pathname: string): string {

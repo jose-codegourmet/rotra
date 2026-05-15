@@ -3,6 +3,8 @@
 ## Purpose
 The top navigation bar for the **Player** role. On desktop (≥1024px) this is the in-page content header (wordmark + contextual page title + notifications); on tablet and mobile it doubles as the app shell top bar. The bottom navigation bar (mobile/tablet only) is also documented here.
 
+> **Client v1 (implemented):** Desktop bell opens a **dropdown** with the **5 most recent** notifications and **View all** → `/notifications`. The mobile header bell **deep-links** to `/notifications` (no dropdown). Full inbox spec and v1 scope: [`../common/notification_center.md`](../common/notification_center.md) (see **Implementation status (Client app v1)**).
+
 > **Desktop-first note:** The sidebar (`sidebar-player.md`) is the primary navigation surface at ≥1024px. This navbar surfaces only in the main content area as a slim page-level bar.
 
 ## Roles

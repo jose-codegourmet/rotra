@@ -3,6 +3,8 @@
 ## Purpose
 The top navigation bar for the **Club Owner** role. Extends the base Player navbar with a live **pending requests badge** on the Clubs tab and a club management shortcut in the desktop top bar. Club Owners can manage one or more clubs — pending join requests from all their clubs are aggregated into the badge count.
 
+> **Client v1:** The shared Player shell bell, dropdown (desktop), mobile deep-link, and `/notifications` page follow [`../common/notification_center.md`](../common/notification_center.md) § Implementation status (Client app v1); Club Owner–specific chips are not wired until club APIs exist.
+
 > **Desktop-first note:** The sidebar (`sidebar-club-owner.md`) is the primary navigation surface at ≥1024px. This navbar surfaces only in the main content area as a slim page-level bar.
 
 ## Roles
