@@ -5,6 +5,7 @@ import { AdminSessionError } from "@/lib/auth/admin-session";
 import {
 	customerProfileErrorResponse,
 	jsonCustomerProfileDetail,
+	notifyCustomerProfileChangedWithNames,
 } from "../../../route-helpers";
 
 export const runtime = "nodejs";
@@ -16,8 +17,15 @@ export async function DELETE(
 	const { id, tagId } = await context.params;
 
 	try {
-		await getAdminActorProfileId();
+		const actorId = await getAdminActorProfileId();
 		await removeProfileTag(db, { profileId: id, tagId });
+		await notifyCustomerProfileChangedWithNames(db, {
+			actorProfileId: actorId,
+			customerProfileId: id,
+			title: "Customer tag removed",
+			bodyTemplate: (actorName, customerName) =>
+				`${actorName} removed a tag from ${customerName}.`,
+		});
 		return jsonCustomerProfileDetail(db, id);
 	} catch (error) {
 		if (error instanceof AdminSessionError) {

@@ -6,6 +6,7 @@ import { AdminSessionError } from "@/lib/auth/admin-session";
 import {
 	customerProfileErrorResponse,
 	jsonCustomerProfileDetail,
+	notifyCustomerProfileChangedWithNames,
 } from "../../route-helpers";
 
 export const runtime = "nodejs";
@@ -37,10 +38,18 @@ export async function POST(
 
 	try {
 		const actorId = await getAdminActorProfileId();
+		const label = parsed.data.label;
 		await addProfileTag(db, {
 			profileId: id,
-			label: parsed.data.label,
+			label,
 			assignedBy: actorId,
+		});
+		await notifyCustomerProfileChangedWithNames(db, {
+			actorProfileId: actorId,
+			customerProfileId: id,
+			title: "Customer tag added",
+			bodyTemplate: (actorName, customerName) =>
+				`${actorName} added tag "${label}" to ${customerName}.`,
 		});
 		return jsonCustomerProfileDetail(db, id);
 	} catch (error) {

@@ -1,10 +1,21 @@
 import type {
 	AdminAction,
+	AdminNotificationType,
 	AdminRole,
 	InvitationStatus,
+	NotificationType,
 	Prisma,
 	PrismaClient,
 } from "@prisma/client";
+
+import { broadcastNotificationInTx } from "./notification-broadcast-service";
+
+/** Client-side enum stored on broadcast audit rows / optional `notifications` fan-out */
+const ADMIN_BROADCAST_NOTIFICATION_TYPE =
+	"platform_announcement" as NotificationType;
+/** Admin inbox rows for lifecycle alerts between Super Admins */
+const ADMIN_LIFECYCLE_NOTIFICATION_TYPE =
+	"admin_profile_changed" as AdminNotificationType;
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
 
@@ -83,6 +94,14 @@ type MutateGuards = {
 
 function normalizeEmail(email: string): string {
 	return email.trim().toLowerCase();
+}
+
+async function profileDisplayName(tx: DbClient, profileId: string): Promise<string> {
+	const row = await tx.profile.findUnique({
+		where: { id: profileId },
+		select: { name: true },
+	});
+	return row?.name?.trim() || "Admin";
 }
 
 function profileSnapshot(profile: {
@@ -417,6 +436,24 @@ export async function inviteAdminUser(
 			},
 		});
 
+		const actorName = await profileDisplayName(tx, input.actorProfileId);
+		await broadcastNotificationInTx(tx, {
+			audience: {
+				adminRoles: ["super_admin"],
+				excludeProfileIds: [input.actorProfileId],
+			},
+			notificationType: ADMIN_BROADCAST_NOTIFICATION_TYPE,
+			adminNotificationType: ADMIN_LIFECYCLE_NOTIFICATION_TYPE,
+			severity: "info",
+			title: "Admin invitation sent",
+			body: `${actorName} invited ${email} as ${input.role}.`,
+			appScopes: ["admin"],
+			targetUrl: `/admins/${profile.id}`,
+			relatedEntityType: "admin_user",
+			relatedEntityId: profile.id,
+			createdById: input.actorProfileId,
+		});
+
 		return {
 			profileId: profile.id,
 			invitationId: invite.id,
@@ -540,6 +577,24 @@ export async function resendAdminInvite(
 				entityId: target.id,
 			},
 		});
+
+		const actorName = await profileDisplayName(tx, input.actorProfileId);
+		await broadcastNotificationInTx(tx, {
+			audience: {
+				adminRoles: ["super_admin"],
+				excludeProfileIds: [input.actorProfileId],
+			},
+			notificationType: ADMIN_BROADCAST_NOTIFICATION_TYPE,
+			adminNotificationType: ADMIN_LIFECYCLE_NOTIFICATION_TYPE,
+			severity: "info",
+			title: "Admin invite resent",
+			body: `${actorName} resent an invite to ${target.email}.`,
+			appScopes: ["admin"],
+			targetUrl: `/admins/${target.id}`,
+			relatedEntityType: "admin_user",
+			relatedEntityId: target.id,
+			createdById: input.actorProfileId,
+		});
 	});
 }
 
@@ -589,6 +644,25 @@ export async function deactivateAdminUser(
 				beforeValue: before as object,
 				afterValue: profileSnapshot(updated) as object,
 			},
+		});
+
+		const actorName = await profileDisplayName(tx, input.actorProfileId);
+		const targetName = await profileDisplayName(tx, target.id);
+		await broadcastNotificationInTx(tx, {
+			audience: {
+				adminRoles: ["super_admin"],
+				excludeProfileIds: [input.actorProfileId],
+			},
+			notificationType: ADMIN_BROADCAST_NOTIFICATION_TYPE,
+			adminNotificationType: ADMIN_LIFECYCLE_NOTIFICATION_TYPE,
+			severity: "warning",
+			title: "Admin deactivated",
+			body: `${actorName} deactivated ${targetName}.`,
+			appScopes: ["admin"],
+			targetUrl: `/admins/${target.id}`,
+			relatedEntityType: "admin_user",
+			relatedEntityId: target.id,
+			createdById: input.actorProfileId,
 		});
 	});
 }
@@ -657,6 +731,25 @@ export async function reactivateAdminUser(
 				afterValue: profileSnapshot(updated) as object,
 			},
 		});
+
+		const actorName = await profileDisplayName(tx, input.actorProfileId);
+		const targetName = await profileDisplayName(tx, target.id);
+		await broadcastNotificationInTx(tx, {
+			audience: {
+				adminRoles: ["super_admin"],
+				excludeProfileIds: [input.actorProfileId],
+			},
+			notificationType: ADMIN_BROADCAST_NOTIFICATION_TYPE,
+			adminNotificationType: ADMIN_LIFECYCLE_NOTIFICATION_TYPE,
+			severity: "info",
+			title: "Admin reactivated",
+			body: `${actorName} reactivated ${targetName}.`,
+			appScopes: ["admin"],
+			targetUrl: `/admins/${target.id}`,
+			relatedEntityType: "admin_user",
+			relatedEntityId: target.id,
+			createdById: input.actorProfileId,
+		});
 	});
 }
 
@@ -707,6 +800,25 @@ export async function changeAdminRole(
 				afterValue: { adminRole: updated.adminRole } as object,
 			},
 		});
+
+		const actorName = await profileDisplayName(tx, input.actorProfileId);
+		const targetName = await profileDisplayName(tx, target.id);
+		await broadcastNotificationInTx(tx, {
+			audience: {
+				adminRoles: ["super_admin"],
+				excludeProfileIds: [input.actorProfileId],
+			},
+			notificationType: ADMIN_BROADCAST_NOTIFICATION_TYPE,
+			adminNotificationType: ADMIN_LIFECYCLE_NOTIFICATION_TYPE,
+			severity: "warning",
+			title: "Admin role changed",
+			body: `${actorName} changed ${targetName}'s role from ${before.adminRole} to ${updated.adminRole}.`,
+			appScopes: ["admin"],
+			targetUrl: `/admins/${target.id}`,
+			relatedEntityType: "admin_user",
+			relatedEntityId: target.id,
+			createdById: input.actorProfileId,
+		});
 	});
 }
 
@@ -739,6 +851,25 @@ export async function forceSignOutAdminUser(
 				entityType: "admin_user",
 				entityId: target.id,
 			},
+		});
+
+		const actorName = await profileDisplayName(tx, input.actorProfileId);
+		const targetName = await profileDisplayName(tx, target.id);
+		await broadcastNotificationInTx(tx, {
+			audience: {
+				adminRoles: ["super_admin"],
+				excludeProfileIds: [input.actorProfileId],
+			},
+			notificationType: ADMIN_BROADCAST_NOTIFICATION_TYPE,
+			adminNotificationType: ADMIN_LIFECYCLE_NOTIFICATION_TYPE,
+			severity: "warning",
+			title: "Admin force signed out",
+			body: `${actorName} force signed out ${targetName}.`,
+			appScopes: ["admin"],
+			targetUrl: `/admins/${target.id}`,
+			relatedEntityType: "admin_user",
+			relatedEntityId: target.id,
+			createdById: input.actorProfileId,
 		});
 	});
 }
@@ -787,6 +918,25 @@ export async function deleteAdminUser(
 				beforeValue: before as object,
 			},
 			select: { id: true },
+		});
+
+		const actorName = await profileDisplayName(tx, input.actorProfileId);
+		const targetName = await profileDisplayName(tx, target.id);
+		await broadcastNotificationInTx(tx, {
+			audience: {
+				adminRoles: ["super_admin"],
+				excludeProfileIds: [input.actorProfileId],
+			},
+			notificationType: ADMIN_BROADCAST_NOTIFICATION_TYPE,
+			adminNotificationType: ADMIN_LIFECYCLE_NOTIFICATION_TYPE,
+			severity: "urgent",
+			title: "Admin user deleted",
+			body: `${actorName} deleted admin ${targetName}.`,
+			appScopes: ["admin"],
+			targetUrl: "/admins",
+			relatedEntityType: "admin_user",
+			relatedEntityId: target.id,
+			createdById: input.actorProfileId,
 		});
 
 		return { auditLogId: log.id };

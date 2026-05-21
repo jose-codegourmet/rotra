@@ -11,7 +11,7 @@ export function NotificationsView({ notifications }: NotificationsViewProps) {
 		<div className="mx-auto max-w-3xl space-y-8">
 			<PageSection
 				title="Notifications"
-				description="Platform alerts and updates — mock data until live feeds exist."
+				description="Platform alerts and updates for your admin account."
 			>
 				{notifications.length === 0 ? (
 					<p className="rounded-lg border border-border bg-bg-surface px-4 py-8 text-center text-body text-text-secondary">

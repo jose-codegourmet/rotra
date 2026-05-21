@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { slugifyTag } from "@rotra/db";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -15,6 +15,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input/Input";
+import { adminNotificationsRootKey } from "@/hooks/useAdminNotifications/queryKey";
 import { postCustomerTag } from "@/hooks/useCustomerDetail/server";
 
 import { addCustomerTagFormDefault } from "./default";
@@ -37,6 +38,7 @@ export function AddCustomerTagForm({
 	onError,
 }: AddCustomerTagFormProps) {
 	const router = useRouter();
+	const queryClient = useQueryClient();
 	const form = useForm<AddCustomerTagFormValues>({
 		resolver: zodResolver(addCustomerTagFormSchema),
 		defaultValues: addCustomerTagFormDefault,
@@ -68,6 +70,9 @@ export function AddCustomerTagForm({
 			onSuccess: () => {
 				const slug = slugifyTag(label);
 				toast.success(`Tag added (slug: ${slug}).`);
+				void queryClient.invalidateQueries({
+					queryKey: [...adminNotificationsRootKey],
+				});
 				router.refresh();
 				onSuccess();
 				reset(addCustomerTagFormDefault);

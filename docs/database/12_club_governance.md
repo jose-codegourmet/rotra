@@ -84,7 +84,9 @@ CREATE TYPE admin_notification_type_enum AS ENUM (
   'new_club_application',
   'new_demotion_request',
   'new_complaint',
-  'new_moderation_flag'
+  'new_moderation_flag',
+  'platform_announcement',
+  'admin_profile_changed'
 );
 
 CREATE TYPE admin_action_enum AS ENUM (
@@ -339,9 +341,12 @@ CREATE TABLE admin_notifications (
   admin_id   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
 
   type       admin_notification_type_enum NOT NULL,
+  severity   notification_severity_enum NOT NULL DEFAULT 'info',
   target_url text NOT NULL,
   title      text NOT NULL,
   body       text,
+
+  broadcast_id uuid REFERENCES notification_broadcasts(id) ON DELETE SET NULL,
 
   read_at    timestamptz,
 
@@ -349,7 +354,7 @@ CREATE TABLE admin_notifications (
 );
 ```
 
-- Populated when new applications, demotions, complaints, or moderation flags need admin attention.
+- Populated when new applications, demotions, complaints, or moderation flags need admin attention; also via **broadcast fan-out** (`platform_announcement`, `admin_profile_changed`) — see [`07_notifications.md`](07_notifications.md).
 - **MVP delivery:** fetch list + unread count when the admin opens the dropdown or `/admin/notifications` (no Realtime requirement).
 - Client app `notifications` continues to use Realtime per [`07_notifications.md`](07_notifications.md).
 
@@ -358,6 +363,7 @@ CREATE TABLE admin_notifications (
 ```sql
 CREATE INDEX idx_admin_notif_admin_unread ON admin_notifications(admin_id, read_at);
 CREATE INDEX idx_admin_notif_created     ON admin_notifications(created_at DESC);
+CREATE INDEX idx_admin_notif_broadcast ON admin_notifications(broadcast_id);
 ```
 
 ---
