@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -14,6 +14,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input/Input";
+import { adminNotificationsRootKey } from "@/hooks/useAdminNotifications/queryKey";
 import { patchCustomerIdentity } from "@/hooks/useCustomerDetail/server";
 import type { CustomerProfileSerialized } from "@/types/customer-profile-serialized";
 
@@ -39,6 +40,7 @@ export function EditCustomerBasicInfoForm({
 	onError,
 }: EditCustomerBasicInfoFormProps) {
 	const router = useRouter();
+	const queryClient = useQueryClient();
 	const defaultValues = buildEditCustomerBasicInfoFormDefaults(profile);
 	const form = useForm<EditCustomerBasicInfoFormValues>({
 		resolver: zodResolver(editCustomerBasicInfoFormSchema),
@@ -59,6 +61,9 @@ export function EditCustomerBasicInfoForm({
 			}),
 		onSuccess: () => {
 			toast.success("Basic information updated.");
+			void queryClient.invalidateQueries({
+				queryKey: [...adminNotificationsRootKey],
+			});
 			onSuccess();
 			router.refresh();
 		},

@@ -1,6 +1,8 @@
 /** Centralized React Query keys for notification broadcasts. */
 
-export const notificationBroadcastsRootKey = ["notification-broadcasts"] as const;
+export const notificationBroadcastsRootKey = [
+	"notification-broadcasts",
+] as const;
 
 export type NotificationBroadcastsListFilters = {
 	page: number;

@@ -8,7 +8,7 @@ import type {
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
 
-export type BroadcastAppScope = "client" | "admin";
+export type BroadcastAppScope = "client" | "admin" | "super_admin";
 export type BroadcastSeverity = "urgent" | "warning" | "info";
 
 export type BroadcastAudience = {
@@ -106,8 +106,7 @@ export async function broadcastNotificationInTx(
 
 	assertNonEmptyAudience(input.audience);
 
-	const notificationType =
-		input.notificationType ?? DEFAULT_NOTIFICATION_TYPE;
+	const notificationType = input.notificationType ?? DEFAULT_NOTIFICATION_TYPE;
 	const adminNotificationType =
 		input.adminNotificationType ?? DEFAULT_ADMIN_NOTIFICATION_TYPE;
 	const severity = input.severity ?? "info";

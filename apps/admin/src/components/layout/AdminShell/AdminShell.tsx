@@ -9,9 +9,7 @@ import { MobileNavbarHeader } from "@/components/modules/admin-shell/mobile-navb
 import { MobileSidebar } from "@/components/modules/admin-shell/mobile-sidebar/MobileSidebar";
 import { SignOutDialog } from "@/components/modules/admin-shell/sign-out-dialog/SignOutDialog";
 import { getAdminShellPageTitle, ROUTES } from "@/constants/admin";
-import {
-	useAdminNotificationsQuery,
-} from "@/hooks/useAdminNotifications/client";
+import { useAdminNotificationsQuery } from "@/hooks/useAdminNotifications/client";
 import { adaptAdminNotificationToUiItem } from "@/hooks/useAdminNotifications/server";
 import { createClient } from "@/lib/supabase/client";
 

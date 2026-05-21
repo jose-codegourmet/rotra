@@ -56,7 +56,9 @@ function parseApiErrorMessage(payload: unknown, fallback: string): string {
 	return fallback;
 }
 
-export type PostNotificationBroadcastResponse = { ok: true } & BroadcastNotificationResult;
+export type PostNotificationBroadcastResponse = {
+	ok: true;
+} & BroadcastNotificationResult;
 
 export async function postNotificationBroadcast(
 	payload: PostNotificationBroadcastPayload,

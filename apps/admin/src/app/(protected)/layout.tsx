@@ -20,7 +20,7 @@ export default async function ProtectedLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	let session;
+	let session: Awaited<ReturnType<typeof requireAdminSession>>;
 	try {
 		session = await requireAdminSession();
 	} catch (error) {

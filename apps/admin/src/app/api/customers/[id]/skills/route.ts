@@ -12,6 +12,7 @@ import { AdminSessionError } from "@/lib/auth/admin-session";
 import {
 	customerProfileErrorResponse,
 	jsonCustomerProfileDetail,
+	notifyCustomerProfileChangedWithNames,
 } from "../../route-helpers";
 
 export const runtime = "nodejs";
@@ -45,13 +46,20 @@ export async function PATCH(
 	}
 
 	try {
-		await getAdminActorProfileId();
+		const actorId = await getAdminActorProfileId();
 		await updateCustomerSkills(db, {
 			profileId: id,
 			playingLevel: parsed.data.playingLevel,
 			formatPreference: parsed.data.formatPreference,
 			courtPosition: parsed.data.courtPosition,
 			playMode: parsed.data.playMode,
+		});
+		await notifyCustomerProfileChangedWithNames(db, {
+			actorProfileId: actorId,
+			customerProfileId: id,
+			title: "Customer skills updated",
+			bodyTemplate: (actorName, customerName) =>
+				`${actorName} updated skills/preferences for ${customerName}.`,
 		});
 		return jsonCustomerProfileDetail(db, id);
 	} catch (error) {

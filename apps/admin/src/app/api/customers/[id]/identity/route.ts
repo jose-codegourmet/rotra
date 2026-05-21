@@ -6,6 +6,7 @@ import { AdminSessionError } from "@/lib/auth/admin-session";
 import {
 	customerProfileErrorResponse,
 	jsonCustomerProfileDetail,
+	notifyCustomerProfileChangedWithNames,
 } from "../../route-helpers";
 
 export const runtime = "nodejs";
@@ -46,12 +47,19 @@ export async function PATCH(
 	}
 
 	try {
-		await getAdminActorProfileId();
+		const actorId = await getAdminActorProfileId();
 		await updateCustomerIdentity(db, {
 			profileId: id,
 			name: parsed.data.name,
 			email: parsed.data.email ?? null,
 			phone: parsed.data.phone ?? null,
+		});
+		await notifyCustomerProfileChangedWithNames(db, {
+			actorProfileId: actorId,
+			customerProfileId: id,
+			title: "Customer identity updated",
+			bodyTemplate: (actorName, customerName) =>
+				`${actorName} updated contact info for ${customerName}.`,
 		});
 		return jsonCustomerProfileDetail(db, id);
 	} catch (error) {

@@ -74,7 +74,8 @@ function formatRelativeTime(iso: string): string {
 	return date.toLocaleDateString(undefined, {
 		month: "short",
 		day: "numeric",
-		year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
+		year:
+			date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
 	});
 }
 
@@ -112,7 +113,9 @@ function parseApiErrorMessage(payload: unknown, fallback: string): string {
 	return fallback;
 }
 
-function buildListSearchParams(filters: AdminNotificationsQueryFilters): string {
+function buildListSearchParams(
+	filters: AdminNotificationsQueryFilters,
+): string {
 	const p = new URLSearchParams();
 	if (filters.page > 1) p.set("page", String(filters.page));
 	if (filters.limit !== 20) p.set("limit", String(filters.limit));

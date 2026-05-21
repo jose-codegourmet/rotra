@@ -7,7 +7,7 @@ import {
 	PlayingLevel,
 	PlayMode,
 } from "@prisma/client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -23,6 +23,7 @@ import {
 	NativeSelect,
 	NativeSelectOption,
 } from "@/components/ui/native-select/NativeSelect";
+import { adminNotificationsRootKey } from "@/hooks/useAdminNotifications/queryKey";
 import { patchCustomerSkills } from "@/hooks/useCustomerDetail/server";
 import type { CustomerProfileSerialized } from "@/types/customer-profile-serialized";
 
@@ -60,6 +61,7 @@ export function EditCustomerSkillsForm({
 	onError,
 }: EditCustomerSkillsFormProps) {
 	const router = useRouter();
+	const queryClient = useQueryClient();
 	const defaultValues = buildEditCustomerSkillsFormDefaults(profile);
 	const form = useForm<EditCustomerSkillsFormValues>({
 		resolver: zodResolver(editCustomerSkillsFormSchema),
@@ -83,6 +85,9 @@ export function EditCustomerSkillsForm({
 			}),
 		onSuccess: () => {
 			toast.success("Skills and preferences updated.");
+			void queryClient.invalidateQueries({
+				queryKey: [...adminNotificationsRootKey],
+			});
 			onSuccess();
 			router.refresh();
 		},

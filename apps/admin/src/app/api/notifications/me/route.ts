@@ -19,7 +19,9 @@ function parseListPagination(searchParams: URLSearchParams): {
 			? Math.floor(Number(pageRaw))
 			: 1;
 	const limitNum =
-		limitRaw != null && Number.isFinite(Number(limitRaw)) && Number(limitRaw) >= 1
+		limitRaw != null &&
+		Number.isFinite(Number(limitRaw)) &&
+		Number(limitRaw) >= 1
 			? Math.floor(Number(limitRaw))
 			: 20;
 	const limit = Math.min(50, Math.max(1, limitNum));

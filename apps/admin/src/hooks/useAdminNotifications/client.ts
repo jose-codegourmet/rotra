@@ -3,9 +3,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
+	type AdminNotificationsQueryFilters,
 	adminNotificationsQueryKey,
 	adminNotificationsRootKey,
-	type AdminNotificationsQueryFilters,
 } from "./queryKey";
 import {
 	fetchAdminNotifications,
