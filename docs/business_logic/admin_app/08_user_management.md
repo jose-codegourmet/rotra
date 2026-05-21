@@ -202,6 +202,10 @@ Notes:
 - The founding Super Admin guard rejects deactivate, role change, and (implicitly) anything that would lock them out, regardless of which Super Admin is calling.
 - Force sign-out is its own action so a Super Admin can log a target out without changing their role or active status (e.g. after credential exposure on the recipient's email).
 
+### Super Admin inbox alerts (`admin_notifications`)
+
+Each mutation above also fans out an **`admin_profile_changed`** notification (severity varies by action) to **every other active Super Admin** — same DB transaction as the audit log via `broadcastNotificationInTx` in `@rotra/db`. Rows include `severity`, `broadcast_id` → `notification_broadcasts`, and `target_url` for deep links. See [`./09_notification_broadcasts.md`](./09_notification_broadcasts.md).
+
 ---
 
 ## Page Permissions

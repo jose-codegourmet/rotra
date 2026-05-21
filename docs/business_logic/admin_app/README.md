@@ -44,6 +44,7 @@ All admin accounts are provisioned through the Super-Admin-driven invitation flo
 | [06_platform_analytics.md](./06_platform_analytics.md) | Platform health dashboard and metrics |
 | [07_mmr_and_skills_management.md](./07_mmr_and_skills_management.md) | MMR and match EXP governance, guardrails, and operational workflows |
 | [08_user_management.md](./08_user_management.md) | **Admin** user management (`/admin/admins`) — inviting, deactivating, role-changing, and auditing platform admin accounts. The player directory at `/admin/users` (`admin_role IS NULL` lens) is read-oriented; see [`../../views/admin_app/users.md`](../../views/admin_app/users.md). |
+| [09_notification_broadcasts.md](./09_notification_broadcasts.md) | Tag/role notification fan-out, `notification_broadcasts` audit trail, Super Admin HTTP API, and automated Super Admin alerts on admin lifecycle mutations. |
 | [customer-detail-and-tags.md](./customer-detail-and-tags.md) | Customer (`/customers/[id]`) edits — identity, skills, and **profile tags**; slug rules and Client API exposure. |
 
 ---

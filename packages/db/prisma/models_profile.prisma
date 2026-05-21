@@ -86,6 +86,7 @@ model Profile {
   emailInvitationsAccepted    EmailInvitation[]           @relation("AcceptedBy")
   tagsAssigned                ProfileTag[]                @relation("ProfileTagsOnProfile")
   tagsCreated                 ProfileTag[]                @relation("ProfileTagsAssignedBy")
+  broadcastsCreated         NotificationBroadcast[]       @relation("BroadcastsCreated")
 
   @@index([facebookId], map: "idx_profiles_facebook_id")
   @@index([email], map: "idx_profiles_email")

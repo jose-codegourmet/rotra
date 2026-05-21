@@ -33,7 +33,7 @@ The schema is designed for **Supabase** as the backend (PostgreSQL), with Prisma
 | [04_matches.md](04_matches.md) | `matches`, `match_players` |
 | [05_reviews_and_ratings.md](05_reviews_and_ratings.md) | `skill_dimensions`, `match_reviews`, `match_review_ratings`, `player_skill_ratings` |
 | [06_gamification.md](06_gamification.md) | `exp_transactions`, `mmr_transactions`, `ranking_tier_config`, `sandbagging_flags` |
-| [07_notifications.md](07_notifications.md) | `notifications` |
+| [07_notifications.md](07_notifications.md) | `notifications`, `notification_broadcasts` |
 | [08_admin.md](08_admin.md) | `kill_switches`, `platform_config`, `moderation_flags` |
 | [12_club_governance.md](12_club_governance.md) | `club_applications`, `club_demotion_requests`, `complaints`, `admin_notifications`, `admin_action_log` |
 | [09_rls_and_realtime.md](09_rls_and_realtime.md) | RLS policies, Realtime subscriptions, Storage buckets |
@@ -300,13 +300,33 @@ erDiagram
         timestamptz detected_at
     }
 
+    notification_broadcasts {
+        uuid id PK
+        notification_type_enum notification_type
+        admin_notification_type_enum admin_notification_type
+        notification_severity_enum severity
+        text title
+        text body
+        text app_scopes
+        text tag_slugs
+        int recipient_count
+        text related_entity_type
+        uuid related_entity_id
+        text target_url
+        timestamptz scheduled_at
+        uuid created_by FK
+        timestamptz created_at
+    }
+
     notifications {
         uuid id PK
         uuid recipient_id FK
         notification_type_enum type
+        notification_severity_enum severity
         text title
         text body
         bool is_read
+        uuid broadcast_id FK
         text related_entity_type
         uuid related_entity_id
         timestamptz scheduled_at
@@ -392,6 +412,9 @@ erDiagram
     profiles ||--o{ mmr_transactions : "changes"
     matches ||--o{ mmr_transactions : "triggers"
     profiles ||--o{ sandbagging_flags : "flagged_by"
+
+    profiles ||--o{ notification_broadcasts : "creates_broadcast"
+    notification_broadcasts ||--o{ notifications : "campaign"
 
     profiles ||--o{ notifications : "receives"
     profiles ||--o{ club_applications : "submits"

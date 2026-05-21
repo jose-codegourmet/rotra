@@ -1,17 +1,28 @@
+import { db, listAdminNotificationsForInbox } from "@rotra/db";
+import {
+	dehydrate,
+	HydrationBoundary,
+	QueryClient,
+} from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/layout/AdminShell/AdminShell";
+import { adminNotificationsQueryKey } from "@/hooks/useAdminNotifications/queryKey";
+import { serializeAdminNotificationsListResult } from "@/hooks/useAdminNotifications/server";
 import {
 	AdminSessionError,
 	requireAdminSession,
 } from "@/lib/auth/admin-session";
+
+const SHELL_NOTIFICATION_FILTERS = { page: 1, limit: 5 } as const;
 
 export default async function ProtectedLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
+	let session;
 	try {
-		await requireAdminSession();
+		session = await requireAdminSession();
 	} catch (error) {
 		if (error instanceof AdminSessionError) {
 			if (error.status === 401) {
@@ -32,5 +43,20 @@ export default async function ProtectedLayout({
 		redirect("/login?error=auth_unavailable");
 	}
 
-	return <AdminShell>{children}</AdminShell>;
+	const inboxResult = await listAdminNotificationsForInbox(db, {
+		adminId: session.profileId,
+		...SHELL_NOTIFICATION_FILTERS,
+	});
+
+	const queryClient = new QueryClient();
+	queryClient.setQueryData(
+		adminNotificationsQueryKey(SHELL_NOTIFICATION_FILTERS),
+		serializeAdminNotificationsListResult(inboxResult),
+	);
+
+	return (
+		<HydrationBoundary state={dehydrate(queryClient)}>
+			<AdminShell>{children}</AdminShell>
+		</HydrationBoundary>
+	);
 }

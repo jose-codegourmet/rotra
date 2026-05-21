@@ -13,6 +13,8 @@ export type Notification = {
 	/** Human-friendly relative time, e.g. "12 min ago" */
 	time: string;
 	unread: boolean;
+	/** Deep link when the notification row is actionable */
+	targetUrl?: string;
 };
 
 export const MOCK_NOTIFICATIONS: Notification[] = [

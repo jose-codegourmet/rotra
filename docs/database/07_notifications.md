@@ -8,7 +8,17 @@ Notifications are inserted server-side (via Supabase Edge Functions or server ac
 
 ---
 
-## Enum
+## Enum: `notification_severity_enum`
+
+Matches Client + Admin notification row UI (`urgent`, `warning`, `info`):
+
+```sql
+CREATE TYPE notification_severity_enum AS ENUM ('urgent', 'warning', 'info');
+```
+
+---
+
+## Enum: `notification_type_enum`
 
 ```sql
 CREATE TYPE notification_type_enum AS ENUM (
@@ -42,9 +52,52 @@ CREATE TYPE notification_type_enum AS ENUM (
   'club_application_rejected',
   'club_demotion_completed',      -- former owner demoted / ownership ended for that club
   'club_closed',                  -- club archived; notify all members
-  'complaint_submitted'           -- optional receipt to reporter (content-only; no resolution follow-up)
+  'complaint_submitted',          -- optional receipt to reporter (content-only; no resolution follow-up)
+
+  -- Broadcasts & cohort sends
+  'platform_announcement'
 );
 ```
+
+---
+
+## Table: `notification_broadcasts`
+
+Campaign / audit row for fan-out sends (tags, admin roles, or both). Referenced by `notifications.broadcast_id` and `admin_notifications.broadcast_id`.
+
+```sql
+CREATE TABLE notification_broadcasts (
+  id                         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  notification_type          notification_type_enum NOT NULL,
+  admin_notification_type    admin_notification_type_enum NOT NULL,
+  severity                   notification_severity_enum NOT NULL DEFAULT 'info',
+  title                      text NOT NULL,
+  body                       text NOT NULL,
+  app_scopes                 text[] NOT NULL DEFAULT '{}',
+  tag_slugs                  text[] NOT NULL DEFAULT '{}',
+  recipient_count            int NOT NULL DEFAULT 0,
+  related_entity_type        text,
+  related_entity_id          uuid,
+  target_url                 text,
+  scheduled_at               timestamptz,
+  created_by                 uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  created_at                 timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_notification_broadcasts_created     ON notification_broadcasts(created_at DESC);
+CREATE INDEX idx_notification_broadcasts_created_by ON notification_broadcasts(created_by);
+```
+
+### Audience rules
+
+The server resolves recipients as the **union** of:
+
+1. **Tags** — profiles owning **any** matching `profile_tags.slug`.
+2. **Admin roles** — profiles with `profiles.admin_role IN (...)` **and** `admin_is_active = true`.
+
+Then **`exclude_profile_ids`** removes ids (typically the actor). **Client scope** inserts into `notifications` for every resolved profile. **Admin scope** inserts into `admin_notifications` only for resolved profiles who are **active admins**.
+
+See [`../business_logic/admin_app/09_notification_broadcasts.md`](../business_logic/admin_app/09_notification_broadcasts.md).
 
 ---
 
@@ -55,12 +108,16 @@ CREATE TABLE notifications (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   recipient_id uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
 
-  type  notification_type_enum NOT NULL,
+  type     notification_type_enum NOT NULL,
+  severity notification_severity_enum NOT NULL DEFAULT 'info',
   title text NOT NULL,
   body  text NOT NULL,
 
   is_read bool NOT NULL DEFAULT false,
   read_at timestamptz,
+
+  -- Optional link back to a broadcast campaign (tag / role fan-out)
+  broadcast_id uuid REFERENCES notification_broadcasts(id) ON DELETE SET NULL,
 
   -- Allows deep-linking from the notification to the relevant entity
   related_entity_type text,  -- e.g. 'session', 'match', 'club', 'review'
@@ -77,6 +134,8 @@ CREATE TABLE notifications (
 
 ### Notes
 
+- **`severity`** drives accent treatment in notification UI (`urgent` / `warning` / `info`).
+- **`broadcast_id`** links a row back to a fan-out campaign when applicable (otherwise `NULL`).
 - **Scheduled notifications** (e.g. session reminders at 2h, 1h, 30m, 5m) are inserted with a `scheduled_at` timestamp. A Supabase Edge Function runs on a cron schedule, queries for unsent notifications where `scheduled_at <= now()` and `sent_at IS NULL`, sends them, and updates `sent_at`.
 - **Immediate notifications** have `scheduled_at = NULL` and are treated as "send now" — `sent_at` is populated on insert.
 - `related_entity_type` + `related_entity_id` enable the client to navigate to the correct screen on tap. No FK constraint is added here because `related_entity_id` may reference any of several tables.
@@ -109,6 +168,7 @@ CREATE TABLE notifications (
 | `club_demotion_completed` | "Ownership update" | "Your ownership of [club name] has ended." |
 | `club_closed` | "Club closed" | "[Club name] has been closed. Thank you for playing with the community." |
 | `complaint_submitted` | "Report received" | "We received your report. Our team will review it." |
+| `platform_announcement` | "[Title]" | "[Body]" — cohort / manual broadcast |
 
 ### Indexes
 
@@ -119,6 +179,7 @@ CREATE INDEX idx_notifications_scheduled_at  ON notifications(scheduled_at)
   WHERE scheduled_at IS NOT NULL AND sent_at IS NULL;
 CREATE INDEX idx_notifications_type          ON notifications(type);
 CREATE INDEX idx_notifications_created_at    ON notifications(created_at DESC);
+CREATE INDEX idx_notifications_broadcast_id ON notifications(broadcast_id);
 ```
 
 ---
@@ -163,6 +224,10 @@ supabase
 
 ```
 profiles ──► notifications (1:many via recipient_id)
+profiles ──► notification_broadcasts (1:many via created_by, nullable)
+notification_broadcasts ──► notifications (1:many via broadcast_id, nullable)
 ```
 
 `related_entity_id` may reference `queue_sessions`, `matches`, `clubs`, or `match_reviews` — resolved at the application layer by `related_entity_type`.
+
+Admin inbox (`admin_notifications`) is documented in [`08_admin.md`](08_admin.md) / [`12_club_governance.md`](12_club_governance.md); it mirrors **`severity`**, **`broadcast_id`**, and uses `admin_notification_type_enum` (includes `platform_announcement`, `admin_profile_changed`).

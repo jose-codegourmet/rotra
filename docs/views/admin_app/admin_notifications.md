@@ -2,7 +2,9 @@
 
 ## Purpose
 
-Surfaces **`admin_notifications`** for platform admins: new club applications, demotion requests, complaints, moderation flags (types per [`../../database/12_club_governance.md`](../../database/12_club_governance.md)).
+Surfaces **`admin_notifications`** for platform admins: new club applications, demotion requests, complaints, moderation flags (types per [`../../database/12_club_governance.md`](../../database/12_club_governance.md)), plus **broadcast / lifecycle** rows (`platform_announcement`, `admin_profile_changed`) tied to [`notification_broadcasts`](../../database/07_notifications.md) when `broadcast_id` is set — see [`../../business_logic/admin_app/09_notification_broadcasts.md`](../../business_logic/admin_app/09_notification_broadcasts.md).
+
+Manual cohort broadcasts from Super Admins use **`POST /api/notifications/broadcasts`** (compose UI may land later); automated admin lifecycle alerts are emitted from [`packages/db/src/admin-user-service.ts`](../../../packages/db/src/admin-user-service.ts).
 
 ## Delivery model (MVP)
 
@@ -23,7 +25,11 @@ Each admin notification carries a `severity` of `urgent`, `warning`, or `info`.
 
 The bell dropdown row and the full notifications page (`/notifications`) use this treatment. For `urgent` and `warning`, read rows drop the background wash and the icon is shown at reduced opacity. `info` rows have no icon.
 
-Until the DB schema lands, severity is sourced from the mock list at [`../../../apps/admin/src/constants/mock-notifications.ts`](../../../apps/admin/src/constants/mock-notifications.ts).
+`severity` is persisted on **`admin_notifications.severity`** (`notification_severity_enum`). Rows created before this column defaulted to `'info'`. Static mocks remain available at [`../../../apps/admin/src/constants/mock-notifications.ts`](../../../apps/admin/src/constants/mock-notifications.ts) for Storybook until API wiring replaces them.
+
+### Broadcast linkage
+
+When `broadcast_id IS NOT NULL`, the row belongs to a fan-out campaign recorded in **`notification_broadcasts`** — useful for tracing cohort sends vs one-off governance notifications (`new_club_application`, etc.).
 
 ## Navbar dropdown
 
@@ -42,3 +48,5 @@ Until the DB schema lands, severity is sourced from the mock list at [`../../../
 ## Cross-link
 
 [`../../database/12_club_governance.md`](../../database/12_club_governance.md) — `admin_notifications` + `admin_notification_type_enum`.
+
+[`../../database/07_notifications.md`](../../database/07_notifications.md) — shared **`severity`** enum + **`notification_broadcasts`** audit table.

@@ -10,9 +10,9 @@ import { MobileSidebar } from "@/components/modules/admin-shell/mobile-sidebar/M
 import { SignOutDialog } from "@/components/modules/admin-shell/sign-out-dialog/SignOutDialog";
 import { getAdminShellPageTitle, ROUTES } from "@/constants/admin";
 import {
-	countUnreadNotifications,
-	MOCK_NOTIFICATIONS,
-} from "@/constants/mock-notifications";
+	useAdminNotificationsQuery,
+} from "@/hooks/useAdminNotifications/client";
+import { adaptAdminNotificationToUiItem } from "@/hooks/useAdminNotifications/server";
 import { createClient } from "@/lib/supabase/client";
 
 export interface AdminShellProps {
@@ -34,7 +34,14 @@ export function AdminShell({
 	const [signOutError, setSignOutError] = useState<string | null>(null);
 	const router = useRouter();
 	const supabase = useMemo(() => createClient(), []);
-	const notificationUnreadCount = countUnreadNotifications(MOCK_NOTIFICATIONS);
+	const { data: notificationsData } = useAdminNotificationsQuery(
+		{ page: 1, limit: 5 },
+		{ refetchInterval: 30_000 },
+	);
+	const shellNotifications =
+		notificationsData?.rows.map((row) => adaptAdminNotificationToUiItem(row)) ??
+		[];
+	const notificationUnreadCount = notificationsData?.unreadCount ?? 0;
 
 	function openSignOutDialog() {
 		setMobileNavOpen(false);
@@ -88,7 +95,7 @@ export function AdminShell({
 				<DesktopNavbarHeader
 					pageTitle={pageTitle}
 					onRequestSignOut={openSignOutDialog}
-					notifications={MOCK_NOTIFICATIONS}
+					notifications={shellNotifications}
 					unreadCount={notificationUnreadCount}
 				/>
 				<main className="flex-1 p-4 md:p-6">{children}</main>

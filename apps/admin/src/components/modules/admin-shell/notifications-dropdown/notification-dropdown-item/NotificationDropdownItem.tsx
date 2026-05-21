@@ -17,7 +17,7 @@ export interface NotificationDropdownItemProps {
 
 export function NotificationDropdownItem({
 	notification,
-	href = ROUTES.NOTIFICATIONS,
+	href = notification.targetUrl ?? ROUTES.NOTIFICATIONS,
 	className,
 }: NotificationDropdownItemProps) {
 	return (

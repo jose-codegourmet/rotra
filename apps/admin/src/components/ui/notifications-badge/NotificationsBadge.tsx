@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { HTMLAttributes } from "react";
 
 import { cn } from "@/lib/utils/tailwind";
@@ -21,6 +22,8 @@ export type NotificationsBadgeProps = Omit<
 	NotificationsBadgeVariants & {
 		count: number;
 		max?: number;
+		/** When set, the badge is wrapped in a link to this route */
+		href?: string;
 		/** Overrides auto-generated label for screen readers */
 		"aria-label"?: string;
 	};
@@ -31,6 +34,7 @@ export function NotificationsBadge({
 	max = 99,
 	size,
 	tone,
+	href,
 	"aria-label": ariaLabelProp,
 	...props
 }: NotificationsBadgeProps) {
@@ -40,7 +44,7 @@ export function NotificationsBadge({
 		ariaLabelProp ??
 		`${count > max ? `${max}+` : count} unread notification${count === 1 ? "" : "s"}`;
 
-	return (
+	const badge = (
 		<span
 			role="status"
 			aria-label={label}
@@ -50,6 +54,20 @@ export function NotificationsBadge({
 			{formatNotificationsCount(count, max)}
 		</span>
 	);
+
+	if (href) {
+		return (
+			<Link
+				href={href}
+				className="inline-flex shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base rounded-full"
+				aria-label={label}
+			>
+				{badge}
+			</Link>
+		);
+	}
+
+	return badge;
 }
 
 NotificationsBadge.displayName = "NotificationsBadge";

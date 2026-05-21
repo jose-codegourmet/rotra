@@ -42,16 +42,21 @@ model AdminNotification {
   id        String @id @default(uuid()) @db.Uuid
   adminId   String @map("admin_id") @db.Uuid
   type      AdminNotificationType
+  severity  NotificationSeverity @default(info)
   targetUrl String @map("target_url")
   title     String
   body      String?
   readAt    DateTime? @map("read_at") @db.Timestamptz(6)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
+  broadcastId String? @map("broadcast_id") @db.Uuid
+
   admin Profile @relation("AdminNotificationRecipient", fields: [adminId], references: [id], onDelete: Cascade)
+  broadcast NotificationBroadcast? @relation(fields: [broadcastId], references: [id], onDelete: SetNull)
 
   @@index([adminId, readAt], map: "idx_admin_notif_admin_unread")
   @@index([createdAt(sort: Desc)], map: "idx_admin_notif_created")
+  @@index([broadcastId], map: "idx_admin_notif_broadcast")
   @@map("admin_notifications")
 }
 
