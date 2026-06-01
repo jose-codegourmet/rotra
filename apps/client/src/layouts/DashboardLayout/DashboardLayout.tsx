@@ -1,15 +1,17 @@
+"use client";
+
 import type { AdminRole } from "@prisma/client";
 import { BottomNav } from "@/components/ui/bottom-nav/BottomNav";
 import { MobileDrawer } from "@/components/ui/mobile-drawer/MobileDrawer";
 import { MobileHeader } from "@/components/ui/mobile-header/MobileHeader";
 import { Navbar } from "@/components/ui/navbar/Navbar";
 import { Sidebar } from "@/components/ui/sidebar/Sidebar";
-import {
-	countUnreadNotifications,
-	MOCK_NOTIFICATIONS,
-} from "@/constants/mock-notifications";
 import { LogoutDialogProvider } from "@/hooks/useLogoutDialog/client";
+import { useNotificationsQuery } from "@/hooks/useNotifications/client";
+import { adaptNotificationToUiItem } from "@/hooks/useNotifications/server";
 import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
+
+const SHELL_NOTIFICATION_FILTERS = { page: 1, limit: 5 } as const;
 
 interface DashboardLayoutProps {
 	children: React.ReactNode;
@@ -26,7 +28,13 @@ export function DashboardLayout({
 	adminRole = null,
 	currentProfile = null,
 }: DashboardLayoutProps) {
-	const notificationUnreadCount = countUnreadNotifications(MOCK_NOTIFICATIONS);
+	const { data: notificationsData } = useNotificationsQuery(
+		SHELL_NOTIFICATION_FILTERS,
+		{ refetchInterval: 30_000 },
+	);
+	const shellNotifications =
+		notificationsData?.rows.map((row) => adaptNotificationToUiItem(row)) ?? [];
+	const notificationUnreadCount = notificationsData?.unreadCount ?? 0;
 
 	return (
 		<LogoutDialogProvider>
@@ -42,7 +50,7 @@ export function DashboardLayout({
 				<Navbar
 					pageTitle={pageTitle}
 					pageSubtitle={pageSubtitle}
-					notifications={MOCK_NOTIFICATIONS}
+					notifications={shellNotifications}
 					unreadCount={notificationUnreadCount}
 				/>
 

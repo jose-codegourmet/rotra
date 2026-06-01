@@ -129,4 +129,12 @@ export {
 	type ListAdminNotificationsForInboxInput,
 	type ListAdminNotificationsForInboxResult,
 } from "./admin-notification-service";
+export {
+	listNotificationsForInbox,
+	markAllNotificationsRead,
+	NotificationError,
+	type ListNotificationsForInboxInput,
+	type ListNotificationsForInboxResult,
+	type NotificationInboxRow,
+} from "./notification-service";
 export type { Database, Json } from "./supabase-database.types";
