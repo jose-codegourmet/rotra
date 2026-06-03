@@ -1,6 +1,6 @@
 "use client";
 
-import { RESERVED_TAG_SLUGS } from "@rotra/db";
+import { RESERVED_TAG_SLUGS } from "@rotra/db/client";
 import { useState } from "react";
 import type { TagDefinitionSerialized } from "@/hooks/useTagDefinitions/server";
 import { cn } from "@/lib/utils/tailwind";

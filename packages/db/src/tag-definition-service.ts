@@ -1,8 +1,11 @@
 import { Prisma, type PrismaClient, type TagAssignableBy } from "@prisma/client";
 
+import { RESERVED_TAG_SLUGS } from "./shared-constants";
+import { slugifyTagDefinitionSlug as slugifyTagDefinitionSlugCore } from "./slugify";
+
 type DbClient = PrismaClient | Prisma.TransactionClient;
 
-export const RESERVED_TAG_SLUGS = ["tester-login-as-guest"] as const;
+export { RESERVED_TAG_SLUGS };
 
 export type TagDefinitionDto = {
 	id: string;
@@ -55,11 +58,11 @@ function toDto(row: {
  * Derives a stable slug from a display label: trim, lowercase, spaces → hyphens.
  */
 export function slugifyTagDefinitionSlug(label: string): string {
-	const slug = label.trim().toLowerCase().replace(/\s/g, "-");
-	if (slug.length === 0) {
+	try {
+		return slugifyTagDefinitionSlugCore(label);
+	} catch {
 		throw new TagDefinitionError("invalid_slug", "Tag slug cannot be empty.");
 	}
-	return slug;
 }
 
 export async function createTagDefinition(

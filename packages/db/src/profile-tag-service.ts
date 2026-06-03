@@ -2,6 +2,7 @@ import { Prisma, type AdminRole, type PrismaClient } from "@prisma/client";
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
 
+import { slugifyTag as slugifyTagCore } from "./slugify";
 import { getTagDefinitionBySlug } from "./tag-definition-service";
 
 export class ProfileTagError extends Error {
@@ -30,11 +31,11 @@ export type ProfileTagDto = {
  * Example: "beta tester - scheduling" → "beta-tester---scheduling"
  */
 export function slugifyTag(label: string): string {
-	const slug = label.trim().toLowerCase().replace(/\s/g, "-");
-	if (slug.length === 0) {
+	try {
+		return slugifyTagCore(label);
+	} catch {
 		throw new ProfileTagError("invalid_label", "Tag label cannot be empty.");
 	}
-	return slug;
 }
 
 async function resolveTagFromCatalog(

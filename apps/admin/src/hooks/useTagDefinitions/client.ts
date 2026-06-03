@@ -4,17 +4,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { adminNotificationsRootKey } from "@/hooks/useAdminNotifications/queryKey";
 
-import { tagDefinitionsQueryKey } from "./queryKey";
 import type {
 	CreateTagDefinitionPayload,
 	TagDefinitionsListResponse,
 	UpdateTagDefinitionPayload,
-} from "./server";
+} from "./api";
 import {
 	fetchTagDefinitions,
 	patchTagDefinition,
 	postTagDefinition,
-} from "./server";
+} from "./api";
+import { tagDefinitionsQueryKey } from "./queryKey";
 
 export { tagDefinitionsQueryKey };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import type { TesterDirectoryStatus } from "@rotra/db";
+import type { TesterDirectoryStatus } from "@rotra/db/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button/Button";

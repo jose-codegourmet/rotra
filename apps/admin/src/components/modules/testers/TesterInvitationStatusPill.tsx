@@ -1,6 +1,6 @@
 "use client";
 
-import type { TesterDirectoryStatus } from "@rotra/db";
+import type { TesterDirectoryStatus } from "@rotra/db/client";
 import { cn } from "@/lib/utils/tailwind";
 
 const STATUS_STYLES: Record<

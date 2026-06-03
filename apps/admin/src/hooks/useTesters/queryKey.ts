@@ -1,4 +1,4 @@
-import type { TesterDirectoryStatus } from "@rotra/db";
+import type { TesterDirectoryStatus } from "@rotra/db/client";
 
 export const testersRootKey = ["testers"] as const;
 

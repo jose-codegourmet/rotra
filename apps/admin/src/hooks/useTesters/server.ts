@@ -1,8 +1,5 @@
-import type {
-	ListTesterProfilesResult,
-	TesterDirectoryStatus,
-	TesterProfileDetail,
-} from "@rotra/db";
+import type { ListTesterProfilesResult, TesterProfileDetail } from "@rotra/db";
+import type { TesterDirectoryStatus } from "@rotra/db/client";
 
 export type TesterDirectoryRowSerialized = {
 	id: string;

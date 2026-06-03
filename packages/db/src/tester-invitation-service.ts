@@ -12,6 +12,9 @@ import type {
 
 import { broadcastNotificationInTx } from "./notification-broadcast-service";
 import { addProfileTag } from "./profile-tag-service";
+import type { TesterDirectoryStatus } from "./shared-types";
+
+export type { TesterDirectoryStatus };
 
 const DEFAULT_INVITE_EXPIRY_DAYS = 7;
 const DEFAULT_TAG_SLUGS = ["tester-login-as-guest"] as const;
@@ -22,12 +25,6 @@ const TESTER_INVITE_NOTIFICATION_TYPE =
 	"tester_invite_sent" as AdminNotificationType;
 
 type DbClient = PrismaClient | Prisma.TransactionClient;
-
-export type TesterDirectoryStatus =
-	| "pending"
-	| "active"
-	| "revoked"
-	| "expired";
 
 export type TesterDirectoryRow = {
 	id: string;

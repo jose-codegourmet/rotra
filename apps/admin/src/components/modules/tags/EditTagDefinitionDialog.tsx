@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RESERVED_TAG_SLUGS } from "@rotra/db";
+import { RESERVED_TAG_SLUGS } from "@rotra/db/client";
 import { Loader2 } from "lucide-react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
