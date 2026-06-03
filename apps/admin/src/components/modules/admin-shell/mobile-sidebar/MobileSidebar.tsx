@@ -1,21 +1,20 @@
 "use client";
 
+import type { AdminRole } from "@prisma/client";
 import { Bell, LogOut, X } from "lucide-react";
 import Link from "next/link";
 import { navItemIsActive } from "@/components/modules/admin-shell/admin-nav";
 import { Button } from "@/components/ui/button/Button";
 import { Logo } from "@/components/ui/logo/Logo";
 import { NotificationsBadge } from "@/components/ui/notifications-badge/NotificationsBadge";
-import {
-	ADMIN_APP_DISPLAY_NAME,
-	ADMIN_NAV_ITEMS,
-	ROUTES,
-} from "@/constants/admin";
+import { ADMIN_APP_DISPLAY_NAME, ROUTES } from "@/constants/admin";
+import { filterAdminNavItems } from "@/lib/admin-nav-items";
 import { cn } from "@/lib/utils/tailwind";
 
 export interface MobileSidebarProps {
 	open: boolean;
 	pathname: string;
+	adminRole: AdminRole;
 	/** Unread count for the notifications nav row badge */
 	unreadCount?: number;
 	onClose: () => void;
@@ -25,10 +24,12 @@ export interface MobileSidebarProps {
 export function MobileSidebar({
 	open,
 	pathname,
+	adminRole,
 	unreadCount = 0,
 	onClose,
 	onRequestSignOut,
 }: MobileSidebarProps) {
+	const navItems = filterAdminNavItems(adminRole);
 	const notificationsActive = navItemIsActive(ROUTES.NOTIFICATIONS, pathname);
 
 	return (
@@ -66,7 +67,7 @@ export function MobileSidebar({
 			</div>
 
 			<nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-				{ADMIN_NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+				{navItems.map(({ label, href, icon: Icon }) => {
 					const active = navItemIsActive(href, pathname);
 					return (
 						<Link

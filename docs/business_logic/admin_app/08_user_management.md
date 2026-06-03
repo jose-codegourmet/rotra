@@ -16,8 +16,10 @@ The Admin App exposes **two filtered lenses** over the same table:
 |------|--------|-----|
 | Player directory | `admin_role IS NULL` | [`../../views/admin_app/users.md`](../../views/admin_app/users.md) |
 | Admin directory (this module) | `admin_role IS NOT NULL` | [`../../views/admin_app/admins.md`](../../views/admin_app/admins.md) |
+| Tag definitions (super admin) | — | [`10_tag_definitions.md`](./10_tag_definitions.md), `/tags` |
+| Testers | `is_tester_account = true`, `admin_role IS NULL` | [`11_tester_management.md`](./11_tester_management.md), `/testers` |
 
-> The player directory at `/admin/users` lists and inspects **non-admin** profiles (read-oriented). Enforcement on players routes through [`./04_approvals_and_moderation.md`](./04_approvals_and_moderation.md). Granting someone platform admin access does not create a second row — it sets `admin_role` on their existing `profiles` row; they then appear under `/admin/admins` and typically **not** in the `/admin/users` directory list.
+> The player directory at `/customers` lists and inspects **non-admin** profiles (read-oriented). Enforcement on players routes through [`./04_approvals_and_moderation.md`](./04_approvals_and_moderation.md). Granting someone platform admin access does not create a second row — it sets `admin_role` on their existing `profiles` row; they then appear under `/admin/admins` and typically **not** in the `/admin/users` directory list.
 
 ---
 

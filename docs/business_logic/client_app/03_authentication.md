@@ -97,6 +97,42 @@ New users are **unverified by default** upon first sign-in. Verified status is a
 
 ---
 
+### Path D — Tester login (client app)
+
+| Property | Value |
+|---|---|
+| Routes | `/login-tester` (returning sign-in), `/login-tester/auth/accept-invite` (invite link), `/set-password` (choose password after invite) |
+| Preconditions | `profiles.is_tester_account = true` and profile tag `tester-login-as-guest` |
+| Credentials | Email + password chosen on `/set-password` after first invite acceptance (optional: `tester_password` from invite email if template shows it) |
+
+**First-time flow (invite email):**
+
+```
+1. Admin invites tester → Supabase email link:
+   /login-tester/auth/accept-invite?token_hash=...&type=invite&next=/set-password
+2. GET accept-invite → verifyOtp(type invite) → session cookies
+   → Redirect to next (default /set-password). Invalid/expired token → /login-tester?error=...
+3. Tester sets password on /set-password → POST /api/auth/set-password → updateUser({ password })
+   → Redirect /home
+```
+
+**Returning flow:**
+
+```
+1. User opens /login-tester (URL not linked from player /login)
+2. User submits email + password → POST /api/auth/tester-sign-in
+   → Supabase signInWithPassword; then validateTesterSession
+   → If not a valid tester: sign out, 403 NOT_TESTER
+   → markTesterInvitationAccepted when pending invite not expired
+   → Redirect /home
+```
+
+**Middleware:** `/login-tester` and `/login-tester/*` are public so the invite handler runs without a prior session. `/set-password` is **not** public; the tester must already have a session from step 2.
+
+**Onboarding:** Testers skip `/onboarding` (same bypass pattern as active admins). See [22_tester_login.md](./22_tester_login.md).
+
+---
+
 ## 03.2 Account Verification Model
 
 New accounts are **unverified immediately after Facebook login**. An account becomes **verified** only when all three of the following conditions are simultaneously satisfied:
@@ -170,7 +206,9 @@ Any authenticated user with `onboarding_completed = false` is redirected to `/on
 | Unauthenticated | `/login` |
 | Authenticated + `onboarding_completed = false` (not an active admin) | `/onboarding` |
 | Authenticated + active admin (`admin_role` + `admin_is_active`) | Protected app (no forced `/onboarding`) |
+| Authenticated + tester (`is_tester_account`) | Protected app (no forced `/onboarding`); may use `/set-password` after invite before `/home` |
 | Authenticated + `onboarding_completed = true` | `/home` |
+| Unauthenticated + `/set-password` | `/login` (session required; typically reached only after invite `verifyOtp`) |
 
 ---
 
@@ -209,6 +247,10 @@ Any authenticated user with `onboarding_completed = false` is redirected to `/on
 | RULE-004 | Invite tokens are single-use. Once `email_invitations.status = 'accepted'`, the token cannot be reused. |
 | RULE-005 | Email verification requires Supabase email confirmation. Linking an email to a profile alone does not set `email_verified = true`. |
 | RULE-006 | Any authenticated user with `onboarding_completed = false` must be redirected to `/onboarding` on every app open. See also RULE-050. |
+| RULE-007 | Tester accounts must have `is_tester_account = true` and the `tester-login-as-guest` profile tag to sign in via Path D. |
+| RULE-008 | Tester auth passwords are set on `/set-password` after invite acceptance (or from invite email if template shows `tester_password`). Admin must not set auth password at invite send time. ROTRA does not store plaintext passwords in Postgres. |
+| RULE-009 | Tester accounts skip the player onboarding wizard. |
+| RULE-010 | Tag slugs assigned to profiles must exist in `tag_definitions` and be active. |
 
 ---
 

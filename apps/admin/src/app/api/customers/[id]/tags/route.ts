@@ -1,8 +1,7 @@
 import { addProfileTag, db } from "@rotra/db";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getAdminActorProfileId } from "@/lib/admin-actor";
-import { AdminSessionError } from "@/lib/auth/admin-session";
+import { requireAdminSession } from "@/lib/auth/admin-session";
 import {
 	customerProfileErrorResponse,
 	jsonCustomerProfileDetail,
@@ -12,7 +11,7 @@ import {
 export const runtime = "nodejs";
 
 const tagBodySchema = z.object({
-	label: z.string().min(1).max(60),
+	slug: z.string().min(1).max(80),
 });
 
 export async function POST(
@@ -37,28 +36,23 @@ export async function POST(
 	}
 
 	try {
-		const actorId = await getAdminActorProfileId();
-		const label = parsed.data.label;
+		const session = await requireAdminSession();
+		const slug = parsed.data.slug;
 		await addProfileTag(db, {
 			profileId: id,
-			label,
-			assignedBy: actorId,
+			slug,
+			assignedBy: session.profileId,
+			callerRole: session.adminRole,
 		});
 		await notifyCustomerProfileChangedWithNames(db, {
-			actorProfileId: actorId,
+			actorProfileId: session.profileId,
 			customerProfileId: id,
 			title: "Customer tag added",
 			bodyTemplate: (actorName, customerName) =>
-				`${actorName} added tag "${label}" to ${customerName}.`,
+				`${actorName} added tag "${slug}" to ${customerName}.`,
 		});
 		return jsonCustomerProfileDetail(db, id);
 	} catch (error) {
-		if (error instanceof AdminSessionError) {
-			return NextResponse.json(
-				{ error: error.message },
-				{ status: error.status },
-			);
-		}
 		return customerProfileErrorResponse(error, "[customers tags POST]");
 	}
 }

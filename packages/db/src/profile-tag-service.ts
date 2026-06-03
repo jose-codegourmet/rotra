@@ -1,9 +1,16 @@
-import { Prisma } from "@prisma/client";
-import type { PrismaClient } from "@prisma/client";
+import { Prisma, type AdminRole, type PrismaClient } from "@prisma/client";
+
+type DbClient = PrismaClient | Prisma.TransactionClient;
+
+import { getTagDefinitionBySlug } from "./tag-definition-service";
 
 export class ProfileTagError extends Error {
 	constructor(
-		public readonly code: "not_found" | "conflict" | "invalid_label",
+		public readonly code:
+			| "not_found"
+			| "conflict"
+			| "invalid_label"
+			| "forbidden",
 		message: string,
 	) {
 		super(message);
@@ -30,25 +37,63 @@ export function slugifyTag(label: string): string {
 	return slug;
 }
 
-export async function addProfileTag(
-	db: PrismaClient,
-	input: {
-		profileId: string;
-		label: string;
-		assignedBy: string | null;
-	},
-): Promise<ProfileTagDto> {
-	const trimmed = input.label.trim();
-	if (trimmed.length === 0) {
-		throw new ProfileTagError("invalid_label", "Tag label cannot be empty.");
+async function resolveTagFromCatalog(
+	db: DbClient,
+	input: { slug?: string; label?: string },
+): Promise<{ slug: string; label: string; assignableBy: "any_admin" | "super_admin_only" }> {
+	let slug: string;
+	if (input.slug?.trim()) {
+		slug = input.slug.trim().toLowerCase();
+	} else if (input.label?.trim()) {
+		slug = slugifyTag(input.label);
+	} else {
+		throw new ProfileTagError(
+			"invalid_label",
+			"Either slug or label is required.",
+		);
 	}
 
-	let slug: string;
-	try {
-		slug = slugifyTag(trimmed);
-	} catch (e) {
-		if (e instanceof ProfileTagError) throw e;
-		throw e;
+	const definition = await getTagDefinitionBySlug(db, slug);
+	if (!definition || !definition.isActive) {
+		throw new ProfileTagError(
+			"not_found",
+			"Tag is not in the active catalog.",
+		);
+	}
+
+	return {
+		slug: definition.slug,
+		label: definition.label,
+		assignableBy: definition.assignableBy,
+	};
+}
+
+export async function addProfileTag(
+	db: DbClient,
+	input: {
+		profileId: string;
+		label?: string;
+		slug?: string;
+		assignedBy: string | null;
+		callerRole?: AdminRole | null;
+	},
+): Promise<ProfileTagDto> {
+	const catalogInput: { slug?: string; label?: string } = {};
+	if (input.slug !== undefined) catalogInput.slug = input.slug;
+	if (input.label !== undefined) catalogInput.label = input.label;
+	const { slug, label, assignableBy } = await resolveTagFromCatalog(
+		db,
+		catalogInput,
+	);
+
+	if (
+		assignableBy === "super_admin_only" &&
+		input.callerRole !== "super_admin"
+	) {
+		throw new ProfileTagError(
+			"forbidden",
+			"Only Super Admins may assign this tag.",
+		);
 	}
 
 	const profile = await db.profile.findUnique({
@@ -64,7 +109,7 @@ export async function addProfileTag(
 			data: {
 				profileId: input.profileId,
 				slug,
-				label: trimmed,
+				label,
 				assignedBy: input.assignedBy,
 			},
 			select: {

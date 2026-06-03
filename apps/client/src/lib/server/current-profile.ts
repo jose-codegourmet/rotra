@@ -22,6 +22,7 @@ export type CurrentProfile = {
 	avatarUrl: string | null;
 	phone: string | null;
 	onboardingCompleted: boolean;
+	isTesterAccount: boolean;
 	createdAt: Date;
 	adminRole: AdminRole | null;
 	adminIsActive: boolean;
@@ -37,6 +38,7 @@ const profileSelect = {
 	avatarUrl: true,
 	phone: true,
 	onboardingCompleted: true,
+	isTesterAccount: true,
 	createdAt: true,
 	adminRole: true,
 	adminIsActive: true,
@@ -57,6 +59,7 @@ type ProfileSelectRow = {
 	avatarUrl: string | null;
 	phone: string | null;
 	onboardingCompleted: boolean;
+	isTesterAccount: boolean;
 	createdAt: Date;
 	adminRole: AdminRole | null;
 	adminIsActive: boolean;

@@ -56,7 +56,7 @@ export default async function ProtectedLayout({
 
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
-			<AdminShell>{children}</AdminShell>
+			<AdminShell adminRole={session.adminRole}>{children}</AdminShell>
 		</HydrationBoundary>
 	);
 }

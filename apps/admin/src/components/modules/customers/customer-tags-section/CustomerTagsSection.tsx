@@ -12,9 +12,13 @@ import { AddCustomerTagFormModal } from "../AddCustomerTagFormModal";
 
 export type CustomerTagsSectionProps = {
 	profile: CustomerProfileSerialized;
+	callerIsSuperAdmin: boolean;
 };
 
-export function CustomerTagsSection({ profile }: CustomerTagsSectionProps) {
+export function CustomerTagsSection({
+	profile,
+	callerIsSuperAdmin,
+}: CustomerTagsSectionProps) {
 	const [addOpen, setAddOpen] = useState(false);
 	const removeTag = useRemoveProfileTag(profile.id);
 
@@ -22,7 +26,7 @@ export function CustomerTagsSection({ profile }: CustomerTagsSectionProps) {
 		<>
 			<PageSection
 				title="Tags"
-				description="Internal labels for cohorts, beta access, and filtering. Slug is derived from the label."
+				description="Internal labels from the tag catalog for cohorts, beta access, and filtering."
 			>
 				<div className="space-y-4 rounded-lg border border-border bg-bg-surface p-6">
 					<div className="flex flex-wrap items-center gap-2">
@@ -67,6 +71,7 @@ export function CustomerTagsSection({ profile }: CustomerTagsSectionProps) {
 				open={addOpen}
 				onOpenChange={setAddOpen}
 				profileId={profile.id}
+				callerIsSuperAdmin={callerIsSuperAdmin}
 			/>
 		</>
 	);

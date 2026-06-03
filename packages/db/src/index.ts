@@ -110,6 +110,34 @@ export {
 	type ProfileTagDto,
 } from "./profile-tag-service";
 export {
+	createTagDefinition,
+	getTagDefinitionById,
+	getTagDefinitionBySlug,
+	listTagDefinitions,
+	updateTagDefinition,
+	RESERVED_TAG_SLUGS,
+	TagDefinitionError,
+	slugifyTagDefinitionSlug,
+	type TagDefinitionDto,
+} from "./tag-definition-service";
+export {
+	createTesterProfile,
+	getTesterProfileDetail,
+	listTesterProfiles,
+	resendTesterInvite,
+	revokeTesterInvitation,
+	markTesterInvitationAccepted,
+	validateTesterSession,
+	TesterInvitationError,
+	type TesterAuthAdmin,
+	type TesterDirectoryRow,
+	type TesterDirectoryStatus,
+	type TesterProfileDetail,
+	type ListTesterProfilesInput,
+	type ListTesterProfilesResult,
+} from "./tester-invitation-service";
+export type { TagAssignableBy } from "@prisma/client";
+export {
 	broadcastNotification,
 	broadcastNotificationByTags,
 	broadcastNotificationInTx,

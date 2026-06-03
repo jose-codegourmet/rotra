@@ -1,18 +1,17 @@
 "use client";
 
+import type { AdminRole } from "@prisma/client";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { navItemIsActive } from "@/components/modules/admin-shell/admin-nav";
 import { Logo } from "@/components/ui/logo/Logo";
-import {
-	ADMIN_APP_DISPLAY_NAME,
-	ADMIN_NAV_ITEMS,
-	ROUTES,
-} from "@/constants/admin";
+import { ADMIN_APP_DISPLAY_NAME, ROUTES } from "@/constants/admin";
+import { filterAdminNavItems } from "@/lib/admin-nav-items";
 import { cn } from "@/lib/utils/tailwind";
 
 export interface DesktopSidebarProps {
 	pathname: string;
+	adminRole: AdminRole;
 }
 
 function SidebarNavLink({
@@ -42,7 +41,9 @@ function SidebarNavLink({
 	);
 }
 
-export function DesktopSidebar({ pathname }: DesktopSidebarProps) {
+export function DesktopSidebar({ pathname, adminRole }: DesktopSidebarProps) {
+	const navItems = filterAdminNavItems(adminRole);
+
 	return (
 		<aside
 			className="fixed left-0 top-0 z-30 hidden h-full w-20 flex-col border-r border-border border-l-2 border-l-accent bg-bg-surface md:flex lg:w-64"
@@ -64,7 +65,7 @@ export function DesktopSidebar({ pathname }: DesktopSidebarProps) {
 			</div>
 
 			<nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-				{ADMIN_NAV_ITEMS.map(({ label, href, icon: Icon }) => (
+				{navItems.map(({ label, href, icon: Icon }) => (
 					<SidebarNavLink
 						key={href}
 						href={href}

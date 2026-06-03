@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo/Logo";
 import { MobileDrawerUserSection } from "@/components/ui/mobile-drawer/MobileDrawerUserSection";
+import { Pill } from "@/components/ui/pill/Pill";
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle";
 import { NAV_ITEMS } from "@/constants/nav";
 import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
@@ -15,11 +16,13 @@ import { closeMobileDrawer } from "@/store/slices/uiSlice";
 
 type MobileDrawerProps = {
 	adminRole?: AdminRole | null;
+	isTesterAccount?: boolean;
 	currentProfile?: CurrentProfileDisplay | null;
 };
 
 export function MobileDrawer({
 	adminRole = null,
+	isTesterAccount = false,
 	currentProfile = null,
 }: MobileDrawerProps) {
 	const pathname = usePathname();
@@ -106,6 +109,11 @@ export function MobileDrawer({
 					<ThemeToggle variant="row" />
 				</nav>
 
+				{isTesterAccount && !adminRole ? (
+					<div className="px-6 pb-2">
+						<Pill variant="outline">Tester</Pill>
+					</div>
+				) : null}
 				<MobileDrawerUserSection
 					adminRole={adminRole}
 					currentProfile={currentProfile}

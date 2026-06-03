@@ -12,6 +12,7 @@ import { CustomerStatsSection } from "@/components/modules/customers/customer-st
 import { CustomerTagsSection } from "@/components/modules/customers/customer-tags-section/CustomerTagsSection";
 import { CustomerVerificationSection } from "@/components/modules/customers/customer-verification-section/CustomerVerificationSection";
 import { ROUTES } from "@/constants/admin";
+import { requireAdminSession } from "@/lib/auth/admin-session";
 import { playerProfileUrl } from "@/lib/client-app-url";
 import { serializeCustomerProfileForClient } from "@/types/customer-profile-serialized";
 
@@ -35,6 +36,8 @@ export async function generateMetadata({
 
 export default async function CustomerDetailPage({ params }: PageProps) {
 	const { id } = await params;
+	const session = await requireAdminSession();
+	const callerIsSuperAdmin = session.adminRole === "super_admin";
 
 	let profile: Awaited<ReturnType<typeof getCustomerProfileDetail>>;
 	try {
@@ -73,7 +76,10 @@ export default async function CustomerDetailPage({ params }: PageProps) {
 
 			<CustomerBasicInfoSection profile={serialized} />
 			<CustomerSkillsSection profile={serialized} />
-			<CustomerTagsSection profile={serialized} />
+			<CustomerTagsSection
+				profile={serialized}
+				callerIsSuperAdmin={callerIsSuperAdmin}
+			/>
 			<CustomerVerificationSection profile={serialized} />
 			<CustomerStatsSection profile={serialized} />
 			<CustomerAuditSection profile={serialized} />

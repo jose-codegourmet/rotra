@@ -6,6 +6,10 @@ Authentication is handled entirely by **Supabase Auth** using Facebook as the pr
 
 The `profiles` table extends `auth.users` with all ROTRA-specific player data. All other tables reference `profiles.id`.
 
+**Tester accounts** use `profiles.is_tester_account = true` with nullable `facebook_id` (identity CHECK: `facebook_id IS NOT NULL OR is_tester_account = true`). See [`14_tester_invitations.md`](14_tester_invitations.md) and client Path D in `03_authentication.md`.
+
+**Tag catalog** assignments validate against [`tag_definitions`](13_tag_definitions.md) before writing `profile_tags`.
+
 Account verification is a **three-condition composite** stored as a generated column (`is_verified`). New accounts are unverified by default. See `03_authentication.md` for the full verification model.
 
 Gear items are modeled as independent rows (not JSONB) to allow querying, filtering, and clean relational joins. Each gear item can have multiple "where to buy" links via `gear_item_links`.
@@ -391,7 +395,7 @@ auth.users (Supabase managed)
 
 ## Table: `profile_tags`
 
-Free-form **internal** labels attached to a player profile (`profiles.id` where `admin_role IS NULL`). Used for cohorts, beta programs, and admin-side filtering. Tags are **not** a product catalog: each row stores the display `label` and a derived `slug` (trim, lowercase, spaces → hyphens) unique per player.
+**Catalog-driven** internal labels attached to a player profile (`profiles.id` where `admin_role IS NULL`). Admins pick a `slug` from [`tag_definitions`](13_tag_definitions.md); the service copies the definition `label` onto the row. Slugs must match an active catalog entry.
 
 Exposed read-only to authenticated clients via `GET /api/profile/[userId]` and server `getCurrentProfile()` so the Client App can render pills or gate features (e.g. `tags.some((t) => t.slug === "beta-tester---scheduling")`).
 
@@ -413,12 +417,18 @@ CREATE INDEX profile_tags_slug_idx ON profile_tags (slug);
 | Column | Notes |
 |--------|--------|
 | `profile_id` | Target player profile; cascades when the profile row is deleted. |
-| `slug` | Derived from `label` for stable keys in code (e.g. `"beta tester - scheduling"` → `beta-tester---scheduling`). |
+| `slug` | From `tag_definitions.slug` at assignment time. |
 | `label` | Human-readable text shown in Admin and optionally in Client UI. |
 | `assigned_at` | When the tag was created. |
 | `assigned_by` | Admin `profiles.id` who added the tag; `NULL` if the admin profile was removed (`ON DELETE SET NULL`). |
 
 Writes are performed from the **Admin App** only (authenticated admin session + API routes).
+
+---
+
+## Table: `tester_invitations`
+
+Tracks admin-issued tester invites. Full schema: [`14_tester_invitations.md`](14_tester_invitations.md).
 
 ---
 

@@ -3,11 +3,13 @@ import {
 	BarChart3,
 	Brain,
 	EyeOff,
+	FlaskConical,
 	LayoutDashboard,
 	Mail,
 	Medal,
 	ShieldAlert,
 	SlidersHorizontal,
+	Tag,
 	UserCheck,
 	UserCog,
 	Users,
@@ -36,6 +38,8 @@ export const ROUTES = {
 	ANALYTICS: "/analytics",
 	WAITLIST: "/waitlist",
 	NOTIFICATIONS: "/notifications",
+	TAGS: "/tags",
+	TESTERS: "/testers",
 } as const;
 
 export function adminDirectoryDetailPath(id: string): string {
@@ -44,6 +48,14 @@ export function adminDirectoryDetailPath(id: string): string {
 
 export function customerProfilePath(id: string): string {
 	return `${ROUTES.CUSTOMERS}/${id}`;
+}
+
+export function tagDefinitionPath(id: string): string {
+	return `${ROUTES.TAGS}?highlight=${id}`;
+}
+
+export function testerProfilePath(id: string): string {
+	return `${ROUTES.TESTERS}/${id}`;
 }
 
 /** Header title per pathname (App Router paths). */
@@ -61,6 +73,8 @@ export const ADMIN_PAGE_TITLES: Record<string, string> = {
 	[ROUTES.ANALYTICS]: "Analytics",
 	[ROUTES.WAITLIST]: "Waitlist",
 	[ROUTES.NOTIFICATIONS]: "Notifications",
+	[ROUTES.TAGS]: "Tag definitions",
+	[ROUTES.TESTERS]: "Testers",
 };
 
 export function getAdminShellPageTitle(pathname: string): string {
@@ -68,6 +82,7 @@ export function getAdminShellPageTitle(pathname: string): string {
 	if (titled) return titled;
 	if (/^\/admins\/[^/]+$/.test(pathname)) return "Admin details";
 	if (/^\/customers\/[^/]+$/.test(pathname)) return "Customer details";
+	if (/^\/testers\/[^/]+$/.test(pathname)) return "Tester details";
 	return "Admin";
 }
 
@@ -75,6 +90,8 @@ export type AdminNavItem = {
 	label: string;
 	href: string;
 	icon: LucideIcon;
+	/** Hidden unless the signed-in admin is a super admin. */
+	superAdminOnly?: boolean;
 };
 
 export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
@@ -92,6 +109,17 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 		label: "Customers",
 		href: ROUTES.CUSTOMERS,
 		icon: Users,
+	},
+	{
+		label: "Tags",
+		href: ROUTES.TAGS,
+		icon: Tag,
+		superAdminOnly: true,
+	},
+	{
+		label: "Testers",
+		href: ROUTES.TESTERS,
+		icon: FlaskConical,
 	},
 	{
 		label: "Waitlist",
