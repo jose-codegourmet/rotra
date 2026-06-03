@@ -19,12 +19,14 @@ export interface AdminShellProps {
 	/** When set (e.g. Storybook), overrides the title derived from the URL. */
 	pageTitle?: string;
 	adminRole?: AdminRole;
+	adminName?: string;
 }
 
 export function AdminShell({
 	children,
 	pageTitle: pageTitleOverride,
 	adminRole = "admin",
+	adminName,
 }: AdminShellProps) {
 	const pathname = usePathname();
 	const derivedTitle = getAdminShellPageTitle(pathname);
@@ -83,6 +85,7 @@ export function AdminShell({
 				open={mobileNavOpen}
 				pathname={pathname}
 				adminRole={adminRole}
+				adminName={adminName}
 				unreadCount={notificationUnreadCount}
 				onClose={() => setMobileNavOpen(false)}
 				onRequestSignOut={openSignOutDialog}
@@ -96,6 +99,7 @@ export function AdminShell({
 			<div className="flex min-h-screen flex-col pt-16 md:ml-20 md:pt-0 lg:ml-64">
 				<DesktopNavbarHeader
 					pageTitle={pageTitle}
+					adminName={adminName}
 					onRequestSignOut={openSignOutDialog}
 					notifications={shellNotifications}
 					unreadCount={notificationUnreadCount}
