@@ -7,6 +7,7 @@ const meta: Meta<typeof AddCustomerTagForm> = {
 	component: AddCustomerTagForm,
 	args: {
 		profileId: "00000000-0000-4000-8000-000000000001",
+		callerIsSuperAdmin: true,
 		onDismiss: () => {},
 		onSuccess: () => {},
 		onError: () => {},

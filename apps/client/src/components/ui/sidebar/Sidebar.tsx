@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo/Logo";
 import { NotificationsBadge } from "@/components/ui/notifications-badge/NotificationsBadge";
+import { Pill } from "@/components/ui/pill/Pill";
 import { SidebarUserMenu } from "@/components/ui/sidebar/SidebarUserMenu/SidebarUserMenu";
 import { NAV_ITEMS, type NavItemId } from "@/constants/nav";
 import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
@@ -15,12 +16,14 @@ export type { NavItemId };
 
 type SidebarProps = {
 	adminRole?: AdminRole | null;
+	isTesterAccount?: boolean;
 	currentProfile?: CurrentProfileDisplay | null;
 	unreadCount?: number;
 };
 
 export function Sidebar({
 	adminRole = null,
+	isTesterAccount = false,
 	currentProfile = null,
 	unreadCount = 0,
 }: SidebarProps) {
@@ -91,6 +94,11 @@ export function Sidebar({
 			</div>
 
 			{/* User section */}
+			{isTesterAccount && !adminRole ? (
+				<div className="px-4 pb-2 hidden lg:block">
+					<Pill variant="outline">Tester</Pill>
+				</div>
+			) : null}
 			<SidebarUserMenu adminRole={adminRole} currentProfile={currentProfile} />
 		</aside>
 	);

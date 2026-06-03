@@ -35,7 +35,7 @@ const mockProfile = {
 const meta: Meta<typeof CustomerTagsSection> = {
 	title: "Modules/Customers/CustomerTagsSection",
 	component: CustomerTagsSection,
-	args: { profile: mockProfile },
+	args: { profile: mockProfile, callerIsSuperAdmin: true },
 };
 
 export default meta;

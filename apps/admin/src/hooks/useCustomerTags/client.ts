@@ -1,6 +1,6 @@
 "use client";
 
-import { slugifyTag } from "@rotra/db";
+import { slugifyTag } from "@rotra/db/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

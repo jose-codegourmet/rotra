@@ -20,7 +20,9 @@ function isPublicPath(pathname: string): boolean {
 	if (
 		pathname === "/login" ||
 		pathname.startsWith("/login/") ||
-		pathname === "/login-admin"
+		pathname === "/login-admin" ||
+		pathname === "/login-tester" ||
+		pathname.startsWith("/login-tester/")
 	) {
 		return true;
 	}
@@ -70,7 +72,20 @@ export async function middleware(request: NextRequest) {
 	}
 
 	if (user) {
-		if (url.pathname.startsWith("/login")) {
+		if (
+			url.pathname === "/login-tester" ||
+			url.pathname === "/login-admin" ||
+			url.pathname === "/login"
+		) {
+			const dest = new URL(
+				url.pathname === "/login-tester" ? "/home" : "/dashboard",
+				request.url,
+			);
+			const redirectResponse = NextResponse.redirect(dest);
+			copyCookies(response, redirectResponse);
+			return redirectResponse;
+		}
+		if (url.pathname.startsWith("/login/")) {
 			const dest = new URL("/dashboard", request.url);
 			const redirectResponse = NextResponse.redirect(dest);
 			copyCookies(response, redirectResponse);

@@ -1,6 +1,6 @@
 model Profile {
   id         String  @id @db.Uuid
-  facebookId String  @unique @map("facebook_id")
+  facebookId String? @unique @map("facebook_id")
   name       String
   avatarUrl  String? @map("avatar_url")
   phone      String?
@@ -21,6 +21,8 @@ model Profile {
   adminActivatedAt   DateTime?  @map("admin_activated_at") @db.Timestamptz(6)
   adminDeactivatedAt DateTime?  @map("admin_deactivated_at") @db.Timestamptz(6)
   adminDeactivatedById String?  @map("admin_deactivated_by") @db.Uuid
+
+  isTesterAccount Boolean @default(false) @map("is_tester_account")
 
   playingLevel     PlayingLevel?     @map("playing_level")
   formatPreference FormatPreference? @map("format_preference")
@@ -87,6 +89,9 @@ model Profile {
   tagsAssigned                ProfileTag[]                @relation("ProfileTagsOnProfile")
   tagsCreated                 ProfileTag[]                @relation("ProfileTagsAssignedBy")
   broadcastsCreated         NotificationBroadcast[]       @relation("BroadcastsCreated")
+  testerInvitationsReceived TesterInvitation[]            @relation("TesterInvitationProfile")
+  testerInvitationsSent     TesterInvitation[]            @relation("TesterInvitedBy")
+  tagDefinitionsCreated     TagDefinition[]               @relation("TagDefinitionCreatedBy")
 
   @@index([facebookId], map: "idx_profiles_facebook_id")
   @@index([email], map: "idx_profiles_email")
@@ -129,6 +134,23 @@ model EmailInvitation {
   @@index([email], map: "idx_email_invitations_email")
   @@index([status], map: "idx_email_invitations_status")
   @@map("email_invitations")
+}
+
+model TesterInvitation {
+  id          String           @id @default(uuid()) @db.Uuid
+  profileId   String           @map("profile_id") @db.Uuid
+  invitedById String?          @map("invited_by") @db.Uuid
+  status      InvitationStatus @default(pending)
+  expiresAt   DateTime         @map("expires_at") @db.Timestamptz(6)
+  revokedAt   DateTime?        @map("revoked_at") @db.Timestamptz(6)
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  profile   Profile  @relation("TesterInvitationProfile", fields: [profileId], references: [id], onDelete: Cascade)
+  invitedBy Profile? @relation("TesterInvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@index([profileId], map: "idx_tester_invitations_profile")
+  @@index([status], map: "idx_tester_invitations_status")
+  @@map("tester_invitations")
 }
 
 model GearItem {

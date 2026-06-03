@@ -24,12 +24,14 @@ type Story = StoryObj<typeof DesktopSidebar>;
 export const Default: Story = {
 	args: {
 		pathname: "/dashboard",
+		adminRole: "super_admin",
 	},
 };
 
 export const CustomersSectionActive: Story = {
 	args: {
 		pathname: "/customers/abc-123",
+		adminRole: "admin",
 	},
 	parameters: {
 		nextjs: {

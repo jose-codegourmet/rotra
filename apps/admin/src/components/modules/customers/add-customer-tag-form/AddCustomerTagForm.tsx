@@ -1,10 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { slugifyTag } from "@rotra/db";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button/Button";
@@ -14,9 +14,9 @@ import {
 	FieldError,
 	FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input/Input";
 import { adminNotificationsRootKey } from "@/hooks/useAdminNotifications/queryKey";
 import { postCustomerTag } from "@/hooks/useCustomerDetail/server";
+import { useTagDefinitionsQuery } from "@/hooks/useTagDefinitions/client";
 
 import { addCustomerTagFormDefault } from "./default";
 import {
@@ -26,6 +26,7 @@ import {
 
 export type AddCustomerTagFormProps = {
 	profileId: string;
+	callerIsSuperAdmin: boolean;
 	onDismiss: () => void;
 	onSuccess: () => void;
 	onError: (error: Error) => void;
@@ -33,12 +34,15 @@ export type AddCustomerTagFormProps = {
 
 export function AddCustomerTagForm({
 	profileId,
+	callerIsSuperAdmin,
 	onDismiss,
 	onSuccess,
 	onError,
 }: AddCustomerTagFormProps) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
+	const { data: tagDefsData, isLoading: defsLoading } =
+		useTagDefinitionsQuery();
 	const form = useForm<AddCustomerTagFormValues>({
 		resolver: zodResolver(addCustomerTagFormSchema),
 		defaultValues: addCustomerTagFormDefault,
@@ -47,11 +51,25 @@ export function AddCustomerTagForm({
 		control,
 		handleSubmit,
 		reset,
+		watch,
 		formState: { errors },
 	} = form;
 
+	const slug = watch("slug");
+
+	const assignableOptions = useMemo(() => {
+		const definitions = tagDefsData?.definitions ?? [];
+		return definitions.filter(
+			(d) =>
+				d.isActive &&
+				(callerIsSuperAdmin || d.assignableBy !== "super_admin_only"),
+		);
+	}, [tagDefsData?.definitions, callerIsSuperAdmin]);
+
+	const selectedDefinition = assignableOptions.find((d) => d.slug === slug);
+
 	const mutation = useMutation({
-		mutationFn: (label: string) => postCustomerTag(profileId, label),
+		mutationFn: (tagSlug: string) => postCustomerTag(profileId, tagSlug),
 		onError: (error) => {
 			const safeMessage =
 				error instanceof Error
@@ -65,11 +83,13 @@ export function AddCustomerTagForm({
 	const isPending = mutation.isPending;
 	const onSubmit = handleSubmit((values) => {
 		if (isPending) return;
-		const label = values.label.trim();
-		mutation.mutate(label, {
+		mutation.mutate(values.slug, {
 			onSuccess: () => {
-				const slug = slugifyTag(label);
-				toast.success(`Tag added (slug: ${slug}).`);
+				toast.success(
+					selectedDefinition
+						? `Tag "${selectedDefinition.label}" added.`
+						: "Tag added.",
+				);
 				void queryClient.invalidateQueries({
 					queryKey: [...adminNotificationsRootKey],
 				});
@@ -83,28 +103,48 @@ export function AddCustomerTagForm({
 	return (
 		<FormProvider {...form}>
 			<form onSubmit={onSubmit} className="space-y-4">
-				<Field data-invalid={!!errors.label}>
-					<FieldLabel htmlFor="add-tag-label">Tag label</FieldLabel>
+				<Field data-invalid={!!errors.slug}>
+					<FieldLabel htmlFor="add-tag-slug">Tag</FieldLabel>
 					<FieldContent>
 						<Controller
 							control={control}
-							name="label"
+							name="slug"
 							render={({ field, fieldState }) => (
 								<>
-									<Input
-										id="add-tag-label"
-										type="text"
-										disabled={isPending}
-										placeholder="e.g. beta tester - scheduling"
+									<select
+										id="add-tag-slug"
+										className="h-11 w-full rounded-md border border-border bg-bg-elevated px-3 text-body text-text-primary"
+										disabled={isPending || defsLoading}
+										value={field.value}
+										onChange={field.onChange}
 										aria-invalid={!!fieldState.error}
-										{...field}
-									/>
+									>
+										<option value="">
+											{defsLoading
+												? "Loading tags…"
+												: "Select a tag definition"}
+										</option>
+										{assignableOptions.map((def) => (
+											<option key={def.id} value={def.slug}>
+												{def.label} ({def.slug})
+											</option>
+										))}
+									</select>
 									<FieldError errors={[fieldState.error]} />
 								</>
 							)}
 						/>
 					</FieldContent>
 				</Field>
+
+				{selectedDefinition ? (
+					<p className="text-body text-text-secondary">
+						Label: <strong>{selectedDefinition.label}</strong>
+						{selectedDefinition.description
+							? ` — ${selectedDefinition.description}`
+							: null}
+					</p>
+				) : null}
 
 				<div className="flex justify-end gap-2 pt-2">
 					<Button
@@ -115,7 +155,7 @@ export function AddCustomerTagForm({
 					>
 						Cancel
 					</Button>
-					<Button type="submit" disabled={isPending}>
+					<Button type="submit" disabled={isPending || !slug}>
 						{isPending ? (
 							<>
 								<Loader2 className="size-4 animate-spin" aria-hidden />

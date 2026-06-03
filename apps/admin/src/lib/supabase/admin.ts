@@ -124,6 +124,33 @@ export async function sendAdminPasswordResetLink(
 	}
 }
 
+export async function inviteTesterAuthUser(input: {
+	email: string;
+	name: string;
+	testerPassword: string;
+	redirectTo: string;
+}): Promise<{ userId: string }> {
+	const adminSupabase = createSupabaseAdminClient();
+	const email = input.email.trim().toLowerCase();
+	const name = input.name.trim();
+	const { data, error } = await adminSupabase.auth.admin.inviteUserByEmail(
+		email,
+		{
+			data: {
+				name,
+				tester_password: input.testerPassword,
+				is_tester: true,
+			},
+			redirectTo: input.redirectTo,
+		},
+	);
+	if (error || !data?.user?.id) {
+		throw new Error(error?.message ?? "Failed to provision tester auth user.");
+	}
+
+	return { userId: data.user.id };
+}
+
 export async function deleteAdminAuthUser(userId: string): Promise<void> {
 	const adminSupabase = createSupabaseAdminClient();
 	const { error } = await adminSupabase.auth.admin.deleteUser(userId);

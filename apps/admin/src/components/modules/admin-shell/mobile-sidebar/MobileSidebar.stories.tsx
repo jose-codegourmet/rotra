@@ -40,6 +40,7 @@ function MobileSidebarDemo() {
 			<MobileSidebar
 				open={open}
 				pathname="/dashboard"
+				adminRole="super_admin"
 				unreadCount={countUnreadNotifications(MOCK_NOTIFICATIONS)}
 				onClose={() => setOpen(false)}
 				onRequestSignOut={() => setOpen(false)}
@@ -56,6 +57,7 @@ export const Closed: Story = {
 	args: {
 		open: false,
 		pathname: "/waitlist",
+		adminRole: "admin",
 		unreadCount: countUnreadNotifications(MOCK_NOTIFICATIONS),
 		onClose: () => {},
 		onRequestSignOut: () => {},

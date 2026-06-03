@@ -9,6 +9,12 @@ enum InvitationStatus {
   @@map("invitation_status_enum")
 }
 
+enum TagAssignableBy {
+  any_admin
+  super_admin_only
+
+  @@map("tag_assignable_by_enum")
+}
 
 enum PlayingLevel {
   beginner
@@ -379,6 +385,12 @@ enum AdminAction {
   admin_role_changed
   admin_force_signed_out
   admin_deleted
+  tester_invited
+  tester_invite_resent
+  tester_invite_revoked
+  tag_definition_created
+  tag_definition_updated
+  tag_definition_deactivated
 
   @@map("admin_action_enum")
 }
@@ -393,6 +405,8 @@ enum AdminActionEntity {
   club
   profile
   admin_user
+  tester_invitation
+  tag_definition
 
   @@map("admin_action_entity_enum")
 }
@@ -411,6 +425,8 @@ enum AdminNotificationType {
   new_moderation_flag
   platform_announcement
   admin_profile_changed
+  tester_invite_sent
+  tag_definition_changed
 
   @@map("admin_notification_type_enum")
 }

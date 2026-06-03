@@ -14,12 +14,14 @@ export type AddCustomerTagFormModalProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	profileId: string;
+	callerIsSuperAdmin: boolean;
 };
 
 export function AddCustomerTagFormModal({
 	open,
 	onOpenChange,
 	profileId,
+	callerIsSuperAdmin,
 }: AddCustomerTagFormModalProps) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -27,13 +29,14 @@ export function AddCustomerTagFormModal({
 				<DialogHeader>
 					<DialogTitle>Add tag</DialogTitle>
 					<DialogDescription>
-						Tags are internal labels for filtering and feature access. Slug is
-						derived from the label (spaces become hyphens).
+						Choose a tag from the catalog. Only active definitions you are
+						allowed to assign are listed.
 					</DialogDescription>
 				</DialogHeader>
 				{open ? (
 					<AddCustomerTagForm
 						profileId={profileId}
+						callerIsSuperAdmin={callerIsSuperAdmin}
 						onDismiss={() => onOpenChange(false)}
 						onSuccess={() => onOpenChange(false)}
 						onError={() => {}}

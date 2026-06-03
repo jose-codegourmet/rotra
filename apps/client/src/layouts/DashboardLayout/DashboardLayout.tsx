@@ -18,6 +18,7 @@ interface DashboardLayoutProps {
 	pageTitle?: string;
 	pageSubtitle?: string;
 	adminRole?: AdminRole | null;
+	isTesterAccount?: boolean;
 	currentProfile?: CurrentProfileDisplay | null;
 }
 
@@ -26,6 +27,7 @@ export function DashboardLayout({
 	pageTitle = "Dashboard",
 	pageSubtitle = "ROTRA",
 	adminRole = null,
+	isTesterAccount = false,
 	currentProfile = null,
 }: DashboardLayoutProps) {
 	const { data: notificationsData } = useNotificationsQuery(
@@ -42,6 +44,7 @@ export function DashboardLayout({
 				{/* Desktop sidebar — icon rail at md, full at lg */}
 				<Sidebar
 					adminRole={adminRole}
+					isTesterAccount={isTesterAccount}
 					currentProfile={currentProfile}
 					unreadCount={notificationUnreadCount}
 				/>
@@ -58,7 +61,11 @@ export function DashboardLayout({
 				<MobileHeader unreadCount={notificationUnreadCount} />
 
 				{/* Mobile navigation drawer — controlled by Redux */}
-				<MobileDrawer adminRole={adminRole} currentProfile={currentProfile} />
+				<MobileDrawer
+					adminRole={adminRole}
+					isTesterAccount={isTesterAccount}
+					currentProfile={currentProfile}
+				/>
 
 				{/* Main content */}
 				<main className="md:ml-20 lg:ml-64 pt-16 pb-20 md:pb-8 min-h-screen">

@@ -65,14 +65,14 @@ export async function patchCustomerSkills(
 
 export async function postCustomerTag(
 	profileId: string,
-	label: string,
+	slug: string,
 ): Promise<void> {
 	const res = await fetch(
 		`/api/customers/${encodeURIComponent(profileId)}/tags`,
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ label }),
+			body: JSON.stringify({ slug }),
 		},
 	);
 	const payload = (await res.json().catch(() => null)) as unknown;

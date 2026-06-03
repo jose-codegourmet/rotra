@@ -1,5 +1,6 @@
 "use client";
 
+import type { AdminRole } from "@prisma/client";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { DesktopNavbarHeader } from "@/components/modules/admin-shell/desktop-navbar-header/DesktopNavbarHeader";
@@ -17,11 +18,13 @@ export interface AdminShellProps {
 	children: React.ReactNode;
 	/** When set (e.g. Storybook), overrides the title derived from the URL. */
 	pageTitle?: string;
+	adminRole?: AdminRole;
 }
 
 export function AdminShell({
 	children,
 	pageTitle: pageTitleOverride,
+	adminRole = "admin",
 }: AdminShellProps) {
 	const pathname = usePathname();
 	const derivedTitle = getAdminShellPageTitle(pathname);
@@ -69,7 +72,7 @@ export function AdminShell({
 
 	return (
 		<div className="min-h-screen bg-bg-base">
-			<DesktopSidebar pathname={pathname} />
+			<DesktopSidebar pathname={pathname} adminRole={adminRole} />
 
 			<MobileNavBackdrop
 				open={mobileNavOpen}
@@ -79,6 +82,7 @@ export function AdminShell({
 			<MobileSidebar
 				open={mobileNavOpen}
 				pathname={pathname}
+				adminRole={adminRole}
 				unreadCount={notificationUnreadCount}
 				onClose={() => setMobileNavOpen(false)}
 				onRequestSignOut={openSignOutDialog}

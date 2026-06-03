@@ -49,6 +49,7 @@ export function customerProfileErrorResponse(error: unknown, context: string) {
 			not_found: 404,
 			conflict: 409,
 			invalid_label: 400,
+			forbidden: 403,
 		};
 		return NextResponse.json(
 			{ error: error.message, code: error.code },

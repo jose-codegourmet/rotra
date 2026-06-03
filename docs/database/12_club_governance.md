@@ -86,7 +86,9 @@ CREATE TYPE admin_notification_type_enum AS ENUM (
   'new_complaint',
   'new_moderation_flag',
   'platform_announcement',
-  'admin_profile_changed'
+  'admin_profile_changed',
+  'tester_invite_sent',
+  'tag_definition_changed'
 );
 
 CREATE TYPE admin_action_enum AS ENUM (
@@ -110,7 +112,13 @@ CREATE TYPE admin_action_enum AS ENUM (
   'admin_deactivated',
   'admin_reactivated',
   'admin_role_changed',
-  'admin_force_signed_out'
+  'admin_force_signed_out',
+  'tester_invited',
+  'tester_invite_resent',
+  'tester_invite_revoked',
+  'tag_definition_created',
+  'tag_definition_updated',
+  'tag_definition_deactivated'
 );
 
 CREATE TYPE admin_action_entity_enum AS ENUM (
@@ -122,7 +130,9 @@ CREATE TYPE admin_action_entity_enum AS ENUM (
   'platform_config',
   'club',
   'profile',
-  'admin_user'
+  'admin_user',
+  'tester_invitation',
+  'tag_definition'
 );
 ```
 
