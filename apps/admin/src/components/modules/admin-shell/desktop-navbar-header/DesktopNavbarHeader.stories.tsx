@@ -22,6 +22,7 @@ type Story = StoryObj<typeof DesktopNavbarHeader>;
 export const Default: Story = {
 	args: {
 		pageTitle: "Dashboard",
+		adminName: "Jose B.",
 		onRequestSignOut: () => {},
 		notifications: MOCK_NOTIFICATIONS,
 		unreadCount: countUnreadNotifications(MOCK_NOTIFICATIONS),

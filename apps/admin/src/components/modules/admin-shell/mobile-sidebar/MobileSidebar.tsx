@@ -1,7 +1,7 @@
 "use client";
 
 import type { AdminRole } from "@prisma/client";
-import { Bell, LogOut, X } from "lucide-react";
+import { Bell, LogOut, User, X } from "lucide-react";
 import Link from "next/link";
 import { navItemIsActive } from "@/components/modules/admin-shell/admin-nav";
 import { Button } from "@/components/ui/button/Button";
@@ -15,6 +15,7 @@ export interface MobileSidebarProps {
 	open: boolean;
 	pathname: string;
 	adminRole: AdminRole;
+	adminName?: string;
 	/** Unread count for the notifications nav row badge */
 	unreadCount?: number;
 	onClose: () => void;
@@ -25,6 +26,7 @@ export function MobileSidebar({
 	open,
 	pathname,
 	adminRole,
+	adminName,
 	unreadCount = 0,
 	onClose,
 	onRequestSignOut,
@@ -102,6 +104,24 @@ export function MobileSidebar({
 				</Link>
 			</nav>
 			<div className="border-t border-border p-3">
+				{adminName ? (
+					<p className="mb-2 truncate px-3 text-small text-text-primary">
+						{adminName}
+					</p>
+				) : null}
+				<Link
+					href={ROUTES.PROFILE}
+					onClick={onClose}
+					className={cn(
+						"mb-1 flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2 text-body transition-colors duration-default",
+						navItemIsActive(ROUTES.PROFILE, pathname)
+							? "bg-accent-subtle text-accent"
+							: "text-text-secondary hover:bg-bg-elevated hover:text-text-primary",
+					)}
+				>
+					<User aria-hidden className="size-5 shrink-0" strokeWidth={1.5} />
+					My profile
+				</Link>
 				<Button
 					type="button"
 					variant="ghost"

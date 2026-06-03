@@ -942,3 +942,136 @@ export async function deleteAdminUser(
 		return { auditLogId: log.id };
 	});
 }
+
+export type OwnAdminProfile = {
+	id: string;
+	name: string;
+	email: string;
+	adminRole: AdminRole;
+};
+
+export async function getOwnAdminProfile(
+	db: PrismaClient,
+	profileId: string,
+): Promise<OwnAdminProfile> {
+	const profile = await db.profile.findUnique({
+		where: { id: profileId },
+		select: {
+			id: true,
+			name: true,
+			email: true,
+			adminRole: true,
+			adminIsActive: true,
+		},
+	});
+	if (!profile?.adminRole || !profile.adminIsActive || !profile.email) {
+		throw new AdminUserError("not_found", "Admin profile not found.");
+	}
+	return {
+		id: profile.id,
+		name: profile.name,
+		email: profile.email,
+		adminRole: profile.adminRole,
+	};
+}
+
+export async function updateOwnAdminName(
+	db: PrismaClient,
+	input: { profileId: string; name: string },
+): Promise<{ name: string }> {
+	const trimmed = input.name.trim();
+	if (!trimmed) {
+		throw new AdminUserError("bad_input", "Name is required.");
+	}
+
+	const existing = await db.profile.findUnique({
+		where: { id: input.profileId },
+		select: { id: true, adminRole: true, adminIsActive: true },
+	});
+	if (!existing?.adminRole || !existing.adminIsActive) {
+		throw new AdminUserError("not_found", "Admin profile not found.");
+	}
+
+	const updated = await db.profile.update({
+		where: { id: input.profileId },
+		data: { name: trimmed },
+		select: { name: true },
+	});
+	return { name: updated.name };
+}
+
+export async function deleteOwnAdminProfile(
+	db: PrismaClient,
+	input: {
+		profileId: string;
+		foundingSuperAdminId?: string | null;
+	},
+): Promise<{ auditLogId: string }> {
+	return db.$transaction(async (tx) => {
+		const target = await tx.profile.findUnique({
+			where: { id: input.profileId },
+			select: {
+				id: true,
+				email: true,
+				adminRole: true,
+				adminIsActive: true,
+				adminInvitedAt: true,
+				adminActivatedAt: true,
+				adminDeactivatedAt: true,
+			},
+		});
+		if (!target?.adminRole || !target.adminIsActive) {
+			throw new AdminUserError("not_found", "Admin profile not found.");
+		}
+		if (input.foundingSuperAdminId && target.id === input.foundingSuperAdminId) {
+			throw new AdminUserError(
+				"forbidden",
+				"Founding Super Admin cannot delete their account.",
+			);
+		}
+		await assertLastActiveSuperAdminGuard(tx, target.id);
+
+		const before = profileSnapshot(target);
+		if (target.email) {
+			await tx.adminInvitation.updateMany({
+				where: {
+					email: target.email,
+					status: "pending",
+				},
+				data: { status: "revoked" },
+			});
+		}
+
+		const log = await tx.adminActionLog.create({
+			data: {
+				adminId: input.profileId,
+				action: "admin_deleted" as AdminAction,
+				entityType: "admin_user",
+				entityId: target.id,
+				beforeValue: before as object,
+				note: "Self-deleted",
+			},
+			select: { id: true },
+		});
+
+		const targetName = await profileDisplayName(tx, target.id);
+		await broadcastNotificationInTx(tx, {
+			audience: {
+				adminRoles: ["super_admin"],
+				excludeProfileIds: [input.profileId],
+			},
+			notificationType: ADMIN_BROADCAST_NOTIFICATION_TYPE,
+			adminNotificationType: ADMIN_LIFECYCLE_NOTIFICATION_TYPE,
+			severity: "urgent",
+			title: "Admin account deleted",
+			body: `${targetName} deleted their admin account.`,
+			appScopes: ["admin"],
+			targetUrl: "/admins",
+			relatedEntityType: "admin_user",
+			relatedEntityId: target.id,
+			createdById: input.profileId,
+		});
+
+		return { auditLogId: log.id };
+	});
+}

@@ -38,6 +38,7 @@ export const ROUTES = {
 	ANALYTICS: "/analytics",
 	WAITLIST: "/waitlist",
 	NOTIFICATIONS: "/notifications",
+	PROFILE: "/profile",
 	TAGS: "/tags",
 	TESTERS: "/testers",
 } as const;
@@ -73,6 +74,7 @@ export const ADMIN_PAGE_TITLES: Record<string, string> = {
 	[ROUTES.ANALYTICS]: "Analytics",
 	[ROUTES.WAITLIST]: "Waitlist",
 	[ROUTES.NOTIFICATIONS]: "Notifications",
+	[ROUTES.PROFILE]: "My profile",
 	[ROUTES.TAGS]: "Tag definitions",
 	[ROUTES.TESTERS]: "Testers",
 };

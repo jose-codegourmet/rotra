@@ -101,7 +101,7 @@ Shared shell component present on all authenticated Admin App views.
   - `staging`: `color-warning` background (`#FFB800`), dark text — `◐ STAGING`
   - `dev`: `color-bg-elevated` background, `color-text-secondary` text — `○ DEVELOPMENT`
 - Left: filled circle icon (8px) + environment label — `text-label` (12px, uppercase, Medium)
-- Right: logged-in admin name + dropdown caret (account menu: Profile, Change Password, Logout)
+- Right: logged-in admin name + dropdown caret (account menu: [Profile](./profile.md), Change Password, Logout)
 - The environment label is non-interactive (display only)
 - On `prod`: all save/toggle actions throughout the app trigger an additional confirmation dialog that re-states "You are modifying PRODUCTION"
 
