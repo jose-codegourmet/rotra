@@ -85,7 +85,7 @@ export function AdminShell({
 				open={mobileNavOpen}
 				pathname={pathname}
 				adminRole={adminRole}
-				adminName={adminName}
+				{...(adminName !== undefined ? { adminName } : {})}
 				unreadCount={notificationUnreadCount}
 				onClose={() => setMobileNavOpen(false)}
 				onRequestSignOut={openSignOutDialog}
@@ -99,7 +99,7 @@ export function AdminShell({
 			<div className="flex min-h-screen flex-col pt-16 md:ml-20 md:pt-0 lg:ml-64">
 				<DesktopNavbarHeader
 					pageTitle={pageTitle}
-					adminName={adminName}
+					{...(adminName !== undefined ? { adminName } : {})}
 					onRequestSignOut={openSignOutDialog}
 					notifications={shellNotifications}
 					unreadCount={notificationUnreadCount}
