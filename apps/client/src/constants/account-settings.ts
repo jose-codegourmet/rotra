@@ -15,14 +15,14 @@ export const SETTINGS_SECTIONS = [
 			{
 				icon: User,
 				label: "Profile Information",
-				description: "Name, photo, playing level",
-				href: "#",
+				description: "Name, email, account deletion",
+				href: "/settings/account",
 			},
 			{
 				icon: Lock,
 				label: "Password & Security",
-				description: "Change password, 2FA",
-				href: "#",
+				description: "Change password (tester accounts)",
+				href: "/settings/account",
 			},
 			{
 				icon: Globe,

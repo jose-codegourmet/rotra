@@ -1,7 +1,7 @@
 "use client";
 
 import type { AdminRole } from "@prisma/client";
-import { LogOut, MoreVertical, UserCircle } from "lucide-react";
+import { LogOut, MoreVertical, Settings, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLogoutDialog } from "@/hooks/useLogoutDialog/client";
@@ -64,6 +64,18 @@ export function SidebarUserMenu({
 								className="shrink-0 text-text-secondary"
 							/>
 							Profile
+						</Link>
+						<Link
+							href="/settings/account"
+							onClick={() => setIsOpen(false)}
+							className="flex items-center gap-3 px-4 min-h-[44px] text-small font-bold text-text-primary hover:bg-bg-elevated transition-colors duration-default uppercase tracking-widest"
+						>
+							<Settings
+								size={16}
+								strokeWidth={1.5}
+								className="shrink-0 text-text-secondary"
+							/>
+							Account Settings
 						</Link>
 						<div className="h-px bg-border" />
 						<button

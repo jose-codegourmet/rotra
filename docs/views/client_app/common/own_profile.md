@@ -74,7 +74,7 @@ Same scrollable structure as the public profile, but with edit affordances inlin
 ### Header Bar
 - No back arrow (this is a tab root)
 - Title: `Profile` — `text-heading`, left-aligned
-- Right: gear icon button → future settings page (Phase 3)
+- Right: **Edit account** link (Settings icon) → [`/settings/account`](./account_settings.md) — name, password (tester), and account deletion
 - Background: `color-bg-base`
 
 ### Avatar with Edit Photo
