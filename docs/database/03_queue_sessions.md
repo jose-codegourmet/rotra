@@ -24,7 +24,7 @@ CREATE TYPE session_origin_enum AS ENUM ('player_organized', 'club_queue');
 -- Only applicable when origin = 'club_queue'; NULL for player_organized
 CREATE TYPE schedule_type_enum AS ENUM ('mmr', 'fun_games');
 
-CREATE TYPE session_status_enum AS ENUM ('draft', 'open', 'active', 'closed', 'cancelled');
+CREATE TYPE session_status_enum AS ENUM ('draft', 'open', 'active', 'closed', 'completed', 'cancelled');
 
 CREATE TYPE session_visibility_enum AS ENUM ('club_members', 'open');
 
@@ -71,6 +71,10 @@ CREATE TABLE queue_sessions (
   -- Venue & time
   location  text NOT NULL,
   address   text,
+  -- Geocoded coordinates for session discovery map (NULL until geocoded)
+  venue_lat      double precision,
+  venue_lng      double precision,
+  venue_address  text,  -- normalized geocoded label; may differ from free-text address
   date_time timestamptz NOT NULL,
   end_time  timestamptz,
 
@@ -115,6 +119,7 @@ CREATE TABLE queue_sessions (
 - `status` transitions follow a strict state machine (see diagram below).
 - `shuttles_used` is updated by the Que Master during the session as tubes are consumed; it feeds the cost calculation.
 - `smart_monitor_threshold` is configurable per session by the Que Master (default 90%).
+- `venue_lat`, `venue_lng`, and `venue_address` power the **Session Discovery Dashboard** map at `/dashboard`. They are populated when a session is created or updated with a resolvable address (Mapbox Geocoding API). Sessions without coordinates remain discoverable in List/Grid views but do not render map pins. `location` and `address` remain the human-entered venue fields; `venue_address` is the geocoder's normalized label.
 
 ### Per-Player Cost Formula
 
@@ -134,7 +139,7 @@ This is calculated at the application layer and written to each player's `sessio
 ### Session Status State Machine
 
 ```
-draft ──► open ──► active ──► closed
+draft ──► open ──► active ──► closed ──► completed
   │                  │
   └──────────────────┴──► cancelled
 ```
@@ -144,8 +149,11 @@ draft ──► open ──► active ──► closed
 | `draft` | Setup incomplete; not visible to players |
 | `open` | Accepting registrations; visible to members |
 | `active` | Session has started; matches running |
-| `closed` | Session ended; read-only |
+| `closed` | Queue is done — no new matches; awaiting final payment settlement |
+| `completed` | All payments settled; session fully wrapped and read-only |
 | `cancelled` | Cancelled before or during; read-only |
+
+> **Discovery visibility:** Only `open` and `active` sessions appear on the Session Discovery Dashboard (`/dashboard`). A session leaves the map/list once it is `closed`, `completed`, or `cancelled`.
 
 ### Indexes
 
@@ -156,6 +164,8 @@ CREATE INDEX idx_queue_sessions_status     ON queue_sessions(status);
 CREATE INDEX idx_queue_sessions_date_time  ON queue_sessions(date_time);
 CREATE INDEX idx_queue_sessions_origin     ON queue_sessions(origin);
 CREATE INDEX idx_queue_sessions_schedule   ON queue_sessions(schedule_type);
+CREATE INDEX idx_queue_sessions_geo        ON queue_sessions(venue_lat, venue_lng)
+  WHERE venue_lat IS NOT NULL AND venue_lng IS NOT NULL;
 ```
 
 ---

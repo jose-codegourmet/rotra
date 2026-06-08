@@ -20,5 +20,6 @@ This document is split by topic. Use the links below.
 8. [Real-Time Architecture](./09_real_time_architecture.md#8-real-time-architecture)
 9. [Form Engineering Guidelines](./11_form_engineering_guidelines.md#11-form-engineering-guidelines)
 10. [Storybook (3.9)](./04_tech_stack_reference.md#39-component-development--storybook)
-11. [Runtime Versions & Hosting](./13_runtime_versions.md#runtime-versions--hosting)
-12. [Summary Table](./10_summary_table.md#summary-table)
+11. [Maps & Geolocation (3.10)](./04_tech_stack_reference.md#310-maps--geolocation)
+12. [Runtime Versions & Hosting](./13_runtime_versions.md#runtime-versions--hosting)
+13. [Summary Table](./10_summary_table.md#summary-table)

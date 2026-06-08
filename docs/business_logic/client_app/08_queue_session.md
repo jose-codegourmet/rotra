@@ -16,6 +16,31 @@ A session handles:
 
 ---
 
+## Session discovery map (`/dashboard`)
+
+The post-login **Home** route (`/dashboard`) is a map-first discovery surface for nearby queue sessions. See [`docs/views/client_app/common/session_discovery_dashboard.md`](../../views/client_app/common/session_discovery_dashboard.md).
+
+### Which sessions appear on the map
+
+| Session `status` | `visibility` | Club membership | On discovery map? |
+|------------------|--------------|-----------------|---------------------|
+| `open` or `active` | `open` | Any authenticated player | Yes (if `venue_lat` / `venue_lng` set) |
+| `open` or `active` | `club_members` | Member of hosting club | Yes (if coordinates set) |
+| `open` or `active` | `club_members` | Not a member | No |
+| `draft`, `closed`, `completed`, `cancelled` | Any | Any | No |
+
+List and Grid views on the same dashboard use the same visibility rules. Sessions without geocoded coordinates are omitted from the map but may still appear in List/Grid with distance hidden.
+
+### Quick Session (player-organized)
+
+From the dashboard, any player **not already in an active session** can start a **Quick Session** — a streamlined create flow for `origin = player_organized` sessions. See [`PLAN_phase_3_quick_session_cta.md`](../../../PLAN_phase_3_quick_session_cta.md).
+
+### Active session guard
+
+A player who is already registered (`admission_status` in `accepted`, `waitlisted`, or `reserved`; `player_status` not `exited`) in a session with `status` `open` or `active` **cannot** start another Quick Session or join a different session without first leaving their current one. The dashboard surfaces a **Resume Session** CTA and blocking prompt instead. See [`PLAN_phase_4_active_session_guard.md`](../../../PLAN_phase_4_active_session_guard.md).
+
+---
+
 ## Session origin & competitive scope
 
 ### Two ways a session is created
@@ -61,9 +86,9 @@ Open (players join, queue fills)
     ↓
 Active (matches are being played)
     ↓
-Closed (no new matches; existing in review)
+Closed (queue is done — no new matches; payments being settled)
     ↓
-Completed (all matches finalized)
+Completed (all payments settled; session fully wrapped)
 ```
 
 | State | Who Can Act | Player Can Join |
@@ -71,8 +96,10 @@ Completed (all matches finalized)
 | Draft | Session host only (player-organized: creator; club queue: Que Master or Club Owner) | No |
 | Open | Session host + Players | Yes |
 | Active | Session host + Players + Umpires | Yes (waitlisted) |
-| Closed | Session host only | No |
+| Closed | Session host only (payment settlement) | No |
 | Completed | Read-only | No |
+
+> **`closed` vs `completed`:** `closed` means the queue is finished (no more matches) but final per-player payments may still be in settlement. `completed` means everyone has paid and the session is fully wrapped. Both are removed from discovery.
 
 ---
 
