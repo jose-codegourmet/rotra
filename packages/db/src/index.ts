@@ -169,4 +169,11 @@ export {
 	type ListNotificationsForInboxResult,
 	type NotificationInboxRow,
 } from "./notification-service";
+export {
+	deleteOwnPlayerProfile,
+	getOwnPlayerProfile,
+	PlayerProfileError,
+	updateOwnPlayerName,
+	type OwnPlayerProfile,
+} from "./player-profile-service";
 export type { Database, Json } from "./supabase-database.types";

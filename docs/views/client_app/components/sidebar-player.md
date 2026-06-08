@@ -34,9 +34,8 @@ The primary navigation shell for the **Player** role on desktop (≥1024px). A f
 │                     │
 │  ─────────────────  │  ← Divider
 │                     │
-│  [av]  Alex Santos  │  ← User identity
-│        Warrior 2    │
-│  [ Logout ]         │
+│  [av]  Alex Santos [⋮]│  ← User identity + menu
+│        Warrior 2      │
 └─────────────────────┘
 ```
 
@@ -156,28 +155,42 @@ When no active session: strip is fully unmounted (not hidden with CSS — no res
 ### 5. User Identity Footer
 
 ```
-│  [av]  Alex Santos  │
-│        Warrior 2    │
-│  [ Logout ]         │
+│  [av]  Alex Santos        [⋮]  │  ← Row trigger (opens menu)
+│        Warrior 2               │
+│  ┌─────────────────────────┐   │  ← Popup (when open, above row)
+│  │  Profile                │   │
+│  │  Account Settings       │   │
+│  │  ─────────────────────  │   │
+│  │  Log Out                │   │
+│  └─────────────────────────┘   │
 ```
 
+Pinned to the bottom of the sidebar (`mt-auto`, top border `color-border`, horizontal padding).
+
+#### User row (trigger)
+
+- **Layout:** full-width button, horizontal flex — `SmallUserCard` (avatar + name + tier) + **MoreVertical** (⋮) icon on the right (desktop only)
 - **Avatar:** 32×32px, `radius-full`, 1px `color-border` border
 - **Name:** `text-small` (13px, SemiBold), `color-text-primary`, truncated with ellipsis, max 1 line
 - **Tier label:** `text-micro` (10px), `color-text-secondary` (e.g. `Warrior 2`)
-- **Layout:** horizontal flex (avatar left + text column right), `space-3` gap
-- **Padding:** `space-4` horizontal, `space-4` vertical
-- **Tap on avatar or name** → navigates to `/profile`
+- **Hover:** `color-bg-elevated` background on the row
+- **Tap row or ⋮** → toggles popup menu (`aria-expanded`)
 
 #### Data source
 
 - **Name:** `profiles.name` from the signed-in player’s profile row (passed into the shell from the server). If the profile payload is not yet available, the UI may fall back to Facebook `full_name` (or equivalent) from Supabase Auth `user_metadata` until the profile loads.
 - **Avatar:** `profiles.avatar_url` when set to a valid `http(s)` URL; otherwise fall back to Facebook `avatar_url` / `picture` from auth metadata.
 
-#### Logout
-- Below the avatar row, `space-2` top margin
-- `Logout` — `text-small` (13px), `color-text-secondary`, no background
-- Hover: `color-text-primary`
-- Tap → triggers logout confirmation or direct logout depending on app config
+#### Popup menu (above the user row)
+
+- **Position:** `absolute`, `bottom-full`, full width of footer, `mb-2`, `z-10`
+- **Container:** `color-bg-surface`, 1px `color-border`, `radius-lg`, `shadow-modal`
+- **Items** (each row min-height 44px, uppercase `text-small`, bold, tracking-widest):
+  - **Profile** — user-circle icon → `/profile` (admin) or `/profile/:id` (player)
+  - **Account Settings** — settings icon → `/settings/account` (see [`../common/account_settings.md`](../common/account_settings.md))
+  - **Divider** — 1px `color-border`
+  - **Log Out** — `color-error` text; tap closes menu and opens logout confirmation dialog
+- **Dismiss:** click outside the footer container closes the menu
 
 ---
 

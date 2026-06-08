@@ -17,32 +17,47 @@ The top navigation bar for the **Player** role. On desktop (≥1024px) this is t
 Sits flush to the top of the main content area, to the right of the sidebar. Not fixed/sticky — scrolls with page content on inner views, but sticky on list/dashboard views.
 
 ```
-┌────────────────────────────────────────────────────────────────┐
-│  [Page Title]                                      [🔔  3]     │
-└────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  [Page Title]     │  [subtitle]     [theme] [🔔] [search] [avatar ▾]      │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Spec
-- **Height:** 56px
-- **Background:** `color-bg-base`
-- **Border-bottom:** 1px solid `color-border`
-- **Left:** Page title — `text-title` (22px, SemiBold), `color-text-primary`
-  - On `/home`: replaced by greeting — `Good morning/afternoon/evening, [First name].`
-  - On inner pages: plain page title (e.g. `Clubs`, `Sessions`, `Profile`)
-- **Right:** Notification bell icon button (24px stroke, `color-text-primary`)
-  - Unread badge: red pill (`color-error` bg, white text, `text-micro`), shows count 1–99 or "99+"
-- **Max content width:** `1200px`, left-aligned in the main area
+- **Height:** 64px (`h-16`)
+- **Position:** Fixed top-right of main content area (`w-[calc(100%-256px)]`), `z-40`
+- **Background:** `color-bg-surface` at 80% opacity with backdrop blur; **border-bottom:** 1px `color-border`
+- **Left:** Breadcrumb-style title row
+  - Primary segment: page title — `text-label`, bold, uppercase, tracking-widest, `color-accent`
+  - Divider: 1px vertical `color-border-strong`
+  - Secondary segment: subtitle (default `ROTRA`) — same typography, `color-text-secondary`
+- **Right (left to right):**
+  - **Theme toggle** — light/dark/system
+  - **Notifications dropdown** — bell with unread badge; 5 most recent + **View all** → `/notifications`
+  - **Search** — icon button (placeholder; no route yet)
+  - **Avatar menu** — 36×36px circular trigger (`border-2` `color-accent`); profile image or user icon fallback
+
+#### Avatar dropdown menu
+
+Opened from the avatar trigger (`align="end"`, min-width ~12rem).
+
+- **Header row:** signed-in display name (`profiles.name` with auth metadata fallback), truncated
+- **View profile** → `/profile` (admin) or `/profile/:id` (player)
+- **Account settings** → `/settings/account` (see [`../common/account_settings.md`](../common/account_settings.md))
+- **Log out** — destructive styling; opens logout confirmation dialog
+
+> Account settings is not a per-route navbar icon; it is always available from this dropdown on desktop (≥1024px).
 
 ### Page-Specific Variations
 
 | Route | Left content | Right content |
 |-------|-------------|---------------|
-| `/home` | `Good [time], [First name].` | 🔔 bell |
-| `/clubs` | `Clubs` | 🔔 bell |
-| `/sessions` | `Sessions` | 🔔 bell |
-| `/profile` | `Profile` | ⚙ settings icon |
-| `/notifications` | `Notifications` | — |
-| Inner page (e.g. `/clubs/:id`) | `← [Back label]` + `[Club name]` | — |
+| `/home` | Page title + subtitle | Theme, 🔔, search, avatar menu |
+| `/clubs` | `Clubs` + subtitle | Theme, 🔔, search, avatar menu |
+| `/sessions` | `Sessions` + subtitle | Theme, 🔔, search, avatar menu |
+| `/profile` | `Profile` + subtitle | Theme, 🔔, search, avatar menu |
+| `/settings/account` | `Account` + subtitle | Theme, 🔔, search, avatar menu |
+| `/notifications` | `Notifications` + subtitle | Theme, avatar menu (no search on some views) |
+| Inner page (e.g. `/clubs/:id`) | `← [Back label]` + `[Club name]` | Contextual actions or avatar menu |
 
 ---
 

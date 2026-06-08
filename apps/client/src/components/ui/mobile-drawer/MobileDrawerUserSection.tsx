@@ -1,5 +1,6 @@
 import type { AdminRole } from "@prisma/client";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, Settings } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button/Button";
 import { useLogoutDialog } from "@/hooks/useLogoutDialog/client";
 import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
@@ -46,19 +47,29 @@ export function MobileDrawerUserSection({
 					/>
 				)}
 
-				<Button
-					type="button"
-					variant="ghost"
-					size="icon"
-					aria-label="Open account options"
-					className="ml-auto shrink-0 text-text-disabled"
-					onClick={() => {
-						dispatch(closeMobileDrawer());
-						openLogoutDialog();
-					}}
-				>
-					<LogOutIcon size={16} strokeWidth={1.5} />
-				</Button>
+				<div className="ml-auto flex shrink-0 items-center gap-1">
+					<Link
+						href="/settings/account"
+						aria-label="Account settings"
+						onClick={() => dispatch(closeMobileDrawer())}
+						className="flex size-9 items-center justify-center rounded-md text-text-disabled hover:bg-bg-elevated hover:text-accent transition-colors duration-default"
+					>
+						<Settings size={16} strokeWidth={1.5} />
+					</Link>
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						aria-label="Log out"
+						className="text-text-disabled"
+						onClick={() => {
+							dispatch(closeMobileDrawer());
+							openLogoutDialog();
+						}}
+					>
+						<LogOutIcon size={16} strokeWidth={1.5} />
+					</Button>
+				</div>
 			</div>
 		</div>
 	);

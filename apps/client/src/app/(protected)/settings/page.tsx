@@ -1,6 +1,7 @@
 import { ChevronRight, LogOut, Trash2 } from "lucide-react";
 import type { Metadata } from "next";
 
+import { SettingsProfileCard } from "@/components/modules/settings/settings-profile-card/SettingsProfileCard";
 import { SETTINGS_SECTIONS } from "@/constants/account-settings";
 
 export const metadata: Metadata = {
@@ -25,24 +26,7 @@ export default function SettingsPage() {
 					</p>
 				</div>
 
-				{/* Profile card */}
-				<div className="bg-bg-surface border border-border rounded-lg p-5 shadow-card flex items-center gap-4">
-					<div className="size-12 rounded-full bg-bg-elevated border-2 border-border flex items-center justify-center shrink-0">
-						<span className="text-body font-black text-text-secondary">AS</span>
-					</div>
-					<div className="flex-1 min-w-0">
-						<p className="text-body font-semibold text-text-primary">
-							Alex Santos
-						</p>
-						<p className="text-small text-text-secondary">alex@example.com</p>
-					</div>
-					<a
-						href="/profile"
-						className="text-small font-bold uppercase tracking-widest text-accent shrink-0"
-					>
-						View Profile
-					</a>
-				</div>
+				<SettingsProfileCard />
 
 				{/* Settings sections */}
 				{SETTINGS_SECTIONS.map((section) => (

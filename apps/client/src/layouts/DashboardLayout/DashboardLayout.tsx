@@ -55,6 +55,8 @@ export function DashboardLayout({
 					pageSubtitle={pageSubtitle}
 					notifications={shellNotifications}
 					unreadCount={notificationUnreadCount}
+					adminRole={adminRole}
+					currentProfile={currentProfile}
 				/>
 
 				{/* Mobile top header — hidden at md+ */}

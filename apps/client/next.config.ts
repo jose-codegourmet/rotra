@@ -10,6 +10,47 @@ const prismaTracingGlobs = [
 	"../../node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client/**",
 ];
 
+/** Facebook / Meta avatar CDNs used by Supabase OAuth (avatar_url, picture). */
+const facebookImageRemotePatterns: NonNullable<
+	NextConfig["images"]
+>["remotePatterns"] = [
+	{
+		protocol: "https",
+		hostname: "platform-lookaside.fbsbx.com",
+		pathname: "/**",
+	},
+	{
+		protocol: "https",
+		hostname: "lookaside.fbsbx.com",
+		pathname: "/**",
+	},
+	{
+		protocol: "https",
+		hostname: "**.fbsbx.com",
+		pathname: "/**",
+	},
+	{
+		protocol: "https",
+		hostname: "*.fbsbx.com",
+		pathname: "/**",
+	},
+	{
+		protocol: "https",
+		hostname: "**.fbcdn.net",
+		pathname: "/**",
+	},
+	{
+		protocol: "https",
+		hostname: "*.fbcdn.net",
+		pathname: "/**",
+	},
+	{
+		protocol: "https",
+		hostname: "graph.facebook.com",
+		pathname: "/**",
+	},
+];
+
 const nextConfig: NextConfig = {
 	outputFileTracingRoot: monorepoRoot,
 	outputFileTracingIncludes: {
@@ -19,10 +60,12 @@ const nextConfig: NextConfig = {
 	transpilePackages: ["@rotra/ui", "@rotra/db", "@rotra/legal-content"],
 	images: {
 		remotePatterns: [
-			{ hostname: "i.pravatar.cc" },
-			{ protocol: "https", hostname: "*.fbcdn.net", pathname: "/**" },
-			{ protocol: "https", hostname: "*.fbsbx.com", pathname: "/**" },
-			{ protocol: "https", hostname: "graph.facebook.com", pathname: "/**" },
+			{
+				protocol: "https",
+				hostname: "i.pravatar.cc",
+				pathname: "/**",
+			},
+			...facebookImageRemotePatterns,
 		],
 	},
 };
