@@ -1,6 +1,7 @@
 "use client";
 
 import type { AdminRole } from "@prisma/client";
+import { usePathname } from "next/navigation";
 import { BottomNav } from "@/components/ui/bottom-nav/BottomNav";
 import { MobileDrawer } from "@/components/ui/mobile-drawer/MobileDrawer";
 import { MobileHeader } from "@/components/ui/mobile-header/MobileHeader";
@@ -30,6 +31,9 @@ export function DashboardLayout({
 	isTesterAccount = false,
 	currentProfile = null,
 }: DashboardLayoutProps) {
+	const pathname = usePathname();
+	const isFullBleed = pathname === "/dashboard";
+
 	const { data: notificationsData } = useNotificationsQuery(
 		SHELL_NOTIFICATION_FILTERS,
 		{ refetchInterval: 30_000 },
@@ -70,7 +74,13 @@ export function DashboardLayout({
 				/>
 
 				{/* Main content */}
-				<main className="md:ml-20 lg:ml-64 pt-16 pb-20 md:pb-8 min-h-screen">
+				<main
+					className={
+						isFullBleed
+							? "md:ml-20 lg:ml-64 pt-16 overflow-hidden"
+							: "md:ml-20 lg:ml-64 pt-16 pb-20 md:pb-8 min-h-screen"
+					}
+				>
 					{children}
 				</main>
 

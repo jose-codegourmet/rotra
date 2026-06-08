@@ -55,7 +55,7 @@ export function DashboardClient() {
 	const sessions = data?.sessions ?? [];
 
 	return (
-		<div className="relative h-[calc(100dvh-var(--navbar-height,0px))] min-h-[480px] w-full overflow-hidden bg-bg-base">
+		<div className="relative h-[calc(100dvh-4rem)] min-h-[480px] w-full overflow-hidden bg-bg-base">
 			{viewMode === "map" ? (
 				<DashboardMap
 					sessions={sessions}

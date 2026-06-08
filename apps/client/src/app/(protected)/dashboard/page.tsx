@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { DashboardSkeleton } from "@/components/modules/dashboard/dashboard-skeleton/DashboardSkeleton";
 import { DashboardClient } from "./DashboardClient";
 
 export const metadata: Metadata = {
@@ -7,5 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function DashboardPage() {
-	return <DashboardClient />;
+	return (
+		<Suspense fallback={<DashboardSkeleton />}>
+			<DashboardClient />
+		</Suspense>
+	);
 }
