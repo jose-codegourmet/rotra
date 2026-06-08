@@ -11,13 +11,18 @@ function initialsFromDisplayName(name: string): string {
 	if (parts.length === 0) return "?";
 	if (parts.length === 1) {
 		const word = parts[0];
-		if (word.length >= 2) {
-			return (word[0] + word[word.length - 1]).toUpperCase();
-		}
-		return word[0]?.toUpperCase() ?? "?";
+		if (!word) return "?";
+		const first = word.at(0);
+		const last = word.at(-1);
+		if (!first) return "?";
+		if (word.length >= 2 && last) return `${first}${last}`.toUpperCase();
+		return first.toUpperCase();
 	}
-	const first = parts[0][0];
-	const last = parts[parts.length - 1][0];
+	const firstWord = parts[0];
+	const lastWord = parts[parts.length - 1];
+	const first = firstWord?.at(0);
+	const last = lastWord?.at(0);
+	if (!first || !last) return "?";
 	return `${first}${last}`.toUpperCase();
 }
 
