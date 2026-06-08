@@ -152,6 +152,7 @@ enum SessionStatus {
   open
   active
   closed
+  completed
   cancelled
 
   @@map("session_status_enum")

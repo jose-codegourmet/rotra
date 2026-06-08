@@ -11,6 +11,9 @@ model QueueSession {
 
   location  String
   address   String?
+  venueLat     Float?  @map("venue_lat")
+  venueLng     Float?  @map("venue_lng")
+  venueAddress String? @map("venue_address")
   dateTime  DateTime @map("date_time") @db.Timestamptz(6)
   endTime   DateTime? @map("end_time") @db.Timestamptz(6)
 
@@ -50,6 +53,7 @@ model QueueSession {
   @@index([dateTime], map: "idx_queue_sessions_date_time")
   @@index([origin], map: "idx_queue_sessions_origin")
   @@index([scheduleType], map: "idx_queue_sessions_schedule")
+  @@index([venueLat, venueLng], map: "idx_queue_sessions_geo")
   @@map("queue_sessions")
 }
 

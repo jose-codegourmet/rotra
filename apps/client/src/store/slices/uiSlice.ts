@@ -1,11 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { DashboardViewMode } from "@/types/session-discovery";
 
 interface UIState {
 	isMobileDrawerOpen: boolean;
+	dashboardViewMode: DashboardViewMode;
 }
 
 const initialState: UIState = {
 	isMobileDrawerOpen: false,
+	dashboardViewMode: "map",
 };
 
 const uiSlice = createSlice({
@@ -21,10 +24,21 @@ const uiSlice = createSlice({
 		closeMobileDrawer(state) {
 			state.isMobileDrawerOpen = false;
 		},
+		setDashboardViewMode(state, action: PayloadAction<DashboardViewMode>) {
+			state.dashboardViewMode = action.payload;
+		},
+		resetDashboardViewMode(state) {
+			state.dashboardViewMode = "map";
+		},
 	},
 });
 
-export const { toggleMobileDrawer, openMobileDrawer, closeMobileDrawer } =
-	uiSlice.actions;
+export const {
+	toggleMobileDrawer,
+	openMobileDrawer,
+	closeMobileDrawer,
+	setDashboardViewMode,
+	resetDashboardViewMode,
+} = uiSlice.actions;
 
 export default uiSlice.reducer;
