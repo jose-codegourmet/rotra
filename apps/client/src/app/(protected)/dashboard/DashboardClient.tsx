@@ -5,6 +5,8 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { ActiveSessionBanner } from "@/components/modules/dashboard/active-session-banner/ActiveSessionBanner";
+import { AlreadyInSessionDialog } from "@/components/modules/dashboard/already-in-session-dialog/AlreadyInSessionDialog";
 import { DashboardSkeleton } from "@/components/modules/dashboard/dashboard-skeleton/DashboardSkeleton";
 import { MapSearchOverlay } from "@/components/modules/dashboard/map-search-overlay/MapSearchOverlay";
 import { QuickSessionButton } from "@/components/modules/dashboard/quick-session-button/QuickSessionButton";
@@ -47,6 +49,7 @@ export function DashboardClient() {
 	const [selectedVenueKey, setSelectedVenueKey] = useState<string | null>(null);
 	const [venueModalKey, setVenueModalKey] = useState<string | null>(null);
 	const [unavailableDialogOpen, setUnavailableDialogOpen] = useState(false);
+	const [blockedDialogOpen, setBlockedDialogOpen] = useState(false);
 	const [nearbyOnly, setNearbyOnly] = useState(true);
 	const [doublesOnly, setDoublesOnly] = useState(false);
 	const [weekendOnly, setWeekendOnly] = useState(false);
@@ -81,7 +84,8 @@ export function DashboardClient() {
 		effectiveCenter.lng,
 		filters,
 	);
-	useActiveSession();
+	const { data: activeData } = useActiveSession();
+	const active = activeData?.active ?? null;
 
 	const sessions = data?.sessions ?? [];
 	const venueGroups = data?.venueGroups ?? [];
@@ -91,6 +95,11 @@ export function DashboardClient() {
 
 	const handleJoinSession = useCallback(
 		async (sessionId: string) => {
+			if (active && active.sessionId !== sessionId) {
+				setBlockedDialogOpen(true);
+				return;
+			}
+
 			try {
 				const res = await fetch(`/api/sessions/${sessionId}`);
 				if (!res.ok) {
@@ -109,7 +118,7 @@ export function DashboardClient() {
 				setUnavailableDialogOpen(true);
 			}
 		},
-		[router],
+		[router, active],
 	);
 
 	const handleRefreshNearby = useCallback(() => {
@@ -203,8 +212,27 @@ export function DashboardClient() {
 			/>
 			<ViewToggle />
 
-			<QuickSessionButton onClick={() => setSheetOpen(true)} />
-			<QuickSessionSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+			{active ? (
+				<ActiveSessionBanner
+					session={active}
+					onNavigate={() => router.push(active.href)}
+					className="absolute top-4 left-4 right-4 z-[25]"
+				/>
+			) : null}
+
+			<QuickSessionButton
+				variant={active ? "resume" : "create"}
+				onClick={() => {
+					if (active) {
+						router.push(active.href);
+					} else {
+						setSheetOpen(true);
+					}
+				}}
+			/>
+			{!active ? (
+				<QuickSessionSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+			) : null}
 
 			<VenueSessionsModal
 				group={venueModalGroup}
@@ -214,6 +242,18 @@ export function DashboardClient() {
 				}}
 				onJoin={handleJoinSession}
 			/>
+
+			{active ? (
+				<AlreadyInSessionDialog
+					open={blockedDialogOpen}
+					onOpenChange={setBlockedDialogOpen}
+					activeSession={active}
+					onGoToSession={() => {
+						setBlockedDialogOpen(false);
+						router.push(active.href);
+					}}
+				/>
+			) : null}
 
 			<SessionUnavailableDialog
 				open={unavailableDialogOpen}

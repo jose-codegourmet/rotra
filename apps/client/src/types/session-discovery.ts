@@ -61,6 +61,7 @@ export interface ActiveSessionSummary {
 	status: "open" | "active";
 	playerStatus: string;
 	admissionStatus: string;
+	courtHint: string | null;
 	href: string;
 }
 

@@ -12,5 +12,6 @@ export function useActiveSession() {
 		queryFn: fetchActiveSession,
 		refetchInterval: 30_000,
 		refetchOnWindowFocus: true,
+		staleTime: 10_000,
 	});
 }

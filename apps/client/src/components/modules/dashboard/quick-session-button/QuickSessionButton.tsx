@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Play, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface QuickSessionButtonProps {
@@ -44,7 +44,11 @@ export function QuickSessionButton({
 					"group-hover:from-bg-base group-hover:to-bg-base group-hover:text-accent",
 				)}
 			>
-				<Plus className="size-6" strokeWidth={2.5} aria-hidden="true" />
+				{isResume ? (
+					<Play className="size-6" strokeWidth={2.5} aria-hidden="true" />
+				) : (
+					<Plus className="size-6" strokeWidth={2.5} aria-hidden="true" />
+				)}
 			</span>
 			<span className="flex min-w-0 flex-col items-start text-left">
 				<span
