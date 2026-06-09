@@ -1,0 +1,103 @@
+import { db } from "@rotra/db";
+import { NextResponse } from "next/server";
+
+import { quickSessionFormSchema } from "@/components/modules/dashboard/quick-session-sheet/schema";
+import { geocodeAddress } from "@/lib/geo/geocode";
+import { getCurrentProfile } from "@/lib/server/current-profile";
+
+export const runtime = "nodejs";
+
+export async function POST(request: Request) {
+	const profile = await getCurrentProfile();
+	if (!profile) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	let body: unknown;
+	try {
+		body = await request.json();
+	} catch {
+		return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+	}
+
+	const parsed = quickSessionFormSchema.safeParse(body);
+	if (!parsed.success) {
+		return NextResponse.json(
+			{ error: "Invalid request body.", details: parsed.error.flatten() },
+			{ status: 400 },
+		);
+	}
+
+	const values = parsed.data;
+
+	const membership = await db.clubMember.findFirst({
+		where: {
+			clubId: values.clubId,
+			playerId: profile.id,
+			status: "active",
+		},
+	});
+
+	if (!membership) {
+		return NextResponse.json(
+			{ error: "You are not a member of this club." },
+			{ status: 403 },
+		);
+	}
+
+	const geocodeQuery = values.address?.trim() || values.location.trim();
+	const geocoded = await geocodeAddress(geocodeQuery);
+
+	const playersPerCourt = Number.parseInt(values.playersPerCourt, 10);
+	const totalSlots = values.numCourts * playersPerCourt;
+
+	const dateTime = new Date(`${values.date}T${values.startTime}:00`);
+
+	try {
+		const session = await db.$transaction(async (tx) => {
+			const created = await tx.queueSession.create({
+				data: {
+					clubId: values.clubId,
+					hostId: profile.id,
+					origin: "player_organized",
+					scheduleType: null,
+					status: "open",
+					visibility: values.visibility,
+					location: values.location.trim(),
+					address: values.address?.trim() || null,
+					venueLat: geocoded?.lat ?? null,
+					venueLng: geocoded?.lng ?? null,
+					venueAddress: geocoded?.formattedAddress ?? null,
+					dateTime,
+					numCourts: values.numCourts,
+					playersPerCourt,
+					totalSlots,
+					matchFormat: values.matchFormat,
+					scoreLimit: values.scoreLimit,
+				},
+			});
+
+			await tx.sessionRegistration.create({
+				data: {
+					sessionId: created.id,
+					playerId: profile.id,
+					admissionStatus: "accepted",
+					playerStatus: "not_arrived",
+				},
+			});
+
+			return created;
+		});
+
+		return NextResponse.json({
+			sessionId: session.id,
+			href: `/sessions/${session.id}`,
+		});
+	} catch (e) {
+		console.error("[sessions/quick POST]", e);
+		return NextResponse.json(
+			{ error: "Failed to create session." },
+			{ status: 500 },
+		);
+	}
+}

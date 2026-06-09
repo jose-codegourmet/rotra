@@ -7,6 +7,8 @@ import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { DashboardSkeleton } from "@/components/modules/dashboard/dashboard-skeleton/DashboardSkeleton";
 import { MapSearchOverlay } from "@/components/modules/dashboard/map-search-overlay/MapSearchOverlay";
+import { QuickSessionButton } from "@/components/modules/dashboard/quick-session-button/QuickSessionButton";
+import { QuickSessionSheet } from "@/components/modules/dashboard/quick-session-sheet/QuickSessionSheet";
 import { SessionGridView } from "@/components/modules/dashboard/session-grid-view/SessionGridView";
 import { SessionListView } from "@/components/modules/dashboard/session-list-view/SessionListView";
 import { SessionUnavailableDialog } from "@/components/modules/dashboard/session-unavailable-dialog/SessionUnavailableDialog";
@@ -53,6 +55,7 @@ export function DashboardClient() {
 	const [slotAvailability, setSlotAvailability] = useState<
 		"full" | "not_full" | undefined
 	>(undefined);
+	const [sheetOpen, setSheetOpen] = useState(false);
 
 	const effectiveCenter = placeCenter ?? center;
 
@@ -199,6 +202,9 @@ export function DashboardClient() {
 				onSlotAvailabilityChange={setSlotAvailability}
 			/>
 			<ViewToggle />
+
+			<QuickSessionButton onClick={() => setSheetOpen(true)} />
+			<QuickSessionSheet open={sheetOpen} onOpenChange={setSheetOpen} />
 
 			<VenueSessionsModal
 				group={venueModalGroup}
