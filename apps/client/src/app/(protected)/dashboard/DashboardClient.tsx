@@ -140,25 +140,44 @@ export function DashboardClient() {
 	return (
 		<div className="relative h-[calc(100dvh-4rem)] min-h-[480px] w-full overflow-hidden bg-bg-base">
 			{viewMode === "map" ? (
-				<DashboardMap
-					venueGroups={venueGroups}
-					center={effectiveCenter}
-					zoom={isUserLocation ? USER_LOCATION_ZOOM : DEFAULT_MAP_ZOOM}
-					selectedVenueKey={selectedVenueKey}
-					onSelectVenue={setSelectedVenueKey}
-					onOpenVenueModal={setVenueModalKey}
-					onJoinSession={handleJoinSession}
-					flyToUserLocation={isUserLocation && placeCenter == null}
-					{...(placeCenter ? { flyToCenter: placeCenter } : {})}
-					onMapError={handleMapError}
-				/>
+				<div
+					key="map"
+					className="absolute inset-0 z-0 animate-in fade-in duration-150 slide-in-from-bottom-1"
+				>
+					<DashboardMap
+						venueGroups={venueGroups}
+						center={effectiveCenter}
+						zoom={isUserLocation ? USER_LOCATION_ZOOM : DEFAULT_MAP_ZOOM}
+						selectedVenueKey={selectedVenueKey}
+						onSelectVenue={setSelectedVenueKey}
+						onOpenVenueModal={setVenueModalKey}
+						onJoinSession={handleJoinSession}
+						flyToUserLocation={isUserLocation && placeCenter == null}
+						{...(placeCenter ? { flyToCenter: placeCenter } : {})}
+						onMapError={handleMapError}
+					/>
+				</div>
 			) : viewMode === "list" ? (
-				<div className="h-full overflow-y-auto bg-bg-base">
-					<SessionListView sessions={sessions} isLoading={isLoading} />
+				<div
+					key="list"
+					className="absolute inset-0 z-0 animate-in fade-in duration-150 slide-in-from-bottom-1"
+				>
+					<SessionListView
+						sessions={sessions}
+						isLoading={isLoading}
+						onJoinSession={handleJoinSession}
+					/>
 				</div>
 			) : (
-				<div className="h-full overflow-y-auto bg-bg-base">
-					<SessionGridView sessions={sessions} isLoading={isLoading} />
+				<div
+					key="grid"
+					className="absolute inset-0 z-0 animate-in fade-in duration-150 slide-in-from-bottom-1"
+				>
+					<SessionGridView
+						sessions={sessions}
+						isLoading={isLoading}
+						onJoinSession={handleJoinSession}
+					/>
 				</div>
 			)}
 

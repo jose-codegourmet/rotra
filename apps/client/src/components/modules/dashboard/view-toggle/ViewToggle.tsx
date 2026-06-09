@@ -23,13 +23,19 @@ export function ViewToggle() {
 
 	return (
 		<div className="pointer-events-auto absolute top-20 right-8 z-30">
-			<div className="flex rounded-xl border border-outline-variant/10 bg-bg-base/80 p-1.5 shadow-lg backdrop-blur-md">
+			<div
+				role="tablist"
+				aria-label="Dashboard view mode"
+				className="flex rounded-xl border border-outline-variant/10 bg-bg-base/80 p-1.5 shadow-lg backdrop-blur-md"
+			>
 				{TABS.map(({ mode, label, Icon }) => {
 					const isActive = activeMode === mode;
 					return (
 						<button
 							key={mode}
 							type="button"
+							role="tab"
+							aria-selected={isActive}
 							onClick={() => dispatch(setDashboardViewMode(mode))}
 							className={cn(viewToggleTabVariants({ active: isActive }))}
 						>
