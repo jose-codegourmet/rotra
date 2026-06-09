@@ -83,7 +83,9 @@ function CompactFullCard({
 					</span>
 				)}
 			</div>
-			<h4 className="text-sm font-bold text-text-primary">{session.clubName}</h4>
+			<h4 className="text-sm font-bold text-text-primary">
+				{session.clubName}
+			</h4>
 			<p className="text-xs text-text-secondary">{session.location}</p>
 			<div className="flex items-center gap-2 text-xs text-text-secondary">
 				<Clock size={12} />
@@ -98,10 +100,7 @@ function CompactFullCard({
 				<span className="text-xs font-bold text-accent">
 					{session.acceptedCount}/{session.totalSlots} Slots
 				</span>
-				<JoinButton
-					sessionId={session.id}
-					{...(onJoin ? { onJoin } : {})}
-				/>
+				<JoinButton sessionId={session.id} {...(onJoin ? { onJoin } : {})} />
 			</div>
 		</>
 	);
@@ -123,10 +122,7 @@ function CompactRowCard({
 			<span className="shrink-0 text-[10px] font-bold text-accent">
 				{session.acceptedCount}/{session.totalSlots}
 			</span>
-			<JoinButton
-				sessionId={session.id}
-				{...(onJoin ? { onJoin } : {})}
-			/>
+			<JoinButton sessionId={session.id} {...(onJoin ? { onJoin } : {})} />
 		</>
 	);
 }
@@ -149,7 +145,9 @@ function ListCard({
 						</span>
 					)}
 				</div>
-				<h4 className="text-sm font-bold text-text-primary">{session.clubName}</h4>
+				<h4 className="text-sm font-bold text-text-primary">
+					{session.clubName}
+				</h4>
 				<p className="text-xs text-text-secondary">{session.location}</p>
 				<div className="flex items-center gap-2 text-xs text-text-secondary">
 					<Clock size={12} />
@@ -160,10 +158,7 @@ function ListCard({
 				<span className="text-xs font-bold text-accent">
 					{session.acceptedCount}/{session.totalSlots} Slots
 				</span>
-				<JoinButton
-					sessionId={session.id}
-					{...(onJoin ? { onJoin } : {})}
-				/>
+				<JoinButton sessionId={session.id} {...(onJoin ? { onJoin } : {})} />
 			</div>
 		</>
 	);
@@ -186,7 +181,9 @@ function GridCard({
 					</span>
 				)}
 			</div>
-			<h4 className="text-sm font-bold text-text-primary">{session.clubName}</h4>
+			<h4 className="text-sm font-bold text-text-primary">
+				{session.clubName}
+			</h4>
 			<p className="text-xs text-text-secondary">{session.location}</p>
 			<div className="flex items-center gap-2 text-xs text-text-secondary">
 				<Clock size={12} />
@@ -196,10 +193,7 @@ function GridCard({
 				<span className="text-xs font-bold text-accent">
 					{session.acceptedCount}/{session.totalSlots} Slots
 				</span>
-				<JoinButton
-					sessionId={session.id}
-					{...(onJoin ? { onJoin } : {})}
-				/>
+				<JoinButton sessionId={session.id} {...(onJoin ? { onJoin } : {})} />
 			</div>
 		</>
 	);
@@ -243,10 +237,7 @@ export function SessionDiscoveryCard({
 			)}
 		>
 			{variant === "compact" && compactLayout === "row" ? (
-				<CompactRowCard
-					session={session}
-					{...(onJoin ? { onJoin } : {})}
-				/>
+				<CompactRowCard session={session} {...(onJoin ? { onJoin } : {})} />
 			) : variant === "compact" ? (
 				<CompactFullCard
 					session={session}

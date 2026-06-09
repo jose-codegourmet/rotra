@@ -22,7 +22,9 @@ export function PlayerAvatarStack({
 
 	if (acceptedCount === 0) {
 		return (
-			<p className={cn("text-[10px] font-medium text-text-secondary", className)}>
+			<p
+				className={cn("text-[10px] font-medium text-text-secondary", className)}
+			>
 				Be the first to join
 			</p>
 		);

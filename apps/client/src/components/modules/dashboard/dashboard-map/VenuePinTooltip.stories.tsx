@@ -1,14 +1,14 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { VenuePinTooltip } from "./VenuePinTooltip";
 import {
+	buildMultiSessionGroup,
 	MOCK_AVATAR_OVERFLOW_GROUP,
 	MOCK_EMPTY_PLAYERS_GROUP,
 	MOCK_MULTI_THREE_GROUP,
 	MOCK_SINGLE_UPCOMING_GROUP,
-	buildMultiSessionGroup,
 } from "@/constants/mock-venue-groups";
+import { VenuePinTooltip } from "./VenuePinTooltip";
 
 const meta: Meta<typeof VenuePinTooltip> = {
 	title: "dashboard/VenuePinTooltip",

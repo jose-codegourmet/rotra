@@ -60,11 +60,7 @@ export const ClubMode: Story = {
 
 export const FiltersActive: Story = {
 	render: () => (
-		<MapSearchOverlayDemo
-			slotAvailability="not_full"
-			doublesOnly
-			weekendOnly
-		/>
+		<MapSearchOverlayDemo slotAvailability="not_full" doublesOnly weekendOnly />
 	),
 };
 

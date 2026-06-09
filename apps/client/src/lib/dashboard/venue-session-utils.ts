@@ -15,7 +15,9 @@ export function getSessionDisplayStatus(
 	return "open";
 }
 
-export function getSessionDisplayStatusLabel(status: SessionDisplayStatus): string {
+export function getSessionDisplayStatusLabel(
+	status: SessionDisplayStatus,
+): string {
 	switch (status) {
 		case "live":
 			return "Live";

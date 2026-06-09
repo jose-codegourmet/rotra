@@ -36,10 +36,7 @@ import { useMyClubs } from "@/hooks/useMyClubs";
 import { useQuickSessionMutation } from "@/hooks/useQuickSessionMutation";
 import { cn } from "@/lib/utils";
 import { defaultQuickSessionValues } from "./default";
-import {
-	type QuickSessionFormValues,
-	quickSessionFormSchema,
-} from "./schema";
+import { type QuickSessionFormValues, quickSessionFormSchema } from "./schema";
 
 export interface QuickSessionSheetProps {
 	open: boolean;
@@ -337,9 +334,7 @@ export function QuickSessionSheet({
 												</NativeSelect>
 											)}
 										/>
-										<FieldError
-											errors={[formState.errors.playersPerCourt]}
-										/>
+										<FieldError errors={[formState.errors.playersPerCourt]} />
 									</FieldContent>
 								</Field>
 							</div>

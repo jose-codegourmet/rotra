@@ -1,9 +1,9 @@
+import { MOCK_SESSION_DISCOVERY } from "@/constants/mock-session-discovery";
 import { groupSessionsByVenue } from "@/lib/api/session-discovery";
 import type {
 	SessionDiscoveryItem,
 	VenueSessionGroup,
 } from "@/types/session-discovery";
-import { MOCK_SESSION_DISCOVERY } from "@/constants/mock-session-discovery";
 
 function withDistance(
 	sessions: SessionDiscoveryItem[],
@@ -42,9 +42,18 @@ export const MOCK_SINGLE_UPCOMING_GROUP: VenueSessionGroup = {
 	sessions: [findMockSession("sess-lapulapu-open")],
 };
 
+function findMockVenueGroup(venueKey: string): VenueSessionGroup {
+	const group =
+		MOCK_VENUE_GROUPS.find((item) => item.venueKey === venueKey) ??
+		MOCK_VENUE_GROUPS[0];
+	if (!group) {
+		throw new Error("MOCK_VENUE_GROUPS is empty");
+	}
+	return group;
+}
+
 export const MOCK_MULTI_THREE_GROUP: VenueSessionGroup =
-	MOCK_VENUE_GROUPS.find((group) => group.venueKey === "10.316_123.885") ??
-	MOCK_VENUE_GROUPS[0]!;
+	findMockVenueGroup("10.316_123.885");
 
 export function buildMultiSessionGroup(count: number): VenueSessionGroup {
 	const base = findMockSession("sess-lapulapu-open");

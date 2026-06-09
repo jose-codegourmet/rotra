@@ -108,9 +108,7 @@ export const MOCK_SESSION_DISCOVERY: SessionDiscoveryItem[] = [
 		acceptedCount: 3,
 		playersPerCourt: 4,
 		distanceKm: null,
-		recentPlayers: [
-			{ id: "p9", displayName: "Diane K.", avatarUrl: null },
-		],
+		recentPlayers: [{ id: "p9", displayName: "Diane K.", avatarUrl: null }],
 	},
 	{
 		id: "sess-cebu-downtown",

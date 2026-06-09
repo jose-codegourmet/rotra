@@ -46,13 +46,19 @@ export const NoFilters: Story = {
 };
 
 export const NotFullSelected: Story = {
-	render: () => <FilterPanelDemo initialFilters={{ slotAvailability: "not_full" }} />,
+	render: () => (
+		<FilterPanelDemo initialFilters={{ slotAvailability: "not_full" }} />
+	),
 };
 
 export const FullSelected: Story = {
-	render: () => <FilterPanelDemo initialFilters={{ slotAvailability: "full" }} />,
+	render: () => (
+		<FilterPanelDemo initialFilters={{ slotAvailability: "full" }} />
+	),
 };
 
 export const ClearAll: Story = {
-	render: () => <FilterPanelDemo initialFilters={{ slotAvailability: "not_full" }} />,
+	render: () => (
+		<FilterPanelDemo initialFilters={{ slotAvailability: "not_full" }} />
+	),
 };

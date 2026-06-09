@@ -1,7 +1,7 @@
 "use client";
 
-import { SessionDiscoveryCard } from "@/components/modules/dashboard/session-discovery-card/SessionDiscoveryCard";
 import { PlayerAvatarStack } from "@/components/modules/dashboard/dashboard-map/PlayerAvatarStack";
+import { SessionDiscoveryCard } from "@/components/modules/dashboard/session-discovery-card/SessionDiscoveryCard";
 import { formatDistanceKm } from "@/lib/geo/haversine";
 import type { VenueSessionGroup } from "@/types/session-discovery";
 
@@ -28,7 +28,9 @@ function MultiSessionTooltip({
 	return (
 		<>
 			<div className="mb-2 flex items-start justify-between gap-2">
-				<h4 className="text-sm font-bold text-text-primary">{group.venueName}</h4>
+				<h4 className="text-sm font-bold text-text-primary">
+					{group.venueName}
+				</h4>
 				{group.distanceKm != null && (
 					<span className="shrink-0 text-[10px] font-medium text-text-secondary">
 						{formatDistanceKm(group.distanceKm)} away

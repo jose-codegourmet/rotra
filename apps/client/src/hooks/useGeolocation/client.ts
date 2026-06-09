@@ -51,14 +51,17 @@ export function useGeolocation() {
 	const [locationLabel, setLocationLabel] = useState(CEBU_FALLBACK_LABEL);
 	const [isUserLocation, setIsUserLocation] = useState(false);
 
-	const resolveLabel = useCallback(async (point: SessionGeoPoint, granted: boolean) => {
-		if (granted) {
-			const label = await reverseGeocodeLabel(point);
-			setLocationLabel(label ?? "Your location");
-			return;
-		}
-		setLocationLabel(CEBU_FALLBACK_LABEL);
-	}, []);
+	const resolveLabel = useCallback(
+		async (point: SessionGeoPoint, granted: boolean) => {
+			if (granted) {
+				const label = await reverseGeocodeLabel(point);
+				setLocationLabel(label ?? "Your location");
+				return;
+			}
+			setLocationLabel(CEBU_FALLBACK_LABEL);
+		},
+		[],
+	);
 
 	const requestPosition = useCallback(() => {
 		if (typeof navigator === "undefined" || !navigator.geolocation) {

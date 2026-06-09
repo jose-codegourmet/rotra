@@ -1,1 +1,4 @@
-export { useGeolocation, type GeolocationStatus } from "./useGeolocation/client";
+export {
+	type GeolocationStatus,
+	useGeolocation,
+} from "./useGeolocation/client";

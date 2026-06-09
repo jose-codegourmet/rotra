@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import Map, { type MapRef, Popup } from "react-map-gl/mapbox";
-import {
-	resolveMapboxStyle,
-	USER_LOCATION_ZOOM,
-} from "@/constants/dashboard";
-import type { SessionGeoPoint, VenueSessionGroup } from "@/types/session-discovery";
+import MapboxMap, { type MapRef, Popup } from "react-map-gl/mapbox";
+import { resolveMapboxStyle, USER_LOCATION_ZOOM } from "@/constants/dashboard";
+import type {
+	SessionGeoPoint,
+	VenueSessionGroup,
+} from "@/types/session-discovery";
 import { VenuePin } from "./VenuePin";
 import { VenuePinTooltip } from "./VenuePinTooltip";
 
@@ -102,11 +102,7 @@ export function DashboardMap({
 		if (!map || !flyToCenter) return;
 
 		const prev = lastFlyToCenterRef.current;
-		if (
-			prev &&
-			prev.lat === flyToCenter.lat &&
-			prev.lng === flyToCenter.lng
-		) {
+		if (prev && prev.lat === flyToCenter.lat && prev.lng === flyToCenter.lng) {
 			return;
 		}
 
@@ -127,8 +123,7 @@ export function DashboardMap({
 						Map unavailable
 					</p>
 					<p className="mt-2 text-body text-text-secondary">
-						Set{" "}
-						<code className="text-accent">NEXT_PUBLIC_MAPBOX_TOKEN</code> to
+						Set <code className="text-accent">NEXT_PUBLIC_MAPBOX_TOKEN</code> to
 						enable the discovery map.
 					</p>
 				</div>
@@ -138,7 +133,7 @@ export function DashboardMap({
 
 	return (
 		<div className="relative h-full w-full">
-			<Map
+			<MapboxMap
 				ref={mapRef}
 				mapboxAccessToken={token}
 				initialViewState={{
@@ -184,7 +179,7 @@ export function DashboardMap({
 						/>
 					</Popup>
 				)}
-			</Map>
+			</MapboxMap>
 			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.05)_0%,transparent_70%)]" />
 		</div>
 	);

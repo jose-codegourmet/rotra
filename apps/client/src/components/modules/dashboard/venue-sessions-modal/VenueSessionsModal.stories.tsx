@@ -1,12 +1,12 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { VenueSessionsModal } from "./VenueSessionsModal";
 import {
+	buildMultiSessionGroup,
 	MOCK_MULTI_THREE_GROUP,
 	MOCK_SINGLE_UPCOMING_GROUP,
-	buildMultiSessionGroup,
 } from "@/constants/mock-venue-groups";
+import { VenueSessionsModal } from "./VenueSessionsModal";
 
 const meta: Meta<typeof VenueSessionsModal> = {
 	title: "dashboard/VenueSessionsModal",

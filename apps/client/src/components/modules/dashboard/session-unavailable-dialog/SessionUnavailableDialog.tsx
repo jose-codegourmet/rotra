@@ -26,7 +26,9 @@ export function SessionUnavailableDialog({
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle>This session is no longer available</AlertDialogTitle>
+					<AlertDialogTitle>
+						This session is no longer available
+					</AlertDialogTitle>
 					<AlertDialogDescription>
 						It may have ended, been cancelled, or filled up. Here are other
 						sessions near you.

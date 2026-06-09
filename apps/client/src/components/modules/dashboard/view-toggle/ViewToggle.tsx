@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, List, Map } from "lucide-react";
+import { LayoutGrid, List, Map as MapIcon } from "lucide-react";
 import { viewToggleTabVariants } from "@/components/modules/dashboard/view-toggle/ViewToggle.variants";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -10,9 +10,9 @@ import type { DashboardViewMode } from "@/types/session-discovery";
 const TABS: Array<{
 	mode: DashboardViewMode;
 	label: string;
-	Icon: typeof Map;
+	Icon: typeof MapIcon;
 }> = [
-	{ mode: "map", label: "Map View", Icon: Map },
+	{ mode: "map", label: "Map View", Icon: MapIcon },
 	{ mode: "list", label: "List", Icon: List },
 	{ mode: "grid", label: "Grid", Icon: LayoutGrid },
 ];

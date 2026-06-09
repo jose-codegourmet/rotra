@@ -240,11 +240,7 @@ export function MapSearchOverlay({
 							open={filterPanelOpen}
 							onOpenChange={setFilterPanelOpen}
 							venueGroups={venueGroups}
-							activeFilters={
-								slotAvailability
-									? { slotAvailability }
-									: {}
-							}
+							activeFilters={slotAvailability ? { slotAvailability } : {}}
 							onApply={(filters) =>
 								onSlotAvailabilityChange(filters.slotAvailability)
 							}

@@ -23,7 +23,8 @@ export function useSessionDiscovery(
 			lat != null && lng != null
 				? sessionDiscoveryQueryKey(lat, lng, resolvedFilters)
 				: [...sessionDiscoveryQueryKey(0, 0, resolvedFilters), "disabled"],
-		queryFn: () => fetchSessionDiscovery(lat as number, lng as number, resolvedFilters),
+		queryFn: () =>
+			fetchSessionDiscovery(lat as number, lng as number, resolvedFilters),
 		enabled: lat != null && lng != null,
 		staleTime: 60_000,
 	});

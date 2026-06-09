@@ -66,8 +66,7 @@ function withDistance(
 			return { ...session, distanceKm };
 		})
 		.filter(
-			(session) =>
-				session.distanceKm == null || session.distanceKm <= radiusKm,
+			(session) => session.distanceKm == null || session.distanceKm <= radiusKm,
 		)
 		.sort((a, b) => {
 			const distA = a.distanceKm ?? Number.POSITIVE_INFINITY;
