@@ -19,6 +19,7 @@ interface DashboardMapProps {
 	onOpenVenueModal: (venueKey: string) => void;
 	onJoinSession: (sessionId: string) => void;
 	flyToUserLocation?: boolean;
+	flyToCenter?: SessionGeoPoint;
 	onMapError?: () => void;
 }
 
@@ -31,9 +32,11 @@ export function DashboardMap({
 	onOpenVenueModal,
 	onJoinSession,
 	flyToUserLocation = false,
+	flyToCenter,
 	onMapError,
 }: DashboardMapProps) {
 	const mapRef = useRef<MapRef>(null);
+	const lastFlyToCenterRef = useRef<SessionGeoPoint | null>(null);
 	const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -93,6 +96,28 @@ export function DashboardMap({
 			essential: true,
 		});
 	}, [center.lat, center.lng, zoom, flyToUserLocation]);
+
+	useEffect(() => {
+		const map = mapRef.current;
+		if (!map || !flyToCenter) return;
+
+		const prev = lastFlyToCenterRef.current;
+		if (
+			prev &&
+			prev.lat === flyToCenter.lat &&
+			prev.lng === flyToCenter.lng
+		) {
+			return;
+		}
+
+		lastFlyToCenterRef.current = flyToCenter;
+		map.flyTo({
+			center: [flyToCenter.lng, flyToCenter.lat],
+			zoom: USER_LOCATION_ZOOM,
+			duration: 1200,
+			essential: true,
+		});
+	}, [flyToCenter]);
 
 	if (!token) {
 		return (

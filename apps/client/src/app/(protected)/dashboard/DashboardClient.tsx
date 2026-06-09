@@ -12,11 +12,7 @@ import { SessionListView } from "@/components/modules/dashboard/session-list-vie
 import { SessionUnavailableDialog } from "@/components/modules/dashboard/session-unavailable-dialog/SessionUnavailableDialog";
 import { VenueSessionsModal } from "@/components/modules/dashboard/venue-sessions-modal/VenueSessionsModal";
 import { ViewToggle } from "@/components/modules/dashboard/view-toggle/ViewToggle";
-import {
-	DEFAULT_MAP_ZOOM,
-	DEFAULT_RADIUS_KM,
-	USER_LOCATION_ZOOM,
-} from "@/constants/dashboard";
+import { DEFAULT_MAP_ZOOM, USER_LOCATION_ZOOM } from "@/constants/dashboard";
 import { useActiveSession } from "@/hooks/useActiveSession/client";
 import { useGeolocation } from "@/hooks/useGeolocation/client";
 import {
@@ -25,7 +21,10 @@ import {
 } from "@/hooks/useSessionDiscovery/client";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setDashboardViewMode } from "@/store/slices/uiSlice";
-import type { SessionDiscoveryFilters } from "@/types/session-discovery";
+import type {
+	SessionDiscoveryFilters,
+	SessionGeoPoint,
+} from "@/types/session-discovery";
 
 const DashboardMap = dynamic(
 	() =>
@@ -49,18 +48,34 @@ export function DashboardClient() {
 	const [nearbyOnly, setNearbyOnly] = useState(true);
 	const [doublesOnly, setDoublesOnly] = useState(false);
 	const [weekendOnly, setWeekendOnly] = useState(false);
+	const [placeCenter, setPlaceCenter] = useState<SessionGeoPoint | null>(null);
+	const [clubQuery, setClubQuery] = useState("");
+	const [slotAvailability, setSlotAvailability] = useState<
+		"full" | "not_full" | undefined
+	>(undefined);
+
+	const effectiveCenter = placeCenter ?? center;
 
 	const filters = useMemo<SessionDiscoveryFilters>(() => {
-		const base = {
-			radiusKm: nearbyOnly ? DEFAULT_RADIUS_KM : 50,
+		const base: SessionDiscoveryFilters = {
+			radiusKm: nearbyOnly ? 2 : 50,
 			weekendOnly,
 		};
+
+		if (clubQuery.trim()) {
+			base.clubQuery = clubQuery.trim();
+		}
+
+		if (slotAvailability) {
+			base.slotAvailability = slotAvailability;
+		}
+
 		return doublesOnly ? { ...base, playersPerCourt: 4 } : base;
-	}, [nearbyOnly, doublesOnly, weekendOnly]);
+	}, [nearbyOnly, doublesOnly, weekendOnly, clubQuery, slotAvailability]);
 
 	const { data, isLoading } = useSessionDiscovery(
-		center.lat,
-		center.lng,
+		effectiveCenter.lat,
+		effectiveCenter.lng,
 		filters,
 	);
 	useActiveSession();
@@ -96,11 +111,26 @@ export function DashboardClient() {
 
 	const handleRefreshNearby = useCallback(() => {
 		queryClient.invalidateQueries({
-			queryKey: sessionDiscoveryQueryKey(center.lat, center.lng, filters),
+			queryKey: sessionDiscoveryQueryKey(
+				effectiveCenter.lat,
+				effectiveCenter.lng,
+				filters,
+			),
 		});
 		setSelectedVenueKey(null);
 		setVenueModalKey(null);
-	}, [center.lat, center.lng, filters, queryClient]);
+	}, [effectiveCenter.lat, effectiveCenter.lng, filters, queryClient]);
+
+	const handlePlaceSelect = useCallback((nextCenter: SessionGeoPoint) => {
+		setPlaceCenter(nextCenter);
+		setSelectedVenueKey(null);
+		setVenueModalKey(null);
+	}, []);
+
+	const handleRecenter = useCallback(() => {
+		setPlaceCenter(null);
+		refresh();
+	}, [refresh]);
 
 	const handleMapError = useCallback(() => {
 		dispatch(setDashboardViewMode("list"));
@@ -112,13 +142,14 @@ export function DashboardClient() {
 			{viewMode === "map" ? (
 				<DashboardMap
 					venueGroups={venueGroups}
-					center={center}
+					center={effectiveCenter}
 					zoom={isUserLocation ? USER_LOCATION_ZOOM : DEFAULT_MAP_ZOOM}
 					selectedVenueKey={selectedVenueKey}
 					onSelectVenue={setSelectedVenueKey}
 					onOpenVenueModal={setVenueModalKey}
 					onJoinSession={handleJoinSession}
-					flyToUserLocation={isUserLocation}
+					flyToUserLocation={isUserLocation && placeCenter == null}
+					{...(placeCenter ? { flyToCenter: placeCenter } : {})}
 					onMapError={handleMapError}
 				/>
 			) : viewMode === "list" ? (
@@ -140,7 +171,13 @@ export function DashboardClient() {
 				onToggleNearby={() => setNearbyOnly((v) => !v)}
 				onToggleDoubles={() => setDoublesOnly((v) => !v)}
 				onToggleWeekend={() => setWeekendOnly((v) => !v)}
-				onRecenter={refresh}
+				onRecenter={handleRecenter}
+				onPlaceSelect={handlePlaceSelect}
+				clubQuery={clubQuery}
+				onClubQueryChange={setClubQuery}
+				venueGroups={venueGroups}
+				slotAvailability={slotAvailability}
+				onSlotAvailabilityChange={setSlotAvailability}
 			/>
 			<ViewToggle />
 

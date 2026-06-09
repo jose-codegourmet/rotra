@@ -61,3 +61,36 @@ export function formatSessionTimeRange(session: SessionDiscoveryItem): string {
 	const end = format(new Date(session.endTime), "h:mm a");
 	return `${start} - ${end}`;
 }
+
+export interface PanelFilterState {
+	slotAvailability?: "full" | "not_full";
+}
+
+function sessionMatchesSlotAvailability(
+	session: SessionDiscoveryItem,
+	slotAvailability?: "full" | "not_full",
+): boolean {
+	if (!slotAvailability) return true;
+	if (slotAvailability === "full") {
+		return session.acceptedCount >= session.totalSlots;
+	}
+	return session.acceptedCount < session.totalSlots;
+}
+
+export function countMatchingSessions(
+	venueGroups: VenueSessionGroup[],
+	filters: PanelFilterState,
+): number {
+	return venueGroups.reduce((total, group) => {
+		return (
+			total +
+			group.sessions.filter((session) =>
+				sessionMatchesSlotAvailability(session, filters.slotAvailability),
+			).length
+		);
+	}, 0);
+}
+
+export function countTotalSessions(venueGroups: VenueSessionGroup[]): number {
+	return venueGroups.reduce((total, group) => total + group.sessions.length, 0);
+}

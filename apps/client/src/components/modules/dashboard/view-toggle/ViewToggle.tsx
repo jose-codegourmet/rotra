@@ -22,7 +22,7 @@ export function ViewToggle() {
 	const activeMode = useAppSelector((s) => s.ui.dashboardViewMode);
 
 	return (
-		<div className="pointer-events-auto absolute top-4 right-4 z-30">
+		<div className="pointer-events-auto absolute top-20 right-8 z-30">
 			<div className="flex rounded-xl border border-outline-variant/10 bg-bg-base/80 p-1.5 shadow-lg backdrop-blur-md">
 				{TABS.map(({ mode, label, Icon }) => {
 					const isActive = activeMode === mode;
