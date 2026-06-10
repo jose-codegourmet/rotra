@@ -15,7 +15,7 @@ function makeStore(
 		reducer: { auth: authReducer, ui: uiReducer },
 		preloadedState: {
 			auth: { user, initialized: true },
-			ui: { isMobileDrawerOpen },
+			ui: { isMobileDrawerOpen, dashboardViewMode: "map" as const },
 		},
 	});
 }

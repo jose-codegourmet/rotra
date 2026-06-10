@@ -1,0 +1,59 @@
+"use client";
+
+import type { Meta, StoryObj } from "@storybook/react";
+import type { ActiveSessionSummary } from "@/types/session-discovery";
+import { ActiveSessionBanner } from "./ActiveSessionBanner";
+
+const liveSession: ActiveSessionSummary = {
+	sessionId: "session-live-1",
+	clubName: "Sunrise Badminton Club",
+	location: "Hall B",
+	status: "active",
+	playerStatus: "playing",
+	admissionStatus: "accepted",
+	courtHint: "On court",
+	href: "/sessions/session-live-1",
+};
+
+const queueSession: ActiveSessionSummary = {
+	sessionId: "session-queue-1",
+	clubName: "Metro Badminton Center",
+	location: "Court 3",
+	status: "open",
+	playerStatus: "waiting",
+	admissionStatus: "accepted",
+	courtHint: "Up next",
+	href: "/sessions/session-queue-1",
+};
+
+const meta: Meta<typeof ActiveSessionBanner> = {
+	title: "dashboard/ActiveSessionBanner",
+	component: ActiveSessionBanner,
+	tags: ["autodocs"],
+	decorators: [
+		(Story) => (
+			<div className="relative min-h-[120px] bg-bg-base p-4">
+				<Story />
+			</div>
+		),
+	],
+};
+
+export default meta;
+type Story = StoryObj<typeof ActiveSessionBanner>;
+
+const noop = () => {};
+
+export const LiveActive: Story = {
+	args: {
+		session: liveSession,
+		onNavigate: noop,
+	},
+};
+
+export const InQueue: Story = {
+	args: {
+		session: queueSession,
+		onNavigate: noop,
+	},
+};

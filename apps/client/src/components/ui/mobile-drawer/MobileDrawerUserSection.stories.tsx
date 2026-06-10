@@ -18,7 +18,7 @@ function makeStore() {
 				},
 				initialized: true,
 			},
-			ui: { isMobileDrawerOpen: true },
+			ui: { isMobileDrawerOpen: true, dashboardViewMode: "map" as const },
 		},
 	});
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button/Button";
 import { Tabs, TabsContent } from "@/components/ui/tabs/Tabs";
 import type { SessionTabId } from "@/constants/mock-session-ui";
 import {
@@ -16,9 +17,11 @@ import {
 	MOCK_STANDING_MINI,
 	SESSION_TAB_IDS,
 } from "@/constants/mock-session-ui";
+import { useLeaveSessionMutation } from "@/hooks/useLeaveSessionMutation";
 
 import { ActiveQueueView } from "../ActiveQueueView/ActiveQueueView";
 import { AssignCourtModal } from "../AssignCourtModal/AssignCourtModal";
+import { LeaveSessionDialog } from "../LeaveSessionDialog/LeaveSessionDialog";
 import { SessionFinancialsView } from "../SessionFinancialsView/SessionFinancialsView";
 import { SessionStandingView } from "../SessionStandingView/SessionStandingView";
 import { SessionStatisticsView } from "../SessionStatisticsView/SessionStatisticsView";
@@ -27,6 +30,8 @@ import { SessionTabNav } from "../SessionTabNav/SessionTabNav";
 export interface SessionLiveTabsProps {
 	/** Small label above tabs, e.g. club or session name */
 	sessionLabel?: string;
+	/** When set, shows the Leave session control wired to this session */
+	sessionId?: string;
 	className?: string;
 }
 
@@ -36,11 +41,14 @@ function isSessionTabId(value: string): value is SessionTabId {
 
 export function SessionLiveTabs({
 	sessionLabel = "Live session",
+	sessionId,
 	className,
 }: SessionLiveTabsProps) {
 	const [tab, setTab] = useState<SessionTabId>("queue");
 	const [assignOpen, setAssignOpen] = useState(false);
 	const [assignTitle, setAssignTitle] = useState("Assign court");
+	const [leaveOpen, setLeaveOpen] = useState(false);
+	const leaveMutation = useLeaveSessionMutation();
 
 	const { inGameCourts, inactiveCourts } = useMemo(() => {
 		const active = MOCK_COURTS.filter((c) => c.variant === "active");
@@ -57,9 +65,21 @@ export function SessionLiveTabs({
 				}}
 			>
 				<div className="mb-6 flex flex-col gap-4">
-					<p className="text-micro font-bold uppercase tracking-widest text-accent">
-						{sessionLabel}
-					</p>
+					<div className="flex items-start justify-between gap-4">
+						<p className="text-micro font-bold uppercase tracking-widest text-accent">
+							{sessionLabel}
+						</p>
+						{sessionId ? (
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => setLeaveOpen(true)}
+							>
+								Leave session
+							</Button>
+						) : null}
+					</div>
 					<SessionTabNav />
 				</div>
 
@@ -104,6 +124,17 @@ export function SessionLiveTabs({
 				courtTitle={assignTitle}
 				players={MOCK_ASSIGN_PLAYERS}
 			/>
+
+			{sessionId ? (
+				<LeaveSessionDialog
+					open={leaveOpen}
+					onOpenChange={setLeaveOpen}
+					busy={leaveMutation.isPending}
+					onConfirm={() => {
+						leaveMutation.mutate(sessionId);
+					}}
+				/>
+			) : null}
 		</div>
 	);
 }

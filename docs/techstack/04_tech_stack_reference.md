@@ -227,3 +227,55 @@ All components are app-local — there is no shared library to maintain. Each ap
 - Each app's Storybook imports the shared Tailwind config from `packages/config` and its own `src/app/globals.css` so tokens render correctly
 
 ---
+
+### 3.10 Maps & Geolocation
+
+| Technology | Version | Used In | Role |
+|------------|---------|---------|------|
+| **Mapbox GL JS** | 3.x | Client App (`/dashboard`) | WebGL map renderer, custom dark style |
+| **react-map-gl** | 8.x (vis.gl) | Client App | React bindings (`Map`, `Marker`, `Popup`) |
+| **Mapbox Geocoding API** | — | Client App (server routes) | Resolve venue text → `venue_lat` / `venue_lng` on session create |
+| **Browser Geolocation API** | — | Client App | Center map on user's position |
+
+**Why Mapbox (not Google Maps):**
+
+- Custom dark Studio styles align with ROTRA's `surface-dim` (#131314) palette without fighting default light tiles.
+- Airbnb-style discovery UX (pins, tooltips, list/map toggle) is well-supported by `react-map-gl`.
+- Geocoding API shares the same token and billing account.
+
+**OSS fallback:** [MapLibre GL JS](https://maplibre.org/) uses the same `react-map-gl` adapter with a different map provider for tiles. Documented in [`PLAN_phase_0_foundation.md`](../../PLAN_phase_0_foundation.md) if Mapbox pricing becomes a concern.
+
+**Environment variables (`apps/client`):**
+
+```env
+NEXT_PUBLIC_MAPBOX_TOKEN=pk.eyJ...
+NEXT_PUBLIC_MAPBOX_STYLE_URL=mapbox://styles/rotra/dark-v1
+```
+
+Restrict the public token by HTTP referrer in the Mapbox dashboard (localhost + production domains only).
+
+**Coding rules:**
+
+1. **Map components MUST be client-only.** Import Mapbox via `next/dynamic({ ssr: false })` or a dedicated `"use client"` module. Never import `mapbox-gl` in Server Components.
+2. **Import Mapbox CSS once** in `apps/client/src/app/globals.css`: `@import "mapbox-gl/dist/mapbox-gl.css";`
+3. **Geocoding runs server-side** in API routes (`/api/sessions/quick`, future session setup) — do not expose geocoding tokens beyond the public Mapbox token scope.
+4. **Distance calculation** uses Haversine in `apps/client/src/lib/geo/haversine.ts` for v1. PostGIS `ST_DWithin` is optional for scale.
+5. **Sessions without coordinates** (`venue_lat` / `venue_lng` NULL) appear in List/Grid discovery only — not as map pins.
+6. **State:** map viewport and selected pin are React local state. Nearby session data uses React Query (`useSessionDiscovery`). View mode (map/list/grid) uses Redux `uiSlice.dashboardViewMode`.
+
+**Key files:**
+
+| Path | Purpose |
+|------|---------|
+| `apps/client/src/components/modules/dashboard/dashboard-map/` | Map, pins, tooltips |
+| `apps/client/src/lib/geo/haversine.ts` | Distance between user and session |
+| `apps/client/src/lib/geo/geocode.ts` | Address → coordinates (Phase 3+) |
+| `apps/client/src/hooks/useSessionDiscovery.ts` | React Query hook for nearby sessions |
+| `apps/client/src/app/api/sessions/discover/route.ts` | Discovery API |
+
+**References:**
+
+- View spec: [`docs/views/client_app/common/session_discovery_dashboard.md`](../views/client_app/common/session_discovery_dashboard.md)
+- Implementation phases: [`PLAN_session_discovery_dashboard.md`](../../PLAN_session_discovery_dashboard.md)
+
+---

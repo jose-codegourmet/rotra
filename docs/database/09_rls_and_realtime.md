@@ -265,24 +265,34 @@ CREATE POLICY "audit_log_admin_select"
 ```sql
 ALTER TABLE queue_sessions ENABLE ROW LEVEL SECURITY;
 
--- Club members can read sessions for their club (owner is also a member)
+-- Readable when: the session has no club and is open (clubless casual sessions
+-- are always visibility = 'open'), OR the caller is a member of the hosting club,
+-- OR the caller is the host (so a host can always see their own session).
 CREATE POLICY "sessions_select_members"
   ON queue_sessions FOR SELECT
-  USING (is_club_member(club_id));
+  USING (
+    host_id = auth_uid()
+    OR (club_id IS NULL AND visibility = 'open')
+    OR (club_id IS NOT NULL AND is_club_member(club_id))
+  );
 
--- Any active club member can create a player_organized session.
--- Only a Que Master or Club Owner can create a club_queue session.
+-- Any authenticated player can create a clubless player_organized session.
+-- Any active club member can create a club-scoped player_organized session.
+-- Only a Que Master or Club Owner can create a club_queue session (club required).
 CREATE POLICY "sessions_host_write"
   ON queue_sessions FOR INSERT
   WITH CHECK (
     host_id = auth_uid()
-    AND is_club_member(club_id)
     AND (
-      -- player_organized sessions: any member may host
-      origin = 'player_organized'
+      -- clubless player_organized: any authenticated player may host
+      (club_id IS NULL AND origin = 'player_organized')
       OR
-      -- club_queue sessions: restricted to Que Masters and Club Owners
-      (origin = 'club_queue' AND (is_que_master(club_id) OR is_club_owner(club_id)))
+      -- club-scoped player_organized: any member may host
+      (club_id IS NOT NULL AND origin = 'player_organized' AND is_club_member(club_id))
+      OR
+      -- club_queue sessions: club required; restricted to Que Masters and Club Owners
+      (origin = 'club_queue' AND club_id IS NOT NULL
+        AND (is_que_master(club_id) OR is_club_owner(club_id)))
     )
   );
 
@@ -290,8 +300,7 @@ CREATE POLICY "sessions_manage_update"
   ON queue_sessions FOR UPDATE
   USING (
     host_id = auth_uid()
-    OR is_que_master(club_id)
-    OR is_club_owner(club_id)
+    OR (club_id IS NOT NULL AND (is_que_master(club_id) OR is_club_owner(club_id)))
   );
 ```
 

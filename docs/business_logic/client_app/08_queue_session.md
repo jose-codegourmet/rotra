@@ -2,7 +2,7 @@
 
 ## Overview
 
-A **Queue Session** is the core operational unit of the app. It is a bounded, time-limited badminton event **scoped to a club**, with a roster of admitted players and the same core mechanics (courts, queue, scoring, real-time sync).
+A **Queue Session** is the core operational unit of the app. It is a bounded, time-limited badminton event — **optionally scoped to a club** (clubless casual sessions are allowed for the player-organized origin) — with a roster of admitted players and the same core mechanics (courts, queue, scoring, real-time sync).
 
 Sessions differ by **who creates them** and whether the schedule is **competitive** for platform progression (EXP / MMR / ranked). See **Session origin & competitive scope** below.
 
@@ -16,13 +16,38 @@ A session handles:
 
 ---
 
+## Session discovery map (`/dashboard`)
+
+The post-login **Home** route (`/dashboard`) is a map-first discovery surface for nearby queue sessions. See [`docs/views/client_app/common/session_discovery_dashboard.md`](../../views/client_app/common/session_discovery_dashboard.md).
+
+### Which sessions appear on the map
+
+| Session `status` | `visibility` | Club membership | On discovery map? |
+|------------------|--------------|-----------------|---------------------|
+| `open` or `active` | `open` | Any authenticated player | Yes (if `venue_lat` / `venue_lng` set) |
+| `open` or `active` | `club_members` | Member of hosting club | Yes (if coordinates set) |
+| `open` or `active` | `club_members` | Not a member | No |
+| `draft`, `closed`, `completed`, `cancelled` | Any | Any | No |
+
+List and Grid views on the same dashboard use the same visibility rules. Sessions without geocoded coordinates are omitted from the map but may still appear in List/Grid with distance hidden.
+
+### Quick Session (player-organized)
+
+From the dashboard, any player **not already in an active session** can start a **Quick Session** — a streamlined create flow for `origin = player_organized` sessions. A **club is optional**: members may attach one of their clubs, or create a **clubless** casual session. Clubless sessions have no club members to scope to, so they are always `visibility = open`. See [`PLAN_phase_3_quick_session_cta.md`](../../../PLAN_phase_3_quick_session_cta.md).
+
+### Active session guard
+
+A player who is already registered (`admission_status` in `accepted`, `waitlisted`, or `reserved`; `player_status` not `exited`) in a session with `status` `open` or `active` **cannot** start another Quick Session or join a different session without first leaving their current one. The dashboard surfaces a **Resume Session** CTA and blocking prompt instead. See [`PLAN_phase_4_active_session_guard.md`](../../../PLAN_phase_4_active_session_guard.md).
+
+---
+
 ## Session origin & competitive scope
 
 ### Two ways a session is created
 
 | Origin | Who creates it | Schedule type | Competitive progression |
 |--------|----------------|----------------|-------------------------|
-| **Player-organized** | Any registered **Player** (member of the club) | Fixed as **informal** — no MMR/Fun toggle | **No** — not ranked; **no EXP**; **no MMR** changes |
+| **Player-organized** | Any registered **Player** (a club is **optional** — sessions may be clubless) | Fixed as **informal** — no MMR/Fun toggle | **No** — not ranked; **no EXP**; **no MMR** changes |
 | **Club queue** | **Que Master** or **Club Owner** for that club | **Required** choice: **MMR (competitive)** or **Fun Games (no points)** | **MMR** schedule only: ranked-eligible; **EXP** and **MMR** can change. **Fun Games**: **no EXP / no MMR**; matches and standings still recorded |
 
 Only **club queue** sessions can grant **EXP**, **MMR** movement, or **ranked** match credit. **Player-organized** sessions are for casual organization and history; they never count toward competitive progression.
@@ -43,7 +68,7 @@ Only **club queue** sessions can grant **EXP**, **MMR** movement, or **ranked** 
 
 ### Host responsibilities
 
-* **Player-organized**: the creating player is the **session host** for draft → open → active flow (queue management, payments, finalization) unless the product later allows transfer.
+* **Player-organized**: the creating player is the **session host** for draft → open → active flow (queue management, payments, finalization) unless the product later allows transfer. A club is optional; clubless sessions are always `visibility = open`.
 * **Club queue**: **Que Master** or **Club Owner** is the host; **Schedule type** is set at setup and defines Fun vs MMR for the whole schedule.
 
 ### Terminology note
@@ -61,9 +86,9 @@ Open (players join, queue fills)
     ↓
 Active (matches are being played)
     ↓
-Closed (no new matches; existing in review)
+Closed (queue is done — no new matches; payments being settled)
     ↓
-Completed (all matches finalized)
+Completed (all payments settled; session fully wrapped)
 ```
 
 | State | Who Can Act | Player Can Join |
@@ -71,8 +96,10 @@ Completed (all matches finalized)
 | Draft | Session host only (player-organized: creator; club queue: Que Master or Club Owner) | No |
 | Open | Session host + Players | Yes |
 | Active | Session host + Players + Umpires | Yes (waitlisted) |
-| Closed | Session host only | No |
+| Closed | Session host only (payment settlement) | No |
 | Completed | Read-only | No |
+
+> **`closed` vs `completed`:** `closed` means the queue is finished (no more matches) but final per-player payments may still be in settlement. `completed` means everyone has paid and the session is fully wrapped. Both are removed from discovery.
 
 ---
 
