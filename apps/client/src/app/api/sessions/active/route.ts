@@ -38,7 +38,7 @@ function toActiveSessionSummary(reg: {
 		id: string;
 		status: string;
 		location: string;
-		club: { name: string };
+		club: { name: string } | null;
 	};
 }): ActiveSessionSummary {
 	const sessionStatus =
@@ -46,7 +46,7 @@ function toActiveSessionSummary(reg: {
 
 	return {
 		sessionId: reg.session.id,
-		clubName: reg.session.club.name,
+		clubName: reg.session.club?.name ?? null,
 		location: reg.session.location,
 		status: sessionStatus,
 		playerStatus: reg.playerStatus,

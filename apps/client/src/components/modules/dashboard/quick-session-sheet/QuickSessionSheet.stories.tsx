@@ -52,6 +52,8 @@ export const Open: Story = {
 	render: () => <SheetStory />,
 };
 
+// A user with no clubs can still open a clubless casual session
+// (the club select only offers "No club — casual").
 export const NoClubs: Story = {
 	render: () => <SheetStory clubs={{ clubs: [] }} />,
 };

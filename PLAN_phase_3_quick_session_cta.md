@@ -49,17 +49,18 @@ Quick Session creates a **player-organized** session per [`08_queue_session.md`]
 | Rule | Value |
 |------|-------|
 | Origin | `player_organized` |
+| Club | **Optional** — may be clubless (casual). `club_queue` still requires a club. |
 | Schedule type | `NULL` (always informal) |
 | EXP / MMR | None |
 | Initial status | `draft` → user confirms → `open` |
-| Visibility default | `club_members` (user picks club) |
+| Visibility default | `club_members` when a club is selected; **forced `open`** when clubless |
 | Host | Current user (`host_id`) |
 
 **Minimum required fields for quick create:**
 
 | Field | UI control | Default |
 |-------|------------|---------|
-| Club | Select (user's clubs only) | First club or required |
+| Club | Select (`No club — casual` + user's clubs) — **optional** | First club if any, else clubless |
 | Location / venue | Text input | Empty |
 | Address | Text input (optional) | Empty |
 | Date | Date picker | Today |
@@ -126,7 +127,7 @@ quick-session-sheet/
 import { z } from "zod";
 
 export const quickSessionFormSchema = z.object({
-  clubId: z.string().uuid(),
+  clubId: z.string().uuid().optional().or(z.literal("")), // optional — empty = clubless
   location: z.string().min(2).max(120),
   address: z.string().max(200).optional(),
   date: z.string(), // ISO date
@@ -167,19 +168,21 @@ Server steps:
 
 1. Auth: resolve current profile via Supabase session
 2. Validate body with Zod
-3. Verify user is member of `clubId`
+3. If a `clubId` is provided, verify user is an active member of it (else 403). Clubless requests skip this check.
 4. Geocode `address` or `location` → `venue_lat`, `venue_lng`, `venue_address`
 5. Prisma `queueSession.create` with:
    - `origin: player_organized`
+   - `clubId: clubId ?? null`
    - `scheduleType: null`
    - `status: open` (skip draft for quick flow — host is creating and opening in one step)
+   - `visibility`: chosen value when club-scoped; forced `open` when clubless
    - `hostId: profile.id`
    - `dateTime`: combine date + startTime in club timezone (or user local v1)
    - `totalSlots`: computed
 6. Auto-register host as `accepted` with `player_status: not_arrived`
 7. Return `{ sessionId, href: `/sessions/${sessionId}` }`
 
-**RLS:** Insert allowed if user is club member.
+**RLS:** Insert allowed if the user is the host and either the session is clubless `player_organized`, or the user is a member of the chosen club.
 
 **Acceptance:** POST creates row in `queue_sessions`; returns navigable href.
 
@@ -204,9 +207,9 @@ Fetch user's clubs for the select dropdown:
 
 - Reuse existing club membership query if available
 - Or server action / `GET /api/clubs/mine`
-- Empty state: "Join a club first" with link to `/clubs/explore`
+- The select always offers a `No club — casual` option first, then the user's clubs (if any). No clubs is not a blocker — the user can still create a clubless session.
 
-**Acceptance:** Only clubs the user belongs to appear in select.
+**Acceptance:** Only clubs the user belongs to appear in the select; a user with no clubs can still create a clubless session.
 
 ---
 

@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 export const quickSessionFormSchema = z.object({
-	clubId: z.string().uuid("Select a club"),
+	clubId: z
+		.union([z.string().uuid("Select a valid club"), z.literal("")])
+		.optional(),
 	location: z.string().min(2, "Location is required").max(120),
 	address: z.string().max(200).optional(),
 	date: z.string().min(1, "Date is required"),

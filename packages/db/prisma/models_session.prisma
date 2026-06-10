@@ -1,6 +1,6 @@
 model QueueSession {
   id      String @id @default(uuid()) @db.Uuid
-  clubId  String @map("club_id") @db.Uuid
+  clubId  String? @map("club_id") @db.Uuid
   hostId  String @map("host_id") @db.Uuid
 
   origin        SessionOrigin
@@ -40,7 +40,7 @@ model QueueSession {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  club   Club    @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  club   Club?   @relation(fields: [clubId], references: [id], onDelete: Cascade)
   host   Profile @relation(fields: [hostId], references: [id])
 
   registrations   SessionRegistration[]

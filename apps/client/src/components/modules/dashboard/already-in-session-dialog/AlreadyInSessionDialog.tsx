@@ -31,7 +31,8 @@ export function AlreadyInSessionDialog({
 				<AlertDialogHeader>
 					<AlertDialogTitle>You&apos;re already in a session</AlertDialogTitle>
 					<AlertDialogDescription>
-						You&apos;re registered at {activeSession.clubName}. Leave that
+						You&apos;re registered at{" "}
+						{activeSession.clubName ?? activeSession.location}. Leave that
 						session before joining another.
 					</AlertDialogDescription>
 				</AlertDialogHeader>

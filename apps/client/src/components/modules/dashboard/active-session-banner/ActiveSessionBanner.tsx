@@ -29,7 +29,7 @@ export function ActiveSessionBanner({
 				"transition-colors hover:bg-accent/10",
 				className,
 			)}
-			aria-label={`${statusLabel}: ${session.clubName}. View session.`}
+			aria-label={`${statusLabel}: ${session.clubName ?? session.location}. View session.`}
 		>
 			<span className="flex shrink-0 items-center gap-2">
 				<span
@@ -48,7 +48,7 @@ export function ActiveSessionBanner({
 					</span>
 				) : null}
 				<span className="block truncate text-sm font-bold text-text-primary">
-					{session.clubName}
+					{session.clubName ?? session.location}
 				</span>
 			</span>
 

@@ -2,11 +2,11 @@
 
 ## Overview
 
-A **Queue Session** is the central operational unit of ROTRA — a bounded, time-limited badminton event hosted under a club. Sessions contain a player roster, a match queue, and real-time state.
+A **Queue Session** is the central operational unit of ROTRA — a bounded, time-limited badminton event, optionally hosted under a club. Sessions contain a player roster, a match queue, and real-time state.
 
 Two origin types exist:
-- **Player-organized** — created by any club member; always informal, no EXP or MMR awarded.
-- **Club queue** — created by a Que Master or Club Owner; must specify a schedule type (MMR competitive or Fun Games).
+- **Player-organized** — created by any registered player; a club is **optional** (clubless casual sessions are allowed). Always informal, no EXP or MMR awarded.
+- **Club queue** — created by a Que Master or Club Owner; a club is **required** and a schedule type (MMR competitive or Fun Games) must be specified.
 
 Only `origin = 'club_queue'` AND `schedule_type = 'mmr'` sessions award EXP and MMR changes.
 
@@ -58,7 +58,8 @@ CREATE TYPE payment_status_enum AS ENUM ('unpaid', 'paid', 'partial');
 ```sql
 CREATE TABLE queue_sessions (
   id       uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  club_id  uuid NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  -- NULL allowed for clubless player_organized (Quick) sessions; see CHECK below
+  club_id  uuid REFERENCES clubs(id) ON DELETE CASCADE,
   host_id  uuid NOT NULL REFERENCES profiles(id),
 
   -- Session classification
@@ -109,7 +110,11 @@ CREATE TABLE queue_sessions (
 
   -- schedule_type must be set when origin is club_queue
   CONSTRAINT club_queue_requires_schedule_type
-    CHECK (origin = 'player_organized' OR schedule_type IS NOT NULL)
+    CHECK (origin = 'player_organized' OR schedule_type IS NOT NULL),
+
+  -- Only player_organized sessions may be clubless; club_queue always needs a club
+  CONSTRAINT clubless_only_player_organized
+    CHECK (club_id IS NOT NULL OR origin = 'player_organized')
 );
 ```
 

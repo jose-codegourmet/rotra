@@ -30,20 +30,28 @@ export async function POST(request: Request) {
 
 	const values = parsed.data;
 
-	const membership = await db.clubMember.findFirst({
-		where: {
-			clubId: values.clubId,
-			playerId: profile.id,
-			status: "active",
-		},
-	});
+	const clubId = values.clubId?.trim() || null;
 
-	if (!membership) {
-		return NextResponse.json(
-			{ error: "You are not a member of this club." },
-			{ status: 403 },
-		);
+	if (clubId) {
+		const membership = await db.clubMember.findFirst({
+			where: {
+				clubId,
+				playerId: profile.id,
+				status: "active",
+			},
+		});
+
+		if (!membership) {
+			return NextResponse.json(
+				{ error: "You are not a member of this club." },
+				{ status: 403 },
+			);
+		}
 	}
+
+	// Clubless casual sessions have no club members to scope to, so they are
+	// always open. Club-scoped sessions honor the chosen visibility.
+	const visibility = clubId ? values.visibility : "open";
 
 	const geocodeQuery = values.address?.trim() || values.location.trim();
 	const geocoded = await geocodeAddress(geocodeQuery);
@@ -57,12 +65,12 @@ export async function POST(request: Request) {
 		const session = await db.$transaction(async (tx) => {
 			const created = await tx.queueSession.create({
 				data: {
-					clubId: values.clubId,
+					clubId,
 					hostId: profile.id,
 					origin: "player_organized",
 					scheduleType: null,
 					status: "open",
-					visibility: values.visibility,
+					visibility,
 					location: values.location.trim(),
 					address: values.address?.trim() || null,
 					venueLat: geocoded?.lat ?? null,

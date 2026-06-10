@@ -263,9 +263,10 @@ Opened via "See more" button in `VenuePinTooltip`.
 ### QuickSessionSheet
 
 - existing `MobileDrawer` from bottom (mobile) or `Dialog` (desktop) — no `Sheet` primitive exists
-- Form fields: club, location, address, date, start time, courts, players per court, match format, score limit, visibility
+- Form fields: club (**optional** — `No club — casual` + user's clubs), location, address, date, start time, courts, players per court, match format, score limit, visibility
+- A club is not required: users with no clubs can still create a clubless casual session. Clubless sessions are always `visibility = open`.
 - Submit label: `OPEN SESSION`
-- Subcopy: "Set up a casual session for your club. No ranked points."
+- Subcopy: "Set up a casual session. A club is optional — either way, Quick Sessions are informal and earn no EXP or Rank."
 
 ### ActiveSessionBanner
 

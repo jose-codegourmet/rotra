@@ -2,7 +2,7 @@
 
 ## Overview
 
-A **Queue Session** is the core operational unit of the app. It is a bounded, time-limited badminton event **scoped to a club**, with a roster of admitted players and the same core mechanics (courts, queue, scoring, real-time sync).
+A **Queue Session** is the core operational unit of the app. It is a bounded, time-limited badminton event — **optionally scoped to a club** (clubless casual sessions are allowed for the player-organized origin) — with a roster of admitted players and the same core mechanics (courts, queue, scoring, real-time sync).
 
 Sessions differ by **who creates them** and whether the schedule is **competitive** for platform progression (EXP / MMR / ranked). See **Session origin & competitive scope** below.
 
@@ -33,7 +33,7 @@ List and Grid views on the same dashboard use the same visibility rules. Session
 
 ### Quick Session (player-organized)
 
-From the dashboard, any player **not already in an active session** can start a **Quick Session** — a streamlined create flow for `origin = player_organized` sessions. See [`PLAN_phase_3_quick_session_cta.md`](../../../PLAN_phase_3_quick_session_cta.md).
+From the dashboard, any player **not already in an active session** can start a **Quick Session** — a streamlined create flow for `origin = player_organized` sessions. A **club is optional**: members may attach one of their clubs, or create a **clubless** casual session. Clubless sessions have no club members to scope to, so they are always `visibility = open`. See [`PLAN_phase_3_quick_session_cta.md`](../../../PLAN_phase_3_quick_session_cta.md).
 
 ### Active session guard
 
@@ -47,7 +47,7 @@ A player who is already registered (`admission_status` in `accepted`, `waitliste
 
 | Origin | Who creates it | Schedule type | Competitive progression |
 |--------|----------------|----------------|-------------------------|
-| **Player-organized** | Any registered **Player** (member of the club) | Fixed as **informal** — no MMR/Fun toggle | **No** — not ranked; **no EXP**; **no MMR** changes |
+| **Player-organized** | Any registered **Player** (a club is **optional** — sessions may be clubless) | Fixed as **informal** — no MMR/Fun toggle | **No** — not ranked; **no EXP**; **no MMR** changes |
 | **Club queue** | **Que Master** or **Club Owner** for that club | **Required** choice: **MMR (competitive)** or **Fun Games (no points)** | **MMR** schedule only: ranked-eligible; **EXP** and **MMR** can change. **Fun Games**: **no EXP / no MMR**; matches and standings still recorded |
 
 Only **club queue** sessions can grant **EXP**, **MMR** movement, or **ranked** match credit. **Player-organized** sessions are for casual organization and history; they never count toward competitive progression.
@@ -68,7 +68,7 @@ Only **club queue** sessions can grant **EXP**, **MMR** movement, or **ranked** 
 
 ### Host responsibilities
 
-* **Player-organized**: the creating player is the **session host** for draft → open → active flow (queue management, payments, finalization) unless the product later allows transfer.
+* **Player-organized**: the creating player is the **session host** for draft → open → active flow (queue management, payments, finalization) unless the product later allows transfer. A club is optional; clubless sessions are always `visibility = open`.
 * **Club queue**: **Que Master** or **Club Owner** is the host; **Schedule type** is set at setup and defines Fun vs MMR for the whole schedule.
 
 ### Terminology note
