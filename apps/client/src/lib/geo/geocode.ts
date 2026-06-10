@@ -17,7 +17,7 @@ interface MapboxGeocodingResponse {
 	features?: MapboxGeocodingFeature[];
 }
 
-const GEOCODE_TYPES = "region,place,locality,neighborhood,address";
+const GEOCODE_TYPES = "region,place,locality,neighborhood,address,poi";
 
 export async function forwardGeocode(
 	query: string,
