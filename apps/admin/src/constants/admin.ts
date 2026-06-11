@@ -6,6 +6,7 @@ import {
 	FlaskConical,
 	LayoutDashboard,
 	Mail,
+	MapPin,
 	Medal,
 	ShieldAlert,
 	SlidersHorizontal,
@@ -28,6 +29,7 @@ export const ROUTES = {
 	ADMINS: "/admins",
 	/** Customer (player) directory — non-admin profiles only */
 	CUSTOMERS: "/customers",
+	PLACES: "/places",
 	KILL_SWITCHES: "/kill-switches",
 	ENVIRONMENTS: "/environments",
 	APPROVALS: "/approvals",
@@ -64,6 +66,7 @@ export const ADMIN_PAGE_TITLES: Record<string, string> = {
 	[ROUTES.DASHBOARD]: "Dashboard",
 	[ROUTES.ADMINS]: "Platform admins",
 	[ROUTES.CUSTOMERS]: "Customers",
+	[ROUTES.PLACES]: "Places",
 	[ROUTES.KILL_SWITCHES]: "Kill switches",
 	[ROUTES.ENVIRONMENTS]: "Environments",
 	[ROUTES.APPROVALS]: "Approvals",
@@ -111,6 +114,11 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
 		label: "Customers",
 		href: ROUTES.CUSTOMERS,
 		icon: Users,
+	},
+	{
+		label: "Places",
+		href: ROUTES.PLACES,
+		icon: MapPin,
 	},
 	{
 		label: "Tags",
