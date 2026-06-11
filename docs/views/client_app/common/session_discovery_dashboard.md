@@ -407,6 +407,10 @@ Follow **No-Line rule:** no 1px list dividers; use spacing and tonal backgrounds
 | `GET /api/sessions/discover` | Nearby sessions |
 | `GET /api/sessions/active` | Current user's active registration |
 | `POST /api/sessions/quick` | Create player-organized session |
+| `GET /api/places/search` | Typeahead search for confirmed places (Phase 4a) |
+| `POST /api/places/submit` | Player submits a new unreviewed place (Phase 4a) |
+
+> **Phase 4b:** [`AddressPinField`](../components/address-pin-field.md) will be embedded inside `VenuePicker` in `QuickSessionSheet`, backed by the places search and submit routes above.
 
 ---
 
