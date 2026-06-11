@@ -22,6 +22,9 @@ function serializePlaces(
 		address: string;
 		latitude: number;
 		longitude: number;
+		description: string | null;
+		phone: string | null;
+		website: string | null;
 		status: PlaceRow["status"];
 		createdAt: Date;
 		submittedBy: { id: string; name: string } | null;
@@ -34,6 +37,9 @@ function serializePlaces(
 		address: place.address,
 		latitude: place.latitude,
 		longitude: place.longitude,
+		description: place.description,
+		phone: place.phone,
+		website: place.website,
 		status: place.status,
 		submittedBy: place.submittedBy
 			? {

@@ -1,12 +1,48 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import * as React from "react";
 
 import { PlacesTable } from "@/components/modules/places/places-table/PlacesTable";
 import { Button } from "@/components/ui/button/Button";
-import { usePlacesQuery } from "@/hooks/usePlaces/client";
-import type { ListPlacesResponse } from "@/hooks/usePlaces/server";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog/Dialog";
+import {
+	useDeletePlace,
+	usePlacesQuery,
+} from "@/hooks/usePlaces/client";
+import type { ListPlacesResponse, PlaceRow } from "@/hooks/usePlaces/server";
 import { cn } from "@/lib/utils/tailwind";
+
+const CreatePlaceDialog = dynamic(
+	() =>
+		import(
+			"@/components/modules/places/create-place-dialog/CreatePlaceDialog"
+		).then((mod) => mod.CreatePlaceDialog),
+	{ ssr: false },
+);
+
+const EditPlaceDialog = dynamic(
+	() =>
+		import("@/components/modules/places/edit-place-dialog/EditPlaceDialog").then(
+			(mod) => mod.EditPlaceDialog,
+		),
+	{ ssr: false },
+);
+
+const ReviewPlaceDialog = dynamic(
+	() =>
+		import(
+			"@/components/modules/places/review-place-dialog/ReviewPlaceDialog"
+		).then((mod) => mod.ReviewPlaceDialog),
+	{ ssr: false },
+);
 
 type PlacesTab = "all" | "confirmed" | "unreviewed";
 
@@ -22,6 +58,12 @@ export type PlacesClientProps = {
 
 export function PlacesClient({ initialPlaces }: PlacesClientProps) {
 	const [activeTab, setActiveTab] = React.useState<PlacesTab>("all");
+	const [createOpen, setCreateOpen] = React.useState(false);
+	const [editTarget, setEditTarget] = React.useState<PlaceRow | null>(null);
+	const [reviewTarget, setReviewTarget] = React.useState<PlaceRow | null>(null);
+	const [deleteTarget, setDeleteTarget] = React.useState<PlaceRow | null>(null);
+
+	const deleteMutation = useDeletePlace();
 
 	const { data, isFetching } = usePlacesQuery(undefined, {
 		initialData: initialPlaces,
@@ -39,6 +81,27 @@ export function PlacesClient({ initialPlaces }: PlacesClientProps) {
 		return places.filter((place) => place.status === activeTab);
 	}, [activeTab, places]);
 
+	const isDeleting = deleteMutation.isPending;
+
+	function handleDeleteOpenChange(open: boolean) {
+		if (isDeleting) return;
+		if (!open) {
+			setDeleteTarget(null);
+		}
+	}
+
+	function handleConfirmDelete() {
+		if (!deleteTarget || isDeleting) return;
+		deleteMutation.mutate(
+			{ id: deleteTarget.id },
+			{
+				onSuccess: () => {
+					setDeleteTarget(null);
+				},
+			},
+		);
+	}
+
 	return (
 		<div className="mx-auto max-w-6xl space-y-6">
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -48,7 +111,7 @@ export function PlacesClient({ initialPlaces }: PlacesClientProps) {
 						Manage custom venue locations submitted by players and admins.
 					</p>
 				</div>
-				<Button type="button" disabled>
+				<Button type="button" onClick={() => setCreateOpen(true)}>
 					Add Place
 				</Button>
 			</div>
@@ -86,7 +149,79 @@ export function PlacesClient({ initialPlaces }: PlacesClientProps) {
 				<p className="text-small text-text-secondary">Refreshing places…</p>
 			) : null}
 
-			<PlacesTable data={filteredPlaces} />
+			<PlacesTable
+				data={filteredPlaces}
+				onEdit={(place) => setEditTarget(place)}
+				onConfirm={(place) => setReviewTarget(place)}
+				onDelete={(place) => setDeleteTarget(place)}
+			/>
+
+			<CreatePlaceDialog
+				open={createOpen}
+				onOpenChange={setCreateOpen}
+				onSuccess={() => undefined}
+				onError={() => undefined}
+			/>
+
+			{editTarget ? (
+				<EditPlaceDialog
+					place={editTarget}
+					open
+					onOpenChange={(open) => {
+						if (!open) setEditTarget(null);
+					}}
+					onSuccess={() => undefined}
+					onError={() => undefined}
+				/>
+			) : null}
+
+			{reviewTarget ? (
+				<ReviewPlaceDialog
+					place={reviewTarget}
+					open
+					onOpenChange={(open) => {
+						if (!open) setReviewTarget(null);
+					}}
+					onConfirmSuccess={() => undefined}
+					onDeleteSuccess={() => undefined}
+				/>
+			) : null}
+
+			<Dialog
+				open={deleteTarget !== null}
+				onOpenChange={handleDeleteOpenChange}
+			>
+				<DialogContent className="max-w-md">
+					<DialogHeader>
+						<DialogTitle>Delete place?</DialogTitle>
+						<DialogDescription>
+							This permanently removes{" "}
+							<span className="font-medium text-text-primary">
+								{deleteTarget?.name}
+							</span>{" "}
+							from the map. This action cannot be undone.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button
+							type="button"
+							variant="outline"
+							disabled={isDeleting}
+							onClick={() => setDeleteTarget(null)}
+						>
+							Cancel
+						</Button>
+						<Button
+							type="button"
+							variant="destructive"
+							disabled={isDeleting}
+							onClick={handleConfirmDelete}
+						>
+							{isDeleting ? "Deleting…" : "Delete"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

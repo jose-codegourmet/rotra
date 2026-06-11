@@ -107,7 +107,6 @@ function buildColumns(input: {
 				const place = row.original;
 				return (
 					<div className="flex items-center justify-end gap-1">
-						{/* TODO: wire in Phase 3b */}
 						<Button
 							type="button"
 							variant="ghost"

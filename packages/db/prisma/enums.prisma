@@ -392,6 +392,10 @@ enum AdminAction {
   tag_definition_created
   tag_definition_updated
   tag_definition_deactivated
+  place_created
+  place_updated
+  place_confirmed
+  place_deleted
 
   @@map("admin_action_enum")
 }
@@ -408,6 +412,7 @@ enum AdminActionEntity {
   admin_user
   tester_invitation
   tag_definition
+  place
 
   @@map("admin_action_entity_enum")
 }

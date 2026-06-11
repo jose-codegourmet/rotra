@@ -1,5 +1,17 @@
 "use client";
 
+/**
+ * Mapbox-backed location picker. Consumers in Next.js App Router pages should
+ * load this component with `next/dynamic` and `{ ssr: false }` (see
+ * `CreatePlaceDialog` / `EditPlaceDialog`).
+ *
+ * `"use client"` alone is not enough: App Router still server-renders client
+ * components for the initial HTML pass. `react-map-gl` / Mapbox GL need `window`,
+ * WebGL, and a real DOM node, so SSR often throws (`window is not defined`) or
+ * causes hydration mismatches. `dynamic(..., { ssr: false })` skips server render
+ * and mounts the map only in the browser.
+ */
+
 import { Loader2, MapPin } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import MapboxMap, { type MapRef, Marker } from "react-map-gl/mapbox";
