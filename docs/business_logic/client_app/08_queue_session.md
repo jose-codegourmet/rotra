@@ -39,6 +39,18 @@ From the dashboard, any player **not already in an active session** can start a 
 
 A player who is already registered (`admission_status` in `accepted`, `waitlisted`, or `reserved`; `player_status` not `exited`) in a session with `status` `open` or `active` **cannot** start another Quick Session or join a different session without first leaving their current one. The dashboard surfaces a **Resume Session** CTA and blocking prompt instead. See [`PLAN_phase_4_active_session_guard.md`](../../../PLAN_phase_4_active_session_guard.md).
 
+### Venue / Places (Quick Session)
+
+When creating a **Quick Session**, venue selection uses `VenuePicker`:
+
+| Source | Behavior |
+|--------|----------|
+| **Confirmed place** | User searches and picks from admin-reviewed places (`status = confirmed`). Coordinates come from the DB — no server geocoding call. |
+| **New pin** | User pins a location not yet in the directory. Session creation proceeds immediately. The place is submitted in the background (`POST /api/places/submit`) as `unreviewed` and does **not** block session creation. |
+| **Admin review** | Unreviewed places appear in the admin Places queue. Once confirmed, they become available to all users in VenuePicker search. |
+
+If place submission fails after the session is created, the session is unaffected.
+
 ---
 
 ## Session origin & competitive scope
@@ -110,7 +122,7 @@ The **session host** configures the session before opening it (Que Master or Clu
 | Setting | Type | Required | Notes |
 |---------|------|----------|-------|
 | **Schedule type** | Select | **Yes for club queue only** | **MMR (competitive)** — EXP/MMR/ranked eligible; **Fun Games (no points)** — no EXP/MMR; matches and standings still recorded. Omitted / N/A for **player-organized** (always informal). |
-| Location / Venue | Text | Yes | Venue name + optional address |
+| Location / Venue | `VenuePicker` (Quick Session) or text (club queue) | Yes | Venue name + address + coordinates; Quick Session uses confirmed places or new pin |
 | Date | Date | Yes | |
 | Start time | Time | Yes | |
 | End time | Time | No | Used for notifications only |

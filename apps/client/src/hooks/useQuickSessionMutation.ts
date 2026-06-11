@@ -44,7 +44,7 @@ export function useQuickSessionMutation() {
 
 	return useMutation({
 		mutationFn: createQuickSession,
-		onSuccess: (data) => {
+		onSuccess: (data, variables) => {
 			toast.success("Session opened. Share the link with your club.");
 			void queryClient.invalidateQueries({
 				queryKey: sessionDiscoveryRootKey,
@@ -53,6 +53,19 @@ export function useQuickSessionMutation() {
 				queryKey: activeSessionQueryKey,
 			});
 			router.push(data.href);
+
+			if (variables.venue.isNewSubmission) {
+				void fetch("/api/places/submit", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						name: variables.venue.name,
+						address: variables.venue.address ?? "",
+						latitude: variables.venue.latitude,
+						longitude: variables.venue.longitude,
+					}),
+				});
+			}
 		},
 		onError: () => {
 			toast.error("Could not create session. Try again.");

@@ -83,7 +83,13 @@ export const ValidationErrors: Story = {
 
 const validInitialValues = {
 	clubId: mockClubs.clubs[0]?.id ?? "",
-	location: "Mandaue Sports Complex",
+	venue: {
+		name: "Mandaue Sports Complex",
+		address: "Mandaue City, Cebu",
+		latitude: 10.3234,
+		longitude: 123.9295,
+		isNewSubmission: false,
+	},
 	date: "2026-06-09",
 	startTime: "18:00",
 	numCourts: 1,

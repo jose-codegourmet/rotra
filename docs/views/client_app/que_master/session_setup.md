@@ -20,11 +20,12 @@ Full-screen scrollable form with a header bar and a sticky bottom save/publish b
 ├──────────────────────────────────────┤
 │                                      │
 │  ── Venue & Time ─────────────────   │  ← Section header
-│  Venue Name *                        │  ← Label
-│  [ __________________________ ]      │  ← Text input
+│  Venue *                             │  ← Label
+│  [ VenuePicker — search or pin ]     │  ← Quick Session uses VenuePicker
 │                                      │
-│  Location / Address                  │
-│  [ __________________________ ]      │
+│  (QM club queue: text fields)        │
+│  Venue Name *  [ ______________ ]    │
+│  Location / Address [ __________ ]   │
 │                                      │
 │  Date *                              │
 │  [ Mar 29, 2025         📅 ]         │  ← Date picker input

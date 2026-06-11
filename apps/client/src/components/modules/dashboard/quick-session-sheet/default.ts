@@ -18,8 +18,14 @@ function getNextRoundedHour(): string {
 export function defaultQuickSessionValues(): QuickSessionFormValues {
 	return {
 		clubId: "",
-		location: "",
-		address: "",
+		venue: {
+			name: "",
+			address: "",
+			latitude: null,
+			longitude: null,
+			placeId: undefined,
+			isNewSubmission: false,
+		},
 		date: getTodayIsoDate(),
 		startTime: getNextRoundedHour(),
 		numCourts: 1,

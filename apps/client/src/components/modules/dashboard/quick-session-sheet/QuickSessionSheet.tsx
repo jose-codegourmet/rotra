@@ -31,6 +31,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover/Popover";
+import { VenuePicker } from "@/components/ui/venue-picker/VenuePicker";
 import { useMyClubs } from "@/hooks/useMyClubs";
 import { useQuickSessionMutation } from "@/hooks/useQuickSessionMutation";
 import { cn } from "@/lib/utils";
@@ -149,48 +150,26 @@ export function QuickSessionSheet({
 							</FieldContent>
 						</Field>
 
-						<Field data-invalid={!!formState.errors.location}>
-							<FieldLabel htmlFor="quick-session-location">
-								Location / venue
-							</FieldLabel>
+						<Field data-invalid={!!formState.errors.venue}>
+							<FieldLabel>Venue</FieldLabel>
 							<FieldContent>
 								<Controller
 									control={control}
-									name="location"
+									name="venue"
 									render={({ field }) => (
-										<Input
-											id="quick-session-location"
-											placeholder="e.g. Mandaue Sports Complex"
+										<VenuePicker
+											value={field.value}
+											onChange={field.onChange}
 											disabled={createMutation.isPending}
-											{...field}
 										/>
 									)}
 								/>
-								<FieldError errors={[formState.errors.location]} />
-							</FieldContent>
-						</Field>
-
-						<Field data-invalid={!!formState.errors.address}>
-							<FieldLabel htmlFor="quick-session-address">
-								Address{" "}
-								<span className="font-normal text-text-secondary">
-									(optional)
-								</span>
-							</FieldLabel>
-							<FieldContent>
-								<Controller
-									control={control}
-									name="address"
-									render={({ field }) => (
-										<Input
-											id="quick-session-address"
-											placeholder="Street address for map pin"
-											disabled={createMutation.isPending}
-											{...field}
-										/>
-									)}
+								<FieldError
+									errors={[
+										formState.errors.venue?.name,
+										formState.errors.venue?.address,
+									]}
 								/>
-								<FieldError errors={[formState.errors.address]} />
 							</FieldContent>
 						</Field>
 
