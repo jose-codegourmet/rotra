@@ -67,7 +67,11 @@ function serializePlace(place: {
 	};
 }
 
-function placesErrorResponse(error: unknown, context: string, fallback: string) {
+function placesErrorResponse(
+	error: unknown,
+	context: string,
+	fallback: string,
+) {
 	if (error instanceof AdminSessionError) {
 		return NextResponse.json(
 			{ error: error.message },
@@ -97,7 +101,11 @@ export async function GET(req: Request) {
 			places: places.map(serializePlace),
 		});
 	} catch (error) {
-		return placesErrorResponse(error, "[places list]", "Failed to load places.");
+		return placesErrorResponse(
+			error,
+			"[places list]",
+			"Failed to load places.",
+		);
 	}
 }
 

@@ -10,10 +10,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog/Dialog";
-import {
-	useConfirmPlace,
-	useDeletePlace,
-} from "@/hooks/usePlaces/client";
+import { useConfirmPlace, useDeletePlace } from "@/hooks/usePlaces/client";
 import type { PlaceRow } from "@/hooks/usePlaces/server";
 
 const submittedAtFmt = new Intl.DateTimeFormat("en-GB", {

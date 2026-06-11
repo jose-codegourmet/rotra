@@ -68,9 +68,13 @@ export function EditPlaceDialog({
 	useEffect(() => {
 		const location = form.getValues("location");
 		if (location.name !== venueName) {
-			form.setValue("location", { ...location, name: venueName }, {
-				shouldValidate: false,
-			});
+			form.setValue(
+				"location",
+				{ ...location, name: venueName },
+				{
+					shouldValidate: false,
+				},
+			);
 		}
 	}, [venueName, form]);
 
@@ -87,9 +91,7 @@ export function EditPlaceDialog({
 					? { description: values.description.trim() }
 					: {}),
 				...(values.phone?.trim() ? { phone: values.phone.trim() } : {}),
-				...(values.website?.trim()
-					? { website: values.website.trim() }
-					: {}),
+				...(values.website?.trim() ? { website: values.website.trim() } : {}),
 			},
 			{
 				onSuccess: () => {

@@ -16,7 +16,10 @@ const patchPlaceBodySchema = z.object({
 	longitude: z.number().optional(),
 	description: z.string().max(500).optional().nullable(),
 	phone: z.string().max(30).optional().nullable(),
-	website: z.union([z.string().url(), z.literal("")]).optional().nullable(),
+	website: z
+		.union([z.string().url(), z.literal("")])
+		.optional()
+		.nullable(),
 	status: z.enum(["confirmed"]).optional(),
 });
 
@@ -60,7 +63,11 @@ function serializePlace(place: {
 	};
 }
 
-function placesErrorResponse(error: unknown, context: string, fallback: string) {
+function placesErrorResponse(
+	error: unknown,
+	context: string,
+	fallback: string,
+) {
 	if (error instanceof AdminSessionError) {
 		return NextResponse.json(
 			{ error: error.message },

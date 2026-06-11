@@ -25,10 +25,7 @@ import { useCreatePlace } from "@/hooks/usePlaces/client";
 import type { CreatePlacePayload } from "@/hooks/usePlaces/server";
 
 import { defaultCreatePlaceValues } from "./default";
-import {
-	type CreatePlaceFormValues,
-	createPlaceSchema,
-} from "./schema";
+import { type CreatePlaceFormValues, createPlaceSchema } from "./schema";
 
 const AddressPinField = dynamic(
 	() =>
@@ -83,9 +80,13 @@ export function CreatePlaceDialog({
 	useEffect(() => {
 		const location = form.getValues("location");
 		if (location.name !== venueName) {
-			form.setValue("location", { ...location, name: venueName }, {
-				shouldValidate: false,
-			});
+			form.setValue(
+				"location",
+				{ ...location, name: venueName },
+				{
+					shouldValidate: false,
+				},
+			);
 		}
 	}, [venueName, form]);
 

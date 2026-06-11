@@ -1,6 +1,6 @@
 import {
-	createPlaceSchema,
 	type CreatePlaceFormValues,
+	createPlaceSchema,
 } from "../create-place-dialog/schema";
 
 export const editPlaceSchema = createPlaceSchema;

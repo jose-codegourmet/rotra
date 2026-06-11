@@ -13,10 +13,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog/Dialog";
-import {
-	useDeletePlace,
-	usePlacesQuery,
-} from "@/hooks/usePlaces/client";
+import { useDeletePlace, usePlacesQuery } from "@/hooks/usePlaces/client";
 import type { ListPlacesResponse, PlaceRow } from "@/hooks/usePlaces/server";
 import { cn } from "@/lib/utils/tailwind";
 
@@ -30,9 +27,9 @@ const CreatePlaceDialog = dynamic(
 
 const EditPlaceDialog = dynamic(
 	() =>
-		import("@/components/modules/places/edit-place-dialog/EditPlaceDialog").then(
-			(mod) => mod.EditPlaceDialog,
-		),
+		import(
+			"@/components/modules/places/edit-place-dialog/EditPlaceDialog"
+		).then((mod) => mod.EditPlaceDialog),
 	{ ssr: false },
 );
 

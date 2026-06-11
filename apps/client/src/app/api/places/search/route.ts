@@ -1,7 +1,7 @@
+import { db } from "@rotra/db";
 import { NextResponse } from "next/server";
 
 import { getCurrentProfile } from "@/lib/server/current-profile";
-import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -16,24 +16,24 @@ export async function GET(request: Request) {
 		return NextResponse.json({ places: [] });
 	}
 
-	let supabase: Awaited<ReturnType<typeof createClient>>;
-	try {
-		supabase = await createClient();
-	} catch {
-		return NextResponse.json({ places: [] });
-	}
+	const places = await db.place.findMany({
+		where: {
+			status: "confirmed",
+			OR: [
+				{ name: { contains: q, mode: "insensitive" } },
+				{ address: { contains: q, mode: "insensitive" } },
+			],
+		},
+		select: {
+			id: true,
+			name: true,
+			address: true,
+			latitude: true,
+			longitude: true,
+		},
+		orderBy: { name: "asc" },
+		take: 6,
+	});
 
-	const { data, error } = await supabase
-		.from("places")
-		.select("id, name, address, latitude, longitude")
-		.or(`name.ilike.%${q}%,address.ilike.%${q}%`)
-		.eq("status", "confirmed")
-		.order("name")
-		.limit(6);
-
-	if (error) {
-		return NextResponse.json({ places: [] });
-	}
-
-	return NextResponse.json({ places: data });
+	return NextResponse.json({ places });
 }

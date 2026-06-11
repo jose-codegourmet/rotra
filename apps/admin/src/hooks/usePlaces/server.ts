@@ -140,9 +140,7 @@ export async function patchPlace(
 	return parseMutationResponse(response, "Failed to update place.");
 }
 
-export async function confirmPlace(
-	id: string,
-): Promise<PlaceMutationResponse> {
+export async function confirmPlace(id: string): Promise<PlaceMutationResponse> {
 	const response = await fetch(`/api/places/${id}`, {
 		method: "PATCH",
 		headers: { "Content-Type": "application/json" },
