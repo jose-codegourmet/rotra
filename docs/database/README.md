@@ -37,6 +37,7 @@ The schema is designed for **Supabase** as the backend (PostgreSQL), with Prisma
 | [08_admin.md](08_admin.md) | `kill_switches`, `platform_config`, `moderation_flags` |
 | [13_tag_definitions.md](13_tag_definitions.md) | `tag_definitions` catalog |
 | [14_tester_invitations.md](14_tester_invitations.md) | `tester_invitations`, tester account invites |
+| [15_places.md](15_places.md) | `places` — custom badminton venue registry |
 | [12_club_governance.md](12_club_governance.md) | `club_applications`, `club_demotion_requests`, `complaints`, `admin_notifications`, `admin_action_log` |
 | [09_rls_and_realtime.md](09_rls_and_realtime.md) | RLS policies, Realtime subscriptions, Storage buckets |
 | [10_prisma_supabase_migrations.md](10_prisma_supabase_migrations.md) | Prisma migrations, Supabase connection strings, deploy workflow |

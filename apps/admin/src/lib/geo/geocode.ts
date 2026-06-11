@@ -50,37 +50,6 @@ export async function forwardGeocode(
 	}
 }
 
-export interface GeocodedAddress {
-	lat: number;
-	lng: number;
-	formattedAddress: string;
-}
-
-/** Server-side helper: geocode a single address/location query via Mapbox. */
-export async function geocodeAddress(
-	query: string,
-): Promise<GeocodedAddress | null> {
-	const trimmed = query.trim();
-	if (!trimmed) return null;
-
-	const token =
-		process.env.MAPBOX_SECRET_TOKEN ??
-		process.env.NEXT_PUBLIC_MAPBOX_TOKEN ??
-		"";
-	if (!token) return null;
-
-	const results = await forwardGeocode(trimmed, token);
-	const first = results[0];
-	if (!first) return null;
-
-	const [lng, lat] = first.center;
-	return {
-		lat,
-		lng,
-		formattedAddress: first.placeName,
-	};
-}
-
 export async function reverseGeocode(
 	lat: number,
 	lng: number,

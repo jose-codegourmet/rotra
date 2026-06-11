@@ -92,6 +92,8 @@ model Profile {
   testerInvitationsReceived TesterInvitation[]            @relation("TesterInvitationProfile")
   testerInvitationsSent     TesterInvitation[]            @relation("TesterInvitedBy")
   tagDefinitionsCreated     TagDefinition[]               @relation("TagDefinitionCreatedBy")
+  placesSubmitted           Place[]                       @relation("PlaceSubmittedBy")
+  placesReviewed            Place[]                       @relation("PlaceReviewedBy")
 
   @@index([facebookId], map: "idx_profiles_facebook_id")
   @@index([email], map: "idx_profiles_email")
