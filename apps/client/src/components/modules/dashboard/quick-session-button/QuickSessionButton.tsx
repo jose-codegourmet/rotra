@@ -57,7 +57,7 @@ export function QuickSessionButton({
 						"group-hover:text-bg-base/80",
 					)}
 				>
-					{isResume ? "ACTIVE SESSION" : "INSTANT QUEUE"}
+					{isResume ? "ACTIVE SESSION" : "SCHEDULE SESSION"}
 				</span>
 				<span
 					className={cn(

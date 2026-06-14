@@ -84,6 +84,9 @@ export function DashboardClient() {
 		effectiveCenter.lng,
 		filters,
 	);
+
+	console.log("[+] data", data);
+
 	const { data: activeData } = useActiveSession();
 	const active = activeData?.active ?? null;
 

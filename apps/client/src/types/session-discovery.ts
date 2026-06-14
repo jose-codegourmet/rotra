@@ -7,11 +7,8 @@ export interface SessionGeoPoint {
 
 export interface SessionDiscoveryItem {
 	id: string;
-	// NOTE: clubId/clubName are non-null today because discovery is mock-backed.
-	// When discovery is wired to the DB, these must become nullable to support
-	// clubless (player-organized) sessions.
-	clubId: string;
-	clubName: string;
+	clubId: string | null;
+	clubName: string | null;
 	location: string;
 	venueAddress: string | null;
 	coordinates: SessionGeoPoint | null;

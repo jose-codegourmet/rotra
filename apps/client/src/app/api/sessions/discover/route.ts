@@ -51,9 +51,10 @@ export async function GET(request: NextRequest) {
 	}
 
 	const filters = parseFilters(searchParams);
-	const { sessions, venueGroups } = buildDiscoveryResponse(
+	const { sessions, venueGroups } = await buildDiscoveryResponse(
 		{ lat, lng },
 		filters,
+		profile.id,
 	);
 
 	return NextResponse.json({ sessions, venueGroups });

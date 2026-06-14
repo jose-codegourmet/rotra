@@ -84,9 +84,11 @@ function CompactFullCard({
 				)}
 			</div>
 			<h4 className="text-sm font-bold text-text-primary">
-				{session.clubName}
+				{session.clubName ?? session.location}
 			</h4>
-			<p className="text-xs text-text-secondary">{session.location}</p>
+			{session.clubName ? (
+				<p className="text-xs text-text-secondary">{session.location}</p>
+			) : null}
 			<div className="flex items-center gap-2 text-xs text-text-secondary">
 				<Clock size={12} />
 				<span>{formatSessionTimeRange(session)}</span>
@@ -146,9 +148,11 @@ function ListCard({
 					)}
 				</div>
 				<h4 className="text-sm font-bold text-text-primary">
-					{session.clubName}
+					{session.clubName ?? session.location}
 				</h4>
-				<p className="text-xs text-text-secondary">{session.location}</p>
+				{session.clubName ? (
+					<p className="text-xs text-text-secondary">{session.location}</p>
+				) : null}
 				<div className="flex items-center gap-2 text-xs text-text-secondary">
 					<Clock size={12} />
 					<span>{formatSessionTimeRange(session)}</span>
@@ -182,9 +186,11 @@ function GridCard({
 				)}
 			</div>
 			<h4 className="text-sm font-bold text-text-primary">
-				{session.clubName}
+				{session.clubName ?? session.location}
 			</h4>
-			<p className="text-xs text-text-secondary">{session.location}</p>
+			{session.clubName ? (
+				<p className="text-xs text-text-secondary">{session.location}</p>
+			) : null}
 			<div className="flex items-center gap-2 text-xs text-text-secondary">
 				<Clock size={12} />
 				<span>{formatSessionTimeRange(session)}</span>

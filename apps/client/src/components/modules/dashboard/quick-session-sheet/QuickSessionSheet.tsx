@@ -1,12 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, parseISO } from "date-fns";
 import { Minus, Plus } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button/Button";
-import { Calendar } from "@/components/ui/calendar/Calendar";
+import { DatePicker } from "@/components/ui/date-picker/DatePicker";
 import {
 	Dialog,
 	DialogContent,
@@ -26,11 +25,6 @@ import {
 	NativeSelect,
 	NativeSelectOption,
 } from "@/components/ui/native-select/NativeSelect";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover/Popover";
 import { VenuePicker } from "@/components/ui/venue-picker/VenuePicker";
 import { useMyClubs } from "@/hooks/useMyClubs";
 import { useQuickSessionMutation } from "@/hooks/useQuickSessionMutation";
@@ -65,6 +59,8 @@ export function QuickSessionSheet({
 	});
 
 	const { control, handleSubmit, reset, formState } = form;
+	const [dialogContainer, setDialogContainer] =
+		useState<HTMLDivElement | null>(null);
 
 	const firstClubId = clubs[0]?.id;
 
@@ -97,6 +93,7 @@ export function QuickSessionSheet({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent
+				ref={setDialogContainer}
 				className={cn(
 					"max-h-[92dvh] overflow-y-auto sm:max-w-lg",
 					"top-auto bottom-0 translate-y-0 sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2",
@@ -180,37 +177,15 @@ export function QuickSessionSheet({
 									<Controller
 										control={control}
 										name="date"
-										render={({ field }) => {
-											const selected = field.value
-												? parseISO(field.value)
-												: undefined;
-											return (
-												<Popover>
-													<PopoverTrigger>
-														<Button
-															type="button"
-															variant="outline"
-															className="w-full justify-start font-normal"
-															disabled={createMutation.isPending}
-														>
-															{selected
-																? format(selected, "PPP")
-																: "Pick a date"}
-														</Button>
-													</PopoverTrigger>
-													<PopoverContent className="w-auto p-0">
-														<Calendar
-															mode="single"
-															selected={selected}
-															onSelect={(date) => {
-																if (!date) return;
-																field.onChange(format(date, "yyyy-MM-dd"));
-															}}
-														/>
-													</PopoverContent>
-												</Popover>
-											);
-										}}
+										render={({ field }) => (
+											<DatePicker
+												value={field.value}
+												onChange={field.onChange}
+												fromDate={new Date()}
+												disabled={createMutation.isPending}
+												popoverContainer={dialogContainer}
+											/>
+										)}
 									/>
 									<FieldError errors={[formState.errors.date]} />
 								</FieldContent>

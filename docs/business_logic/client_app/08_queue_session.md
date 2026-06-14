@@ -33,7 +33,7 @@ List and Grid views on the same dashboard use the same visibility rules. Session
 
 ### Quick Session (player-organized)
 
-From the dashboard, any player **not already in an active session** can start a **Quick Session** — a streamlined create flow for `origin = player_organized` sessions. A **club is optional**: members may attach one of their clubs, or create a **clubless** casual session. Clubless sessions have no club members to scope to, so they are always `visibility = open`. See [`PLAN_phase_3_quick_session_cta.md`](../../../PLAN_phase_3_quick_session_cta.md).
+From the dashboard, any player **not already in an active session** can start a **Quick Session** — a streamlined create flow for `origin = player_organized` sessions. A **club is optional**: members may attach one of their clubs, or create a **clubless** casual session. Clubless sessions have no club members to scope to, so they are always `visibility = open`. The session **date** may be set for today or any future date — Quick Sessions are not restricted to the current day. See [`PLAN_phase_3_quick_session_cta.md`](../../../PLAN_phase_3_quick_session_cta.md).
 
 ### Active session guard
 
