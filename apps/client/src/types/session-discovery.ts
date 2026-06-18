@@ -52,6 +52,10 @@ export interface SessionDiscoveryFilters {
 	scheduleType?: "mmr" | "fun_games";
 	playersPerCourt?: number;
 	weekendOnly?: boolean;
+	/** Inclusive start date (yyyy-MM-dd) */
+	dateFrom?: string;
+	/** Inclusive end date (yyyy-MM-dd) */
+	dateTo?: string;
 }
 
 export interface ActiveSessionSummary {

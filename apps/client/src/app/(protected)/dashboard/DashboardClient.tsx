@@ -58,6 +58,8 @@ export function DashboardClient() {
 	const [slotAvailability, setSlotAvailability] = useState<
 		"full" | "not_full" | undefined
 	>(undefined);
+	const [dateFrom, setDateFrom] = useState<string | undefined>(undefined);
+	const [dateTo, setDateTo] = useState<string | undefined>(undefined);
 	const [sheetOpen, setSheetOpen] = useState(false);
 
 	const effectiveCenter = placeCenter ?? center;
@@ -76,8 +78,21 @@ export function DashboardClient() {
 			base.slotAvailability = slotAvailability;
 		}
 
+		if (dateFrom && dateTo) {
+			base.dateFrom = dateFrom;
+			base.dateTo = dateTo;
+		}
+
 		return doublesOnly ? { ...base, playersPerCourt: 4 } : base;
-	}, [nearbyOnly, doublesOnly, weekendOnly, clubQuery, slotAvailability]);
+	}, [
+		nearbyOnly,
+		doublesOnly,
+		weekendOnly,
+		clubQuery,
+		slotAvailability,
+		dateFrom,
+		dateTo,
+	]);
 
 	const { data, isLoading } = useSessionDiscovery(
 		effectiveCenter.lat,
@@ -147,6 +162,29 @@ export function DashboardClient() {
 		refresh();
 	}, [refresh]);
 
+	const handleDateRangeChange = useCallback(
+		(from: string | undefined, to: string | undefined) => {
+			setDateFrom(from);
+			setDateTo(to);
+			if (from && to) {
+				setWeekendOnly(false);
+			}
+		},
+		[],
+	);
+
+	const handleDiscover = useCallback(() => {
+		queryClient.invalidateQueries({
+			queryKey: sessionDiscoveryQueryKey(
+				effectiveCenter.lat,
+				effectiveCenter.lng,
+				filters,
+			),
+		});
+		setSelectedVenueKey(null);
+		setVenueModalKey(null);
+	}, [effectiveCenter.lat, effectiveCenter.lng, filters, queryClient]);
+
 	const handleMapError = useCallback(() => {
 		dispatch(setDashboardViewMode("list"));
 		toast.error("Map unavailable — showing list");
@@ -212,6 +250,10 @@ export function DashboardClient() {
 				venueGroups={venueGroups}
 				slotAvailability={slotAvailability}
 				onSlotAvailabilityChange={setSlotAvailability}
+				dateFrom={dateFrom}
+				dateTo={dateTo}
+				onDateRangeChange={handleDateRangeChange}
+				onDiscover={handleDiscover}
 			/>
 			<ViewToggle />
 

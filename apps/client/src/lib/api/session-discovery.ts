@@ -44,6 +44,14 @@ function applyFilters(
 		result = result.filter((s) => isWeekend(s.dateTime));
 	}
 
+	if (filters.dateFrom && filters.dateTo) {
+		const { dateFrom, dateTo } = filters;
+		result = result.filter((s) => {
+			const d = s.dateTime.slice(0, 10);
+			return d >= dateFrom && d <= dateTo;
+		});
+	}
+
 	if (filters.slotAvailability === "full") {
 		result = result.filter((s) => s.acceptedCount >= s.totalSlots);
 	} else if (filters.slotAvailability === "not_full") {

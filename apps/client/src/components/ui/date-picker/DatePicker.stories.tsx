@@ -18,8 +18,8 @@ function DatePickerDemo({
 		<DatePicker
 			value={value}
 			onChange={setValue}
-			fromDate={fromDate}
-			disabled={disabled}
+			{...(fromDate !== undefined ? { fromDate } : {})}
+			{...(disabled !== undefined ? { disabled } : {})}
 		/>
 	);
 }

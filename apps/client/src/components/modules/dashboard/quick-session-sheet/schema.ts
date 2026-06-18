@@ -16,8 +16,7 @@ export const quickSessionFormSchema = z.object({
 			isNewSubmission: z.boolean().optional(),
 		})
 		.refine(
-			(v) =>
-				(v.latitude != null && v.longitude != null) || v.placeId != null,
+			(v) => (v.latitude != null && v.longitude != null) || v.placeId != null,
 			{
 				message: "Pin a location or select a confirmed venue",
 				path: ["name"],

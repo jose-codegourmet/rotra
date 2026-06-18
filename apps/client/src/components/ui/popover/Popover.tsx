@@ -26,10 +26,10 @@ function PopoverContent({
 		PopoverPrimitive.Positioner.Props,
 		"align" | "alignOffset" | "side" | "sideOffset"
 	> & {
-		container?: Element | null;
+		container?: HTMLElement | null;
 	}) {
 	return (
-		<PopoverPrimitive.Portal container={container ?? undefined}>
+		<PopoverPrimitive.Portal {...(container != null ? { container } : {})}>
 			<PopoverPrimitive.Positioner
 				align={align}
 				alignOffset={alignOffset}

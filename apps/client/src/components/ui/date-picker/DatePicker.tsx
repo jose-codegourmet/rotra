@@ -18,7 +18,7 @@ export interface DatePickerProps {
 	fromDate?: Date;
 	placeholder?: string;
 	className?: string;
-	popoverContainer?: Element | null;
+	popoverContainer?: HTMLElement | null;
 }
 
 export function DatePicker({

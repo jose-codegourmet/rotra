@@ -59,8 +59,9 @@ export function QuickSessionSheet({
 	});
 
 	const { control, handleSubmit, reset, formState } = form;
-	const [dialogContainer, setDialogContainer] =
-		useState<HTMLDivElement | null>(null);
+	const [dialogContainer, setDialogContainer] = useState<HTMLDivElement | null>(
+		null,
+	);
 
 	const firstClubId = clubs[0]?.id;
 

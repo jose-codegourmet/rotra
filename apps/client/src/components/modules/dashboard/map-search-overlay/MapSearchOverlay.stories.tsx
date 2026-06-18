@@ -11,7 +11,7 @@ const meta: Meta<typeof MapSearchOverlay> = {
 	tags: ["autodocs"],
 	decorators: [
 		(Story) => (
-			<div className="relative min-h-[280px] bg-bg-base">
+			<div className="relative min-h-[420px] bg-bg-base">
 				<Story />
 			</div>
 		),
@@ -28,6 +28,8 @@ function MapSearchOverlayDemo(
 	const [slotAvailability, setSlotAvailability] = useState<
 		"full" | "not_full" | undefined
 	>(props.slotAvailability);
+	const [dateFrom, setDateFrom] = useState<string | undefined>(props.dateFrom);
+	const [dateTo, setDateTo] = useState<string | undefined>(props.dateTo);
 
 	return (
 		<MapSearchOverlay
@@ -46,6 +48,13 @@ function MapSearchOverlayDemo(
 			venueGroups={props.venueGroups ?? MOCK_VENUE_GROUPS}
 			slotAvailability={slotAvailability}
 			onSlotAvailabilityChange={setSlotAvailability}
+			dateFrom={dateFrom}
+			dateTo={dateTo}
+			onDateRangeChange={(from, to) => {
+				setDateFrom(from);
+				setDateTo(to);
+			}}
+			onDiscover={() => {}}
 		/>
 	);
 }
@@ -61,6 +70,12 @@ export const ClubMode: Story = {
 export const FiltersActive: Story = {
 	render: () => (
 		<MapSearchOverlayDemo slotAvailability="not_full" doublesOnly weekendOnly />
+	),
+};
+
+export const DateRangeSelected: Story = {
+	render: () => (
+		<MapSearchOverlayDemo dateFrom="2026-06-14" dateTo="2026-06-17" />
 	),
 };
 
