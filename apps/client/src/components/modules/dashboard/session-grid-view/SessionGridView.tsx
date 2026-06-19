@@ -18,7 +18,7 @@ export function SessionGridView({
 }: SessionGridViewProps) {
 	if (isLoading) {
 		return (
-			<div className="absolute inset-0 z-0 overflow-y-auto bg-bg-surface px-4 pt-32 pb-24 md:px-8">
+			<div className="h-full overflow-y-auto bg-bg-surface px-4 pb-24 md:px-8">
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
 					{[1, 2, 3, 4].map((i) => (
 						<div
@@ -33,7 +33,7 @@ export function SessionGridView({
 
 	if (sessions.length === 0) {
 		return (
-			<div className="absolute inset-0 z-0 flex items-center justify-center bg-bg-surface px-8 pt-32 pb-24 text-center">
+			<div className="flex h-full items-center justify-center bg-bg-surface px-8 pb-24 text-center">
 				<div className="max-w-sm space-y-3">
 					<p className="text-body text-text-secondary">
 						No sessions in this area.
@@ -56,7 +56,7 @@ export function SessionGridView({
 	}
 
 	return (
-		<div className="absolute inset-0 z-0 overflow-y-auto bg-bg-surface px-4 pt-32 pb-24 md:px-8">
+		<div className="h-full overflow-y-auto bg-bg-surface px-4 pb-24 md:px-8">
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
 				{sessions.map((session) => (
 					<SessionDiscoveryCard

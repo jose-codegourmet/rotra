@@ -3,7 +3,10 @@
 import { format, parseISO } from "date-fns";
 import {
 	Building2,
+	LayoutGrid,
+	List,
 	Loader2,
+	Map as MapIcon,
 	MapPin,
 	Search,
 	SlidersHorizontal,
@@ -11,6 +14,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { FilterPanel } from "@/components/modules/dashboard/filter-panel/FilterPanel";
+import { viewToggleTabVariants } from "@/components/modules/dashboard/view-toggle/ViewToggle.variants";
 import { DateRangePicker } from "@/components/ui/date-range-picker/DateRangePicker";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs/Tabs";
@@ -18,10 +22,23 @@ import { MAX_RADIUS_KM } from "@/constants/dashboard";
 import type { GeolocationStatus } from "@/hooks/useGeolocation";
 import { forwardGeocode, type GeocodingSuggestion } from "@/lib/geo/geocode";
 import { cn } from "@/lib/utils";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { setDashboardViewMode } from "@/store/slices/uiSlice";
 import type {
+	DashboardViewMode,
 	SessionGeoPoint,
 	VenueSessionGroup,
 } from "@/types/session-discovery";
+
+const VIEW_TABS: Array<{
+	mode: DashboardViewMode;
+	label: string;
+	Icon: typeof MapIcon;
+}> = [
+	{ mode: "map", label: "Map View", Icon: MapIcon },
+	{ mode: "list", label: "List", Icon: List },
+	{ mode: "grid", label: "Grid", Icon: LayoutGrid },
+];
 
 type SearchMode = "place" | "club";
 type ActivePanel = "where" | "when" | null;
@@ -106,6 +123,8 @@ export function MapSearchOverlay({
 	onDateRangeChange,
 	onDiscover,
 }: MapSearchOverlayProps) {
+	const dispatch = useAppDispatch();
+	const viewMode = useAppSelector((s) => s.ui.dashboardViewMode);
 	const [activePanel, setActivePanel] = useState<ActivePanel>(null);
 	const [searchMode, setSearchMode] = useState<SearchMode>("place");
 	const [placeInput, setPlaceInput] = useState("");
@@ -210,7 +229,14 @@ export function MapSearchOverlay({
 	};
 
 	return (
-		<div className="pointer-events-auto absolute top-4 left-1/2 z-20 w-full max-w-[990px] -translate-x-1/2 px-4">
+		<div
+			className={cn(
+				"pointer-events-auto w-full px-4",
+				viewMode === "map"
+					? "absolute top-4 left-1/2 z-20 max-w-[990px] -translate-x-1/2"
+					: "relative z-10 shrink-0 pt-4",
+			)}
+		>
 			<div className="rounded-2xl border border-outline-variant/10 bg-bg-base/90 p-3 shadow-2xl backdrop-blur-xl">
 				<div className="flex items-stretch gap-2">
 					<div className="flex min-w-0 flex-1 overflow-hidden rounded-full border border-outline-variant/10 bg-bg-elevated">
@@ -255,6 +281,32 @@ export function MapSearchOverlay({
 						<Search size={16} />
 						<span>Discover</span>
 					</button>
+				</div>
+
+				<div
+					role="tablist"
+					aria-label="Dashboard view mode"
+					className="mt-3 flex rounded-xl border border-outline-variant/10 bg-bg-elevated p-1.5"
+				>
+					{VIEW_TABS.map(({ mode, label, Icon }) => {
+						const isActive = viewMode === mode;
+						return (
+							<button
+								key={mode}
+								type="button"
+								role="tab"
+								aria-selected={isActive}
+								onClick={() => dispatch(setDashboardViewMode(mode))}
+								className={cn(
+									viewToggleTabVariants({ active: isActive }),
+									"flex-1 justify-center",
+								)}
+							>
+								<Icon size={14} fill={isActive ? "currentColor" : "none"} />
+								<span>{label}</span>
+							</button>
+						);
+					})}
 				</div>
 
 				{activePanel === "where" ? (
