@@ -18,7 +18,7 @@ export function SessionListView({
 }: SessionListViewProps) {
 	if (isLoading) {
 		return (
-			<div className="absolute inset-0 z-0 overflow-y-auto bg-bg-surface px-4 pt-32 pb-24 md:px-8">
+			<div className="h-full overflow-y-auto bg-bg-surface px-4 pb-24 md:px-8">
 				<div className="flex flex-col gap-3">
 					{[1, 2, 3].map((i) => (
 						<div
@@ -33,7 +33,7 @@ export function SessionListView({
 
 	if (sessions.length === 0) {
 		return (
-			<div className="absolute inset-0 z-0 flex items-center justify-center bg-bg-surface px-8 pt-32 pb-24 text-center">
+			<div className="flex h-full items-center justify-center bg-bg-surface px-8 pb-24 text-center">
 				<div className="max-w-sm space-y-3">
 					<p className="text-body text-text-secondary">
 						No sessions in this area.
@@ -56,7 +56,7 @@ export function SessionListView({
 	}
 
 	return (
-		<div className="absolute inset-0 z-0 overflow-y-auto bg-bg-surface px-4 pt-32 pb-24 md:px-8">
+		<div className="h-full overflow-y-auto bg-bg-surface px-4 pb-24 md:px-8">
 			<p className="mb-4 text-micro font-bold uppercase tracking-widest text-text-secondary">
 				{sessions.length} sessions near you
 			</p>

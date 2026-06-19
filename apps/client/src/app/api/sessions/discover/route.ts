@@ -14,6 +14,8 @@ function parseFilters(searchParams: URLSearchParams): SessionDiscoveryFilters {
 	const slotAvailability = searchParams.get("slotAvailability");
 	const clubQuery = searchParams.get("clubQuery");
 	const placeQuery = searchParams.get("placeQuery");
+	const dateFrom = searchParams.get("dateFrom");
+	const dateTo = searchParams.get("dateTo");
 
 	const filters: SessionDiscoveryFilters = {
 		radiusKm: Number.isFinite(radiusKm) ? radiusKm : DEFAULT_RADIUS_KM,
@@ -22,6 +24,8 @@ function parseFilters(searchParams: URLSearchParams): SessionDiscoveryFilters {
 
 	if (clubQuery) filters.clubQuery = clubQuery;
 	if (placeQuery) filters.placeQuery = placeQuery;
+	if (dateFrom) filters.dateFrom = dateFrom;
+	if (dateTo) filters.dateTo = dateTo;
 	if (playersPerCourt) filters.playersPerCourt = Number(playersPerCourt);
 	if (scheduleType === "mmr" || scheduleType === "fun_games") {
 		filters.scheduleType = scheduleType;
@@ -51,9 +55,10 @@ export async function GET(request: NextRequest) {
 	}
 
 	const filters = parseFilters(searchParams);
-	const { sessions, venueGroups } = buildDiscoveryResponse(
+	const { sessions, venueGroups } = await buildDiscoveryResponse(
 		{ lat, lng },
 		filters,
+		profile.id,
 	);
 
 	return NextResponse.json({ sessions, venueGroups });

@@ -30,29 +30,36 @@ function buildCourtHint(playerStatus: string): string | null {
 	return null;
 }
 
-function toActiveSessionSummary(reg: {
-	sessionId: string;
-	playerStatus: string;
-	admissionStatus: string;
-	session: {
-		id: string;
-		status: string;
-		location: string;
-		club: { name: string } | null;
-	};
-}): ActiveSessionSummary {
+function toActiveSessionSummary(
+	reg: {
+		sessionId: string;
+		playerStatus: string;
+		admissionStatus: string;
+		session: {
+			id: string;
+			status: string;
+			title: string | null;
+			hostId: string;
+			location: string;
+			club: { name: string } | null;
+		};
+	},
+	profileId: string,
+): ActiveSessionSummary {
 	const sessionStatus =
 		reg.session.status === "active" ? "active" : ("open" as const);
 
 	return {
 		sessionId: reg.session.id,
+		title: reg.session.title,
+		isOwner: reg.session.hostId === profileId,
 		clubName: reg.session.club?.name ?? null,
 		location: reg.session.location,
 		status: sessionStatus,
 		playerStatus: reg.playerStatus,
 		admissionStatus: reg.admissionStatus,
 		courtHint: buildCourtHint(reg.playerStatus),
-		href: `/sessions/${reg.session.id}`,
+		href: `/find-sessions/${reg.session.id}`,
 	};
 }
 
@@ -105,7 +112,7 @@ export async function GET() {
 		}
 
 		const response: ActiveSessionResponse = {
-			active: toActiveSessionSummary(best),
+			active: toActiveSessionSummary(best, profile.id),
 		};
 		return NextResponse.json(response);
 	} catch (e) {

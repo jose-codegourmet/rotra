@@ -255,7 +255,7 @@ Opened via "See more" button in `VenuePinTooltip`.
 - **Shape:** `rounded-full` pill
 - **Left icon:** 56px gradient circle (`from-primary to-primary-container`) with `+`
 - **Labels:**
-  - `INSTANT QUEUE` — micro uppercase, `text-primary-container`
+  - `SCHEDULE SESSION` — micro uppercase, `text-primary-container`
   - `START QUICK SESSION` — `text-sm font-black`
 - **Hover:** Expand padding; background → `primary-container`; reveal chevron
 - **Guarded variant:** See Active Session Guard below
@@ -263,7 +263,7 @@ Opened via "See more" button in `VenuePinTooltip`.
 ### QuickSessionSheet
 
 - existing `MobileDrawer` from bottom (mobile) or `Dialog` (desktop) — no `Sheet` primitive exists
-- Form fields: club (**optional** — `No club — casual` + user's clubs), location, address, date, start time, courts, players per court, match format, score limit, visibility
+- Form fields: **session title** (required, max 80 chars), club (**optional** — `No club — casual` + user's clubs), venue (`VenuePicker` — search confirmed places or pin a new location), date (today or any future date), start time, courts, players per court, match format, score limit, visibility
 - A club is not required: users with no clubs can still create a clubless casual session. Clubless sessions are always `visibility = open`.
 - Submit label: `OPEN SESSION`
 - Subcopy: "Set up a casual session. A club is optional — either way, Quick Sessions are informal and earn no EXP or Rank."
@@ -407,6 +407,10 @@ Follow **No-Line rule:** no 1px list dividers; use spacing and tonal backgrounds
 | `GET /api/sessions/discover` | Nearby sessions |
 | `GET /api/sessions/active` | Current user's active registration |
 | `POST /api/sessions/quick` | Create player-organized session |
+| `GET /api/places/search` | Typeahead search for confirmed places (Phase 4a) |
+| `POST /api/places/submit` | Player submits a new unreviewed place (Phase 4a) |
+
+> **Phase 4b:** [`VenuePicker`](../components/venue-picker.md) in `QuickSessionSheet` embeds [`AddressPinField`](../components/address-pin-field.md) for new pins, backed by the places search and submit routes above.
 
 ---
 

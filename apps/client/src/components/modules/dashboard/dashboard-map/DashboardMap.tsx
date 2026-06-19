@@ -1,7 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import MapboxMap, { type MapRef, Popup } from "react-map-gl/mapbox";
+import MapboxMap, {
+	Layer,
+	type MapRef,
+	Marker,
+	Popup,
+	Source,
+} from "react-map-gl/mapbox";
 import { resolveMapboxStyle, USER_LOCATION_ZOOM } from "@/constants/dashboard";
 import type {
 	SessionGeoPoint,
@@ -10,9 +16,43 @@ import type {
 import { VenuePin } from "./VenuePin";
 import { VenuePinTooltip } from "./VenuePinTooltip";
 
+function createRadiusCircle(center: SessionGeoPoint, radiusKm: number) {
+	const points = 64;
+	const coords: [number, number][] = [];
+	const distX = radiusKm / (111.32 * Math.cos((center.lat * Math.PI) / 180));
+	const distY = radiusKm / 110.574;
+
+	for (let i = 0; i <= points; i++) {
+		const theta = (i / points) * 2 * Math.PI;
+		coords.push([
+			center.lng + distX * Math.cos(theta),
+			center.lat + distY * Math.sin(theta),
+		]);
+	}
+
+	return {
+		type: "Feature" as const,
+		geometry: { type: "Polygon" as const, coordinates: [coords] },
+		properties: {},
+	};
+}
+
+function UserLocationMarker({ location }: { location: SessionGeoPoint }) {
+	return (
+		<Marker longitude={location.lng} latitude={location.lat} anchor="center">
+			<div className="relative flex items-center justify-center">
+				<span className="absolute h-8 w-8 animate-ping rounded-full bg-[#00cc6a] opacity-20" />
+				<span className="relative h-4 w-4 rounded-full border-2 border-white bg-[#00cc6a] shadow-md" />
+			</div>
+		</Marker>
+	);
+}
+
 interface DashboardMapProps {
 	venueGroups: VenueSessionGroup[];
 	center: SessionGeoPoint;
+	userLocation?: SessionGeoPoint;
+	radiusKm?: number;
 	zoom?: number;
 	selectedVenueKey: string | null;
 	onSelectVenue: (venueKey: string | null) => void;
@@ -26,6 +66,8 @@ interface DashboardMapProps {
 export function DashboardMap({
 	venueGroups,
 	center,
+	userLocation,
+	radiusKm,
 	zoom = USER_LOCATION_ZOOM,
 	selectedVenueKey,
 	onSelectVenue,
@@ -149,6 +191,31 @@ export function DashboardMap({
 				onMoveStart={() => onSelectVenue(null)}
 				onError={() => onMapError?.()}
 			>
+				{radiusKm ? (
+					<Source
+						id="radius-circle"
+						type="geojson"
+						data={createRadiusCircle(center, radiusKm)}
+					>
+						<Layer
+							id="radius-circle-fill"
+							type="fill"
+							paint={{ "fill-color": "#00cc6a", "fill-opacity": 0.06 }}
+						/>
+						<Layer
+							id="radius-circle-border"
+							type="line"
+							paint={{
+								"line-color": "#00cc6a",
+								"line-width": 1.5,
+								"line-opacity": 0.5,
+							}}
+						/>
+					</Source>
+				) : null}
+
+				{userLocation ? <UserLocationMarker location={userLocation} /> : null}
+
 				{venueGroups.map((group) => (
 					<VenuePin
 						key={group.venueKey}
@@ -168,6 +235,8 @@ export function DashboardMap({
 						offset={24}
 						closeButton={false}
 						closeOnClick={false}
+						className="venue-pin-popup"
+						maxWidth="none"
 						onClose={() => onSelectVenue(null)}
 					>
 						<VenuePinTooltip

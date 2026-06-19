@@ -53,8 +53,17 @@ export async function POST(request: Request) {
 	// always open. Club-scoped sessions honor the chosen visibility.
 	const visibility = clubId ? values.visibility : "open";
 
-	const geocodeQuery = values.address?.trim() || values.location.trim();
-	const geocoded = await geocodeAddress(geocodeQuery);
+	const { venue } = values;
+
+	const hasCoordinates = venue.latitude != null && venue.longitude != null;
+
+	const geocoded = hasCoordinates
+		? {
+				lat: venue.latitude,
+				lng: venue.longitude,
+				formattedAddress: venue.address?.trim() ?? "",
+			}
+		: await geocodeAddress(venue.address?.trim() || venue.name.trim());
 
 	const playersPerCourt = Number.parseInt(values.playersPerCourt, 10);
 	const totalSlots = values.numCourts * playersPerCourt;
@@ -71,8 +80,9 @@ export async function POST(request: Request) {
 					scheduleType: null,
 					status: "open",
 					visibility,
-					location: values.location.trim(),
-					address: values.address?.trim() || null,
+					title: values.title.trim(),
+					location: venue.name.trim(),
+					address: venue.address?.trim() || null,
 					venueLat: geocoded?.lat ?? null,
 					venueLng: geocoded?.lng ?? null,
 					venueAddress: geocoded?.formattedAddress ?? null,
@@ -99,7 +109,7 @@ export async function POST(request: Request) {
 
 		return NextResponse.json({
 			sessionId: session.id,
-			href: `/sessions/${session.id}`,
+			href: `/find-sessions/${session.id}`,
 		});
 	} catch (e) {
 		console.error("[sessions/quick POST]", e);

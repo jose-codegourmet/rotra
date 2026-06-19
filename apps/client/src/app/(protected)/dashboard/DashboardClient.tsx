@@ -15,14 +15,18 @@ import { SessionGridView } from "@/components/modules/dashboard/session-grid-vie
 import { SessionListView } from "@/components/modules/dashboard/session-list-view/SessionListView";
 import { SessionUnavailableDialog } from "@/components/modules/dashboard/session-unavailable-dialog/SessionUnavailableDialog";
 import { VenueSessionsModal } from "@/components/modules/dashboard/venue-sessions-modal/VenueSessionsModal";
-import { ViewToggle } from "@/components/modules/dashboard/view-toggle/ViewToggle";
-import { DEFAULT_MAP_ZOOM, USER_LOCATION_ZOOM } from "@/constants/dashboard";
+import {
+	DEFAULT_MAP_ZOOM,
+	DEFAULT_RADIUS_KM,
+	USER_LOCATION_ZOOM,
+} from "@/constants/dashboard";
 import { useActiveSession } from "@/hooks/useActiveSession/client";
 import { useGeolocation } from "@/hooks/useGeolocation/client";
 import {
 	sessionDiscoveryQueryKey,
 	useSessionDiscovery,
 } from "@/hooks/useSessionDiscovery/client";
+import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setDashboardViewMode } from "@/store/slices/uiSlice";
 import type {
@@ -50,7 +54,7 @@ export function DashboardClient() {
 	const [venueModalKey, setVenueModalKey] = useState<string | null>(null);
 	const [unavailableDialogOpen, setUnavailableDialogOpen] = useState(false);
 	const [blockedDialogOpen, setBlockedDialogOpen] = useState(false);
-	const [nearbyOnly, setNearbyOnly] = useState(true);
+	const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
 	const [doublesOnly, setDoublesOnly] = useState(false);
 	const [weekendOnly, setWeekendOnly] = useState(false);
 	const [placeCenter, setPlaceCenter] = useState<SessionGeoPoint | null>(null);
@@ -58,13 +62,15 @@ export function DashboardClient() {
 	const [slotAvailability, setSlotAvailability] = useState<
 		"full" | "not_full" | undefined
 	>(undefined);
+	const [dateFrom, setDateFrom] = useState<string | undefined>(undefined);
+	const [dateTo, setDateTo] = useState<string | undefined>(undefined);
 	const [sheetOpen, setSheetOpen] = useState(false);
 
 	const effectiveCenter = placeCenter ?? center;
 
 	const filters = useMemo<SessionDiscoveryFilters>(() => {
 		const base: SessionDiscoveryFilters = {
-			radiusKm: nearbyOnly ? 2 : 50,
+			radiusKm,
 			weekendOnly,
 		};
 
@@ -76,14 +82,34 @@ export function DashboardClient() {
 			base.slotAvailability = slotAvailability;
 		}
 
+		if (dateFrom && dateTo) {
+			base.dateFrom = dateFrom;
+			base.dateTo = dateTo;
+		}
+
 		return doublesOnly ? { ...base, playersPerCourt: 4 } : base;
-	}, [nearbyOnly, doublesOnly, weekendOnly, clubQuery, slotAvailability]);
+	}, [
+		radiusKm,
+		doublesOnly,
+		weekendOnly,
+		clubQuery,
+		slotAvailability,
+		dateFrom,
+		dateTo,
+	]);
 
 	const { data, isLoading } = useSessionDiscovery(
 		effectiveCenter.lat,
 		effectiveCenter.lng,
 		filters,
 	);
+
+	console.log("[+] DEBUG", {
+		data,
+		effectiveCenter,
+		filters,
+	});
+
 	const { data: activeData } = useActiveSession();
 	const active = activeData?.active ?? null;
 
@@ -113,7 +139,7 @@ export function DashboardClient() {
 					return;
 				}
 
-				router.push(`/sessions/${sessionId}`);
+				router.push(`/find-sessions/${sessionId}`);
 			} catch {
 				setUnavailableDialogOpen(true);
 			}
@@ -144,13 +170,67 @@ export function DashboardClient() {
 		refresh();
 	}, [refresh]);
 
+	const handleDateRangeChange = useCallback(
+		(from: string | undefined, to: string | undefined) => {
+			setDateFrom(from);
+			setDateTo(to);
+			if (from && to) {
+				setWeekendOnly(false);
+			}
+		},
+		[],
+	);
+
+	const handleDiscover = useCallback(() => {
+		queryClient.invalidateQueries({
+			queryKey: sessionDiscoveryQueryKey(
+				effectiveCenter.lat,
+				effectiveCenter.lng,
+				filters,
+			),
+		});
+		setSelectedVenueKey(null);
+		setVenueModalKey(null);
+	}, [effectiveCenter.lat, effectiveCenter.lng, filters, queryClient]);
+
 	const handleMapError = useCallback(() => {
 		dispatch(setDashboardViewMode("list"));
 		toast.error("Map unavailable — showing list");
 	}, [dispatch]);
 
+	const searchOverlay = (
+		<MapSearchOverlay
+			locationLabel={locationLabel}
+			geoStatus={status}
+			radiusKm={radiusKm}
+			doublesOnly={doublesOnly}
+			weekendOnly={weekendOnly}
+			onRadiusChange={setRadiusKm}
+			onToggleDoubles={() => setDoublesOnly((v) => !v)}
+			onToggleWeekend={() => setWeekendOnly((v) => !v)}
+			onRecenter={handleRecenter}
+			onPlaceSelect={handlePlaceSelect}
+			clubQuery={clubQuery}
+			onClubQueryChange={setClubQuery}
+			venueGroups={venueGroups}
+			slotAvailability={slotAvailability}
+			onSlotAvailabilityChange={setSlotAvailability}
+			dateFrom={dateFrom}
+			dateTo={dateTo}
+			onDateRangeChange={handleDateRangeChange}
+			onDiscover={handleDiscover}
+		/>
+	);
+
 	return (
-		<div className="relative h-[calc(100dvh-4rem)] min-h-[480px] w-full overflow-hidden bg-bg-base">
+		<div
+			className={cn(
+				"h-[calc(100dvh-4rem)] min-h-[480px] w-full bg-bg-base",
+				viewMode === "map" ? "relative overflow-hidden" : "flex flex-col",
+			)}
+		>
+			{viewMode !== "map" ? searchOverlay : null}
+
 			{viewMode === "map" ? (
 				<div
 					key="map"
@@ -159,6 +239,8 @@ export function DashboardClient() {
 					<DashboardMap
 						venueGroups={venueGroups}
 						center={effectiveCenter}
+						{...(isUserLocation ? { userLocation: center } : {})}
+						radiusKm={filters.radiusKm}
 						zoom={isUserLocation ? USER_LOCATION_ZOOM : DEFAULT_MAP_ZOOM}
 						selectedVenueKey={selectedVenueKey}
 						onSelectVenue={setSelectedVenueKey}
@@ -172,7 +254,7 @@ export function DashboardClient() {
 			) : viewMode === "list" ? (
 				<div
 					key="list"
-					className="absolute inset-0 z-0 animate-in fade-in duration-150 slide-in-from-bottom-1"
+					className="relative z-0 min-h-0 flex-1 overflow-hidden animate-in fade-in duration-150 slide-in-from-bottom-1"
 				>
 					<SessionListView
 						sessions={sessions}
@@ -183,7 +265,7 @@ export function DashboardClient() {
 			) : (
 				<div
 					key="grid"
-					className="absolute inset-0 z-0 animate-in fade-in duration-150 slide-in-from-bottom-1"
+					className="relative z-0 min-h-0 flex-1 overflow-hidden animate-in fade-in duration-150 slide-in-from-bottom-1"
 				>
 					<SessionGridView
 						sessions={sessions}
@@ -193,24 +275,7 @@ export function DashboardClient() {
 				</div>
 			)}
 
-			<MapSearchOverlay
-				locationLabel={locationLabel}
-				geoStatus={status}
-				nearbyOnly={nearbyOnly}
-				doublesOnly={doublesOnly}
-				weekendOnly={weekendOnly}
-				onToggleNearby={() => setNearbyOnly((v) => !v)}
-				onToggleDoubles={() => setDoublesOnly((v) => !v)}
-				onToggleWeekend={() => setWeekendOnly((v) => !v)}
-				onRecenter={handleRecenter}
-				onPlaceSelect={handlePlaceSelect}
-				clubQuery={clubQuery}
-				onClubQueryChange={setClubQuery}
-				venueGroups={venueGroups}
-				slotAvailability={slotAvailability}
-				onSlotAvailabilityChange={setSlotAvailability}
-			/>
-			<ViewToggle />
+			{viewMode === "map" ? searchOverlay : null}
 
 			{active ? (
 				<ActiveSessionBanner

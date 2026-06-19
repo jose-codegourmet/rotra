@@ -1,12 +1,40 @@
+import { format } from "date-fns";
 import { z } from "zod";
 
 export const quickSessionFormSchema = z.object({
+	title: z
+		.string()
+		.min(1, "Session title is required")
+		.max(80, "Session title must be 80 characters or fewer"),
+
 	clubId: z
 		.union([z.string().uuid("Select a valid club"), z.literal("")])
 		.optional(),
-	location: z.string().min(2, "Location is required").max(120),
-	address: z.string().max(200).optional(),
-	date: z.string().min(1, "Date is required"),
+
+	venue: z
+		.object({
+			name: z.string().min(2, "Venue name is required").max(120),
+			address: z.string().max(200).optional(),
+			latitude: z.number().nullable().optional(),
+			longitude: z.number().nullable().optional(),
+			placeId: z.string().uuid().optional(),
+			isNewSubmission: z.boolean().optional(),
+		})
+		.refine(
+			(v) => (v.latitude != null && v.longitude != null) || v.placeId != null,
+			{
+				message: "Pin a location or select a confirmed venue",
+				path: ["name"],
+			},
+		),
+
+	date: z
+		.string()
+		.min(1, "Date is required")
+		.refine(
+			(val) => val >= format(new Date(), "yyyy-MM-dd"),
+			"Session date must be today or in the future",
+		),
 	startTime: z.string().min(1, "Start time is required"),
 	numCourts: z.coerce.number().int().min(1).max(12),
 	playersPerCourt: z.enum(["2", "4"]),

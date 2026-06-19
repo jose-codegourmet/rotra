@@ -18,5 +18,7 @@ export function sessionDiscoveryQueryKey(
 		filters.scheduleType ?? "",
 		filters.playersPerCourt ?? "",
 		filters.weekendOnly ?? false,
+		filters.dateFrom ?? "",
+		filters.dateTo ?? "",
 	] as const;
 }

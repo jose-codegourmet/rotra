@@ -69,7 +69,7 @@ export function PlayerAvatarStack({
 			</div>
 			{overflowCount > 0 ? (
 				<Link
-					href={`/sessions/${sessionId}`}
+					href={`/find-sessions/${sessionId}`}
 					className="text-[10px] font-bold text-accent hover:underline"
 					onClick={(event) => event.stopPropagation()}
 				>

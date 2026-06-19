@@ -1,5 +1,6 @@
 export { ActiveQueueView } from "./ActiveQueueView/ActiveQueueView";
 export { AssignCourtModal } from "./AssignCourtModal/AssignCourtModal";
+export { CloseSessionDialog } from "./CloseSessionDialog/CloseSessionDialog";
 export { CourtCard } from "./CourtCard/CourtCard";
 export { KpiCard } from "./KpiCard/KpiCard";
 export { LeaveSessionDialog } from "./LeaveSessionDialog/LeaveSessionDialog";

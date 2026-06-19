@@ -22,6 +22,8 @@ function buildDiscoverSearchParams(
 	if (filters.playersPerCourt != null)
 		params.set("playersPerCourt", String(filters.playersPerCourt));
 	if (filters.weekendOnly) params.set("weekendOnly", "true");
+	if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
+	if (filters.dateTo) params.set("dateTo", filters.dateTo);
 	return params.toString();
 }
 

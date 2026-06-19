@@ -1,4 +1,5 @@
-import { MOCK_SESSION_DISCOVERY } from "@/constants/mock-session-discovery";
+import { db } from "@rotra/db";
+
 import { haversineKm } from "@/lib/geo/haversine";
 import type {
 	SessionDiscoveryFilters,
@@ -26,7 +27,7 @@ function applyFilters(
 
 	if (filters.clubQuery?.trim()) {
 		const q = filters.clubQuery.trim().toLowerCase();
-		result = result.filter((s) => s.clubName.toLowerCase().includes(q));
+		result = result.filter((s) => s.clubName?.toLowerCase().includes(q));
 	}
 
 	if (filters.scheduleType) {
@@ -41,6 +42,14 @@ function applyFilters(
 
 	if (filters.weekendOnly) {
 		result = result.filter((s) => isWeekend(s.dateTime));
+	}
+
+	if (filters.dateFrom && filters.dateTo) {
+		const { dateFrom, dateTo } = filters;
+		result = result.filter((s) => {
+			const d = s.dateTime.slice(0, 10);
+			return d >= dateFrom && d <= dateTo;
+		});
 	}
 
 	if (filters.slotAvailability === "full") {
@@ -76,15 +85,89 @@ function withDistance(
 		});
 }
 
-/**
- * Phase 0 stub — returns mock sessions filtered by radius and filters.
- * Wire to Prisma in a later phase when venue coordinates are populated.
- */
-export function getNearbySessions(
+async function fetchOpenSessionItems(
+	profileId: string,
+): Promise<SessionDiscoveryItem[]> {
+	const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+
+	const memberships = await db.clubMember.findMany({
+		where: { playerId: profileId, status: "active" },
+		select: { clubId: true },
+	});
+	const memberClubIds = new Set(memberships.map((m) => m.clubId));
+
+	const rawSessions = await db.queueSession.findMany({
+		where: { status: { in: ["open", "active"] } },
+		include: {
+			club: { select: { id: true, name: true } },
+			registrations: {
+				where: { admissionStatus: "accepted" },
+				include: {
+					player: { select: { id: true, name: true, avatarUrl: true } },
+				},
+			},
+		},
+	});
+
+	const items: SessionDiscoveryItem[] = [];
+
+	for (const s of rawSessions) {
+		if (s.status === "open" && s.dateTime < twelveHoursAgo) continue;
+
+		if (s.visibility === "club_members") {
+			if (!s.clubId || !memberClubIds.has(s.clubId)) continue;
+		}
+
+		const coordinates =
+			s.venueLat != null && s.venueLng != null
+				? { lat: s.venueLat, lng: s.venueLng }
+				: null;
+
+		items.push({
+			id: s.id,
+			isOwner: s.hostId === profileId,
+			clubId: s.clubId,
+			clubName: s.club?.name ?? null,
+			location: s.location,
+			venueAddress: s.venueAddress,
+			coordinates,
+			venueKey: coordinates
+				? deriveVenueKey(coordinates.lat, coordinates.lng)
+				: s.id,
+			dateTime: s.dateTime.toISOString(),
+			endTime: s.endTime?.toISOString() ?? null,
+			status: s.status as "open" | "active",
+			scheduleType: s.scheduleType as SessionDiscoveryItem["scheduleType"],
+			origin: s.origin as SessionDiscoveryItem["origin"],
+			totalSlots: s.totalSlots,
+			acceptedCount: s.registrations.length,
+			recentPlayers: s.registrations.slice(0, 5).map((r) => ({
+				id: r.player.id,
+				displayName: r.player.name,
+				avatarUrl: r.player.avatarUrl,
+			})),
+			distanceKm: null,
+			playersPerCourt: s.playersPerCourt,
+		});
+	}
+
+	return items;
+}
+
+export async function getAllOpenSessions(
+	profileId: string,
+): Promise<SessionDiscoveryItem[]> {
+	const items = await fetchOpenSessionItems(profileId);
+	return [...items].sort((a, b) => a.dateTime.localeCompare(b.dateTime));
+}
+
+export async function getNearbySessions(
 	origin: SessionGeoPoint,
 	filters: SessionDiscoveryFilters,
-): SessionDiscoveryItem[] {
-	const filtered = applyFilters([...MOCK_SESSION_DISCOVERY], filters);
+	profileId: string,
+): Promise<SessionDiscoveryItem[]> {
+	const items = await fetchOpenSessionItems(profileId);
+	const filtered = applyFilters(items, filters);
 	return withDistance(filtered, origin, filters.radiusKm);
 }
 
@@ -126,11 +209,12 @@ export function groupSessionsByVenue(
 		});
 }
 
-export function buildDiscoveryResponse(
+export async function buildDiscoveryResponse(
 	origin: SessionGeoPoint,
 	filters: SessionDiscoveryFilters,
+	profileId: string,
 ) {
-	const sessions = getNearbySessions(origin, filters);
+	const sessions = await getNearbySessions(origin, filters, profileId);
 	const venueGroups = groupSessionsByVenue(sessions);
 	return { sessions, venueGroups };
 }

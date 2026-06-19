@@ -241,6 +241,7 @@ Triggered from player row action sheet → Early Exit.
 Triggered by `CLOSE SESSION` in the header.
 
 - Title: `Close Session?` — `text-title`
+- **Typed confirmation (required):** label `Type the session name to confirm:` + bold session title; primary action disabled until input matches exactly
 - Summary section (`color-bg-elevated`, `radius-lg`, padding `space-4`):
   - Total spent, total collected, outstanding, markup profit — one row each
   - Outstanding in `color-error` if > 0

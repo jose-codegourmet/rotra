@@ -79,30 +79,33 @@ export function VenuePinTooltip({
 	if (isSingle && !singleSession) return null;
 
 	return (
-		<div
-			className="w-64 rounded-xl border border-outline-variant/20 bg-bg-base/80 p-4 shadow-2xl backdrop-blur-xl"
-			onMouseEnter={onMouseEnter}
-			onMouseLeave={onMouseLeave}
-			onClick={(event) => event.stopPropagation()}
-			onKeyDown={(event) => event.stopPropagation()}
-			role="dialog"
-			aria-label={`Sessions at ${group.venueName}`}
-		>
-			{isSingle && singleSession ? (
-				<SessionDiscoveryCard
-					variant="compact"
-					compactLayout="full"
-					session={singleSession}
-					onJoin={onJoin}
-					showAvatars
-				/>
-			) : (
-				<MultiSessionTooltip
-					group={group}
-					onJoin={onJoin}
-					onOpenModal={onOpenModal}
-				/>
-			)}
+		<div className="flex flex-col items-center">
+			<div
+				className="w-64 rounded-xl border border-outline-variant/20 bg-bg-base/80 p-4 shadow-2xl backdrop-blur-xl"
+				onMouseEnter={onMouseEnter}
+				onMouseLeave={onMouseLeave}
+				onClick={(event) => event.stopPropagation()}
+				onKeyDown={(event) => event.stopPropagation()}
+				role="dialog"
+				aria-label={`Sessions at ${group.venueName}`}
+			>
+				{isSingle && singleSession ? (
+					<SessionDiscoveryCard
+						variant="compact"
+						compactLayout="full"
+						session={singleSession}
+						onJoin={onJoin}
+						showAvatars
+					/>
+				) : (
+					<MultiSessionTooltip
+						group={group}
+						onJoin={onJoin}
+						onOpenModal={onOpenModal}
+					/>
+				)}
+			</div>
+			<div className="h-0 w-0 border-x-[8px] border-x-transparent border-t-[8px] border-t-bg-base/80" />
 		</div>
 	);
 }

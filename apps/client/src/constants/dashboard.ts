@@ -5,7 +5,8 @@ import rotraDarkStyle from "@/mapbox/rotra-dark-style.json";
 export const DEFAULT_MAP_CENTER = { lat: 10.3157, lng: 123.8854 };
 export const DEFAULT_MAP_ZOOM = 12;
 export const USER_LOCATION_ZOOM = 13;
-export const DEFAULT_RADIUS_KM = 10;
+export const DEFAULT_RADIUS_KM = 6;
+export const MAX_RADIUS_KM = 50;
 
 /** Version-controlled ROTRA dark style (Mapbox Style Spec v8). */
 export const MAPBOX_STYLE = rotraDarkStyle as StyleSpecification;

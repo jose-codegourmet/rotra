@@ -80,3 +80,28 @@ export async function geocodeAddress(
 		formattedAddress: first.placeName,
 	};
 }
+
+export async function reverseGeocode(
+	lat: number,
+	lng: number,
+	token: string,
+): Promise<string> {
+	const url = new URL(
+		`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`,
+	);
+	url.searchParams.set("access_token", token);
+	url.searchParams.set("types", "address,poi,place");
+	url.searchParams.set("country", "PH");
+	url.searchParams.set("limit", "1");
+
+	try {
+		const res = await fetch(url.toString());
+		if (!res.ok) return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+		const data = (await res.json()) as MapboxGeocodingResponse;
+		return (
+			data.features?.[0]?.place_name ?? `${lat.toFixed(6)}, ${lng.toFixed(6)}`
+		);
+	} catch {
+		return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+	}
+}

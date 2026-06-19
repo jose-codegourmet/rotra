@@ -6,24 +6,28 @@ import { ActiveSessionBanner } from "./ActiveSessionBanner";
 
 const liveSession: ActiveSessionSummary = {
 	sessionId: "session-live-1",
+	title: "Saturday Smash",
+	isOwner: false,
 	clubName: "Sunrise Badminton Club",
 	location: "Hall B",
 	status: "active",
 	playerStatus: "playing",
 	admissionStatus: "accepted",
 	courtHint: "On court",
-	href: "/sessions/session-live-1",
+	href: "/find-sessions/session-live-1",
 };
 
 const queueSession: ActiveSessionSummary = {
 	sessionId: "session-queue-1",
+	title: "Evening Queue",
+	isOwner: true,
 	clubName: "Metro Badminton Center",
 	location: "Court 3",
 	status: "open",
 	playerStatus: "waiting",
 	admissionStatus: "accepted",
 	courtHint: "Up next",
-	href: "/sessions/session-queue-1",
+	href: "/find-sessions/session-queue-1",
 };
 
 const meta: Meta<typeof ActiveSessionBanner> = {

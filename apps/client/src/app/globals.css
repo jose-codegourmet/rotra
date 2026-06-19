@@ -3,6 +3,17 @@
 @import "shadcn/tailwind.css";
 @import "mapbox-gl/dist/mapbox-gl.css";
 
+/* Strip chrome from venue pin popup so VenuePinTooltip owns its own design */
+.venue-pin-popup .mapboxgl-popup-content {
+	background: transparent;
+	padding: 0;
+	border-radius: 0;
+	box-shadow: none;
+}
+.venue-pin-popup .mapboxgl-popup-tip {
+	display: none;
+}
+
 @custom-variant dark (&:is(.dark *));
 @config "../../tailwind.config.ts";
 

@@ -1,51 +1,46 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { format } from "date-fns";
-import * as React from "react";
+import { useState } from "react";
 
-import { Button } from "@/components/ui/button/Button";
-import { Calendar } from "@/components/ui/calendar/Calendar";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover/Popover";
+import { DatePicker } from "@/components/ui/date-picker/DatePicker";
 
-function DatePickerDemo() {
-	const [open, setOpen] = React.useState(false);
-	const [date, setDate] = React.useState<Date | undefined>();
+function DatePickerDemo({
+	fromDate,
+	disabled,
+}: {
+	fromDate?: Date;
+	disabled?: boolean;
+}) {
+	const [value, setValue] = useState<string>("");
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger>
-				<Button variant="outline" type="button">
-					{date ? format(date, "PPP") : "Pick a date"}
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="w-auto p-0">
-				<Calendar
-					mode="single"
-					selected={date}
-					onSelect={(d) => {
-						setDate(d);
-						setOpen(false);
-					}}
-				/>
-			</PopoverContent>
-		</Popover>
+		<DatePicker
+			value={value}
+			onChange={setValue}
+			{...(fromDate !== undefined ? { fromDate } : {})}
+			{...(disabled !== undefined ? { disabled } : {})}
+		/>
 	);
 }
 
-const meta: Meta<typeof DatePickerDemo> = {
+const meta: Meta<typeof DatePicker> = {
 	title: "UI/DatePicker",
-	component: DatePickerDemo,
+	component: DatePicker,
 	tags: ["autodocs"],
 };
 
 export default meta;
-type Story = StoryObj<typeof DatePickerDemo>;
+type Story = StoryObj<typeof DatePicker>;
 
 export const Default: Story = {
 	render: () => <DatePickerDemo />,
+};
+
+export const WithMinDate: Story = {
+	render: () => <DatePickerDemo fromDate={new Date()} />,
+};
+
+export const Disabled: Story = {
+	render: () => <DatePickerDemo disabled />,
 };
