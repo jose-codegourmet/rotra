@@ -121,6 +121,7 @@ The **session host** configures the session before opening it (Que Master or Clu
 
 | Setting | Type | Required | Notes |
 |---------|------|----------|-------|
+| **Session title** | Text | Yes | Human-readable name shown in session headers and close confirmation (e.g. "Friday Night Doubles"); distinct from venue/location |
 | **Schedule type** | Select | **Yes for club queue only** | **MMR (competitive)** — EXP/MMR/ranked eligible; **Fun Games (no points)** — no EXP/MMR; matches and standings still recorded. Omitted / N/A for **player-organized** (always informal). |
 | Location / Venue | `VenuePicker` (Quick Session) or text (club queue) | Yes | Venue name + address + coordinates; Quick Session uses confirmed places or new pin |
 | Date | Date | Yes | |
@@ -279,6 +280,21 @@ A player may exit the session early at any time.
 * An exited player cannot re-enter the session queue
 * An exited player retains read-only access to the session view
 * If the player has an active match when they exit, the Que Master must handle the mid-match situation manually (e.g. replace the player, void the match, or record a walkover)
+
+---
+
+## 8.8a Close Session (Host Only)
+
+The session **host** (`host_id`) — the player who created a Quick Session or the Que Master / Club Owner who published a club queue — can end the session for everyone.
+
+### Rules
+
+* Only the host may close a session (`POST /api/sessions/:id/close`)
+* Allowed from `draft`, `open`, or `active` status → transitions to `closed`
+* UI shows **Close session** (not **Leave session**) when `host_id` matches the current player
+* Confirmation modal requires typing the exact **session title** before the destructive action is enabled
+* Legacy sessions without a title fall back to the venue `location` label for confirmation
+* Closing ends the queue for all players; it is distinct from a single player **leaving** (§8.8)
 
 ---
 

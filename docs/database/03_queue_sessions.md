@@ -69,6 +69,9 @@ CREATE TABLE queue_sessions (
   status     session_status_enum NOT NULL DEFAULT 'draft',
   visibility session_visibility_enum NOT NULL DEFAULT 'club_members',
 
+  -- Display name (distinct from venue/location label)
+  title     text,
+
   -- Venue & time
   location  text NOT NULL,
   address   text,

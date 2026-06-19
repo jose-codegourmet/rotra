@@ -85,9 +85,7 @@ function withDistance(
 		});
 }
 
-export async function getNearbySessions(
-	origin: SessionGeoPoint,
-	filters: SessionDiscoveryFilters,
+async function fetchOpenSessionItems(
 	profileId: string,
 ): Promise<SessionDiscoveryItem[]> {
 	const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
@@ -127,6 +125,7 @@ export async function getNearbySessions(
 
 		items.push({
 			id: s.id,
+			isOwner: s.hostId === profileId,
 			clubId: s.clubId,
 			clubName: s.club?.name ?? null,
 			location: s.location,
@@ -152,6 +151,22 @@ export async function getNearbySessions(
 		});
 	}
 
+	return items;
+}
+
+export async function getAllOpenSessions(
+	profileId: string,
+): Promise<SessionDiscoveryItem[]> {
+	const items = await fetchOpenSessionItems(profileId);
+	return [...items].sort((a, b) => a.dateTime.localeCompare(b.dateTime));
+}
+
+export async function getNearbySessions(
+	origin: SessionGeoPoint,
+	filters: SessionDiscoveryFilters,
+	profileId: string,
+): Promise<SessionDiscoveryItem[]> {
+	const items = await fetchOpenSessionItems(profileId);
 	const filtered = applyFilters(items, filters);
 	return withDistance(filtered, origin, filters.radiusKm);
 }

@@ -2,6 +2,11 @@ import { format } from "date-fns";
 import { z } from "zod";
 
 export const quickSessionFormSchema = z.object({
+	title: z
+		.string()
+		.min(1, "Session title is required")
+		.max(80, "Session title must be 80 characters or fewer"),
+
 	clubId: z
 		.union([z.string().uuid("Select a valid club"), z.literal("")])
 		.optional(),

@@ -16,7 +16,11 @@ import { SessionListView } from "@/components/modules/dashboard/session-list-vie
 import { SessionUnavailableDialog } from "@/components/modules/dashboard/session-unavailable-dialog/SessionUnavailableDialog";
 import { VenueSessionsModal } from "@/components/modules/dashboard/venue-sessions-modal/VenueSessionsModal";
 import { ViewToggle } from "@/components/modules/dashboard/view-toggle/ViewToggle";
-import { DEFAULT_MAP_ZOOM, USER_LOCATION_ZOOM } from "@/constants/dashboard";
+import {
+	DEFAULT_MAP_ZOOM,
+	DEFAULT_RADIUS_KM,
+	USER_LOCATION_ZOOM,
+} from "@/constants/dashboard";
 import { useActiveSession } from "@/hooks/useActiveSession/client";
 import { useGeolocation } from "@/hooks/useGeolocation/client";
 import {
@@ -50,7 +54,7 @@ export function DashboardClient() {
 	const [venueModalKey, setVenueModalKey] = useState<string | null>(null);
 	const [unavailableDialogOpen, setUnavailableDialogOpen] = useState(false);
 	const [blockedDialogOpen, setBlockedDialogOpen] = useState(false);
-	const [nearbyOnly, setNearbyOnly] = useState(true);
+	const [radiusKm, setRadiusKm] = useState(DEFAULT_RADIUS_KM);
 	const [doublesOnly, setDoublesOnly] = useState(false);
 	const [weekendOnly, setWeekendOnly] = useState(false);
 	const [placeCenter, setPlaceCenter] = useState<SessionGeoPoint | null>(null);
@@ -66,7 +70,7 @@ export function DashboardClient() {
 
 	const filters = useMemo<SessionDiscoveryFilters>(() => {
 		const base: SessionDiscoveryFilters = {
-			radiusKm: nearbyOnly ? 2 : 50,
+			radiusKm,
 			weekendOnly,
 		};
 
@@ -85,7 +89,7 @@ export function DashboardClient() {
 
 		return doublesOnly ? { ...base, playersPerCourt: 4 } : base;
 	}, [
-		nearbyOnly,
+		radiusKm,
 		doublesOnly,
 		weekendOnly,
 		clubQuery,
@@ -100,7 +104,11 @@ export function DashboardClient() {
 		filters,
 	);
 
-	console.log("[+] data", data);
+	console.log("[+] DEBUG", {
+		data,
+		effectiveCenter,
+		filters,
+	});
 
 	const { data: activeData } = useActiveSession();
 	const active = activeData?.active ?? null;
@@ -131,7 +139,7 @@ export function DashboardClient() {
 					return;
 				}
 
-				router.push(`/sessions/${sessionId}`);
+				router.push(`/find-sessions/${sessionId}`);
 			} catch {
 				setUnavailableDialogOpen(true);
 			}
@@ -200,6 +208,8 @@ export function DashboardClient() {
 					<DashboardMap
 						venueGroups={venueGroups}
 						center={effectiveCenter}
+						{...(isUserLocation ? { userLocation: center } : {})}
+						radiusKm={filters.radiusKm}
 						zoom={isUserLocation ? USER_LOCATION_ZOOM : DEFAULT_MAP_ZOOM}
 						selectedVenueKey={selectedVenueKey}
 						onSelectVenue={setSelectedVenueKey}
@@ -237,10 +247,10 @@ export function DashboardClient() {
 			<MapSearchOverlay
 				locationLabel={locationLabel}
 				geoStatus={status}
-				nearbyOnly={nearbyOnly}
+				radiusKm={radiusKm}
 				doublesOnly={doublesOnly}
 				weekendOnly={weekendOnly}
-				onToggleNearby={() => setNearbyOnly((v) => !v)}
+				onRadiusChange={setRadiusKm}
 				onToggleDoubles={() => setDoublesOnly((v) => !v)}
 				onToggleWeekend={() => setWeekendOnly((v) => !v)}
 				onRecenter={handleRecenter}

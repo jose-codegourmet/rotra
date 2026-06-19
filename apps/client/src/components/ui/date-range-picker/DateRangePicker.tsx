@@ -15,6 +15,8 @@ export interface DateRangePickerProps {
 	to?: string | undefined;
 	onChange: (from: string | undefined, to: string | undefined) => void;
 	className?: string;
+	/** When true, past dates can be selected (e.g. session history filters). */
+	allowPastDates?: boolean;
 }
 
 function toDateRange(from?: string, to?: string): DateRange | undefined {
@@ -31,6 +33,7 @@ export function DateRangePicker({
 	to,
 	onChange,
 	className,
+	allowPastDates = false,
 }: DateRangePickerProps) {
 	const [mode, setMode] = useState<DateRangePickerMode>("dates");
 	const [baseRange, setBaseRange] = useState<DateRange | undefined>(() =>
@@ -93,7 +96,7 @@ export function DateRangePicker({
 						numberOfMonths={2}
 						selected={calendarRange}
 						onSelect={handleRangeSelect}
-						disabled={{ before: new Date() }}
+						disabled={allowPastDates ? undefined : { before: new Date() }}
 						className="bg-transparent p-0 [--cell-size:--spacing(10)] md:[--cell-size:--spacing(11)] w-full"
 						classNames={{
 							months: "relative flex flex-col gap-6 md:flex-row md:gap-10",

@@ -17,6 +17,7 @@ function getNextRoundedHour(): string {
 
 export function defaultQuickSessionValues(): QuickSessionFormValues {
 	return {
+		title: "",
 		clubId: "",
 		venue: {
 			name: "",

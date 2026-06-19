@@ -38,8 +38,11 @@ Full-screen page with header and a 3-tab navigation row below it. Tab content ar
 
 ### Header Bar
 - Left: back arrow → `/clubs/:id/sessions`
-- Title: `Session · [Venue]` (top line) + `[Day], [Date]` (subtitle line, `text-small`, `color-text-secondary`)
-- Right: session info icon (ⓘ) → shows cost breakdown modal on tap
+- Title: `[Session title]` or `Session · [Venue]` when no title (top line) + `[Day], [Date]` (subtitle line, `text-small`, `color-text-secondary`)
+- Right (live session at `/find-sessions/:id`): session action button — **role-dependent**:
+  - **Host** (`host_id` matches current player): `Close session` → typed-title confirmation modal (see below)
+  - **Joined player** (registered, not host): `Leave session` → early exit confirm modal (see below)
+- Right (legacy player view): session info icon (ⓘ) → shows cost breakdown modal on tap
 - Background: `color-bg-base`, border-bottom: 1px solid `color-border`
 - Height: 64px (taller than standard for two-line title)
 
@@ -210,6 +213,17 @@ Triggered by tapping the ⓘ icon in the header.
   - Per player: `₱[amount] / [N] players` — `text-body`, `color-accent`
 - Note: `text-micro`, `color-text-disabled`: `Final amount may change as more shuttles are used.`
 - Close: `CLOSE` — secondary outline button, full-width
+
+### Close Session Confirm Modal (Host only)
+Triggered when the session host taps `Close session` on `/find-sessions/:id`.
+
+- Title: `Close This Session?` — `text-title`, `color-text-primary`
+- Body: `Closing ends the session for all players. The queue will stop and no new matches can be assigned.` — `text-body`, `color-text-secondary`
+- Confirmation field: label `Type the session name to confirm:` + bold session title; text input must match exactly
+- Actions:
+  - Primary: `Close session` — `color-error` background (destructive), disabled until typed title matches
+  - Secondary: `Cancel` — outline
+- On success: session status → `closed`; host redirected to `/find-sessions`
 
 ### Leave Session / Early Exit Confirm Modal
 Triggered when player updates status to `Exited` via the status selector.

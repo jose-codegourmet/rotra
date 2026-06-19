@@ -6,13 +6,15 @@ import { AlreadyInSessionDialog } from "./AlreadyInSessionDialog";
 
 const activeSession: ActiveSessionSummary = {
 	sessionId: "session-active-1",
+	title: "Friday Night Doubles",
+	isOwner: false,
 	clubName: "Sunrise Badminton Club",
 	location: "Hall B",
 	status: "open",
 	playerStatus: "waiting",
 	admissionStatus: "accepted",
 	courtHint: "Up next",
-	href: "/sessions/session-active-1",
+	href: "/find-sessions/session-active-1",
 };
 
 const meta: Meta<typeof AlreadyInSessionDialog> = {

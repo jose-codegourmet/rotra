@@ -2,6 +2,7 @@
 
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
+import { DEFAULT_RADIUS_KM } from "@/constants/dashboard";
 import { MOCK_VENUE_GROUPS } from "@/constants/mock-venue-groups";
 import { MapSearchOverlay } from "./MapSearchOverlay";
 
@@ -30,15 +31,16 @@ function MapSearchOverlayDemo(
 	>(props.slotAvailability);
 	const [dateFrom, setDateFrom] = useState<string | undefined>(props.dateFrom);
 	const [dateTo, setDateTo] = useState<string | undefined>(props.dateTo);
+	const [radiusKm, setRadiusKm] = useState(props.radiusKm ?? DEFAULT_RADIUS_KM);
 
 	return (
 		<MapSearchOverlay
 			locationLabel={props.locationLabel ?? "Cebu City"}
 			geoStatus={props.geoStatus ?? "granted"}
-			nearbyOnly={props.nearbyOnly ?? true}
+			radiusKm={radiusKm}
 			doublesOnly={props.doublesOnly ?? false}
 			weekendOnly={props.weekendOnly ?? false}
-			onToggleNearby={() => {}}
+			onRadiusChange={setRadiusKm}
 			onToggleDoubles={() => {}}
 			onToggleWeekend={() => {}}
 			onRecenter={() => {}}
@@ -81,10 +83,6 @@ export const DateRangeSelected: Story = {
 
 export const NoGeolocation: Story = {
 	render: () => (
-		<MapSearchOverlayDemo
-			locationLabel=""
-			geoStatus="denied"
-			nearbyOnly={false}
-		/>
+		<MapSearchOverlayDemo locationLabel="" geoStatus="denied" radiusKm={50} />
 	),
 };

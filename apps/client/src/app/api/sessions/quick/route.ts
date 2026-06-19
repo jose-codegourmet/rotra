@@ -80,6 +80,7 @@ export async function POST(request: Request) {
 					scheduleType: null,
 					status: "open",
 					visibility,
+					title: values.title.trim(),
 					location: venue.name.trim(),
 					address: venue.address?.trim() || null,
 					venueLat: geocoded?.lat ?? null,
@@ -108,7 +109,7 @@ export async function POST(request: Request) {
 
 		return NextResponse.json({
 			sessionId: session.id,
-			href: `/sessions/${session.id}`,
+			href: `/find-sessions/${session.id}`,
 		});
 	} catch (e) {
 		console.error("[sessions/quick POST]", e);

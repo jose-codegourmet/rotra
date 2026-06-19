@@ -7,6 +7,7 @@ export interface SessionGeoPoint {
 
 export interface SessionDiscoveryItem {
 	id: string;
+	isOwner: boolean;
 	clubId: string | null;
 	clubName: string | null;
 	location: string;
@@ -60,6 +61,8 @@ export interface SessionDiscoveryFilters {
 
 export interface ActiveSessionSummary {
 	sessionId: string;
+	title: string | null;
+	isOwner: boolean;
 	// Null for clubless (player-organized) sessions; UI falls back to location.
 	clubName: string | null;
 	location: string;

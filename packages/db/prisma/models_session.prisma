@@ -9,6 +9,7 @@ model QueueSession {
   status     SessionStatus     @default(draft)
   visibility SessionVisibility @default(club_members)
 
+  title     String?
   location  String
   address   String?
   venueLat     Float?  @map("venue_lat")

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { activeSessionQueryKey } from "@/hooks/useActiveSession/queryKey";
+import { sessionLiveQueryKey } from "@/hooks/useSessionLive/queryKey";
 
 async function leaveSession(sessionId: string): Promise<{ ok: true }> {
 	const res = await fetch(`/api/sessions/${sessionId}/leave`, {
@@ -33,10 +34,13 @@ export function useLeaveSessionMutation() {
 
 	return useMutation({
 		mutationFn: leaveSession,
-		onSuccess: () => {
+		onSuccess: (_data, sessionId) => {
 			toast.success("You've left the session.");
 			void queryClient.invalidateQueries({
 				queryKey: activeSessionQueryKey,
+			});
+			void queryClient.invalidateQueries({
+				queryKey: sessionLiveQueryKey(sessionId),
 			});
 			router.push("/dashboard");
 		},

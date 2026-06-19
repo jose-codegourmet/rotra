@@ -21,7 +21,8 @@ The primary player-facing web application. Used by Players, Club Owners, and Que
 
 | Page | Strategy | Reason |
 |------|----------|--------|
-| `/` Home / Dashboard | SSR | User-specific; shows live session data |
+| `/dashboard` Home / Dashboard | SSR | Interactive session discovery on the map; user-specific live session data |
+| `/find-sessions` Find Sessions | SSR | Browse all open sessions in list mode; shows user's booked upcoming sessions alongside to prevent double-booking |
 | `/club/[slug]` | SSR + ISR | Public club page; OG shareable |
 | `/player/[id]` | SSR + ISR | Public profile; OG shareable |
 | `/session/[id]` | SSR → live hydration | Initial state from server, then Supabase Realtime subscription |

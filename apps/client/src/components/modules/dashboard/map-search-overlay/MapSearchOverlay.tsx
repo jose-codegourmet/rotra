@@ -12,7 +12,9 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { FilterPanel } from "@/components/modules/dashboard/filter-panel/FilterPanel";
 import { DateRangePicker } from "@/components/ui/date-range-picker/DateRangePicker";
+import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs/Tabs";
+import { MAX_RADIUS_KM } from "@/constants/dashboard";
 import type { GeolocationStatus } from "@/hooks/useGeolocation";
 import { forwardGeocode, type GeocodingSuggestion } from "@/lib/geo/geocode";
 import { cn } from "@/lib/utils";
@@ -27,10 +29,10 @@ type ActivePanel = "where" | "when" | null;
 interface MapSearchOverlayProps {
 	locationLabel: string;
 	geoStatus: GeolocationStatus;
-	nearbyOnly: boolean;
+	radiusKm: number;
 	doublesOnly: boolean;
 	weekendOnly: boolean;
-	onToggleNearby: () => void;
+	onRadiusChange: (km: number) => void;
 	onToggleDoubles: () => void;
 	onToggleWeekend: () => void;
 	onRecenter?: () => void;
@@ -86,10 +88,10 @@ function formatWhereLabel(
 export function MapSearchOverlay({
 	locationLabel,
 	geoStatus,
-	nearbyOnly,
+	radiusKm,
 	doublesOnly,
 	weekendOnly,
-	onToggleNearby,
+	onRadiusChange,
 	onToggleDoubles,
 	onToggleWeekend,
 	onRecenter,
@@ -366,46 +368,64 @@ export function MapSearchOverlay({
 					</div>
 				) : null}
 
-				<div className="mt-3 flex items-center gap-2">
-					<div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1">
-						<FilterChip
-							active={nearbyOnly}
-							onClick={onToggleNearby}
-							label="Nearby (< 2km)"
-						/>
-						<FilterChip
-							active={doublesOnly}
-							onClick={onToggleDoubles}
-							label="Doubles Only"
-						/>
-						<FilterChip
-							active={weekendOnly}
-							onClick={onToggleWeekend}
-							label="Weekend"
+				<div className="mt-3 flex flex-col gap-2">
+					<div className="rounded-xl border border-outline-variant/10 bg-bg-elevated p-3">
+						<div className="mb-2 flex items-center justify-between">
+							<span className="text-xs font-bold tracking-wider text-text-secondary uppercase">
+								Distance
+							</span>
+							<span className="text-xs font-medium text-text-primary">
+								{radiusKm} km
+							</span>
+						</div>
+						<Slider
+							value={[radiusKm]}
+							min={1}
+							max={MAX_RADIUS_KM}
+							step={1}
+							onValueChange={(vals) => {
+								const next = Array.isArray(vals) ? vals[0] : vals;
+								if (next !== undefined) onRadiusChange(next);
+							}}
 						/>
 					</div>
 
-					<FilterPanel
-						open={filterPanelOpen}
-						onOpenChange={setFilterPanelOpen}
-						venueGroups={venueGroups}
-						activeFilters={slotAvailability ? { slotAvailability } : {}}
-						onApply={(filters) =>
-							onSlotAvailabilityChange(filters.slotAvailability)
-						}
-						trigger={
-							<button
-								type="button"
-								className="relative flex size-10 shrink-0 items-center justify-center rounded-xl border border-outline-variant/10 bg-bg-elevated text-text-secondary"
-								aria-label="Filters"
-							>
-								<SlidersHorizontal size={16} />
-								{hasActivePanelFilters && (
-									<span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-accent" />
-								)}
-							</button>
-						}
-					/>
+					<div className="flex items-center gap-2">
+						<div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1">
+							<FilterChip
+								active={doublesOnly}
+								onClick={onToggleDoubles}
+								label="Doubles Only"
+							/>
+							<FilterChip
+								active={weekendOnly}
+								onClick={onToggleWeekend}
+								label="Weekend"
+							/>
+						</div>
+
+						<FilterPanel
+							open={filterPanelOpen}
+							onOpenChange={setFilterPanelOpen}
+							venueGroups={venueGroups}
+							activeFilters={slotAvailability ? { slotAvailability } : {}}
+							onApply={(filters) =>
+								onSlotAvailabilityChange(filters.slotAvailability)
+							}
+							trigger={
+								<button
+									type="button"
+									className="relative flex size-10 shrink-0 items-center justify-center rounded-xl border border-outline-variant/10 bg-bg-elevated text-text-secondary"
+									aria-label="Filters"
+								>
+									<SlidersHorizontal size={16} />
+									{hasActivePanelFilters && (
+										<span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-accent" />
+									)}
+								</button>
+							}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>

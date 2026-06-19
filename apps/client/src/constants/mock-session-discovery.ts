@@ -25,6 +25,7 @@ function hoursFromNow(hours: number): string {
 export const MOCK_SESSION_DISCOVERY: SessionDiscoveryItem[] = [
 	{
 		id: "sess-sunrise-today",
+		isOwner: false,
 		clubId: SUNRISE_VENUE.clubId,
 		clubName: SUNRISE_VENUE.clubName,
 		location: SUNRISE_VENUE.location,
@@ -48,6 +49,7 @@ export const MOCK_SESSION_DISCOVERY: SessionDiscoveryItem[] = [
 	},
 	{
 		id: "sess-sunrise-weekend",
+		isOwner: false,
 		clubId: SUNRISE_VENUE.clubId,
 		clubName: SUNRISE_VENUE.clubName,
 		location: SUNRISE_VENUE.location,
@@ -70,6 +72,7 @@ export const MOCK_SESSION_DISCOVERY: SessionDiscoveryItem[] = [
 	},
 	{
 		id: "sess-mandaue-live",
+		isOwner: false,
 		clubId: "club-mandaue-sports",
 		clubName: "Mandaue Sports Hub",
 		location: "Mandaue City Sports Complex",
@@ -93,6 +96,7 @@ export const MOCK_SESSION_DISCOVERY: SessionDiscoveryItem[] = [
 	},
 	{
 		id: "sess-lapulapu-open",
+		isOwner: false,
 		clubId: "club-lapulapu",
 		clubName: "Lapu-Lapu Smashers",
 		location: "Hoops Dome Lapu-Lapu",
@@ -112,6 +116,7 @@ export const MOCK_SESSION_DISCOVERY: SessionDiscoveryItem[] = [
 	},
 	{
 		id: "sess-cebu-downtown",
+		isOwner: false,
 		clubId: "club-cebu-central",
 		clubName: "Cebu Central Que",
 		location: "Cebu IT Park Courts",
@@ -134,6 +139,7 @@ export const MOCK_SESSION_DISCOVERY: SessionDiscoveryItem[] = [
 	},
 	{
 		id: "sess-talisay-weekend",
+		isOwner: false,
 		clubId: "club-talisay",
 		clubName: "Talisay Shuttle Club",
 		location: "Talisay Sports Center",

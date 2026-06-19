@@ -112,3 +112,11 @@ export const GridUpcoming: Story = {
 		onJoin: noop,
 	},
 };
+
+export const ListOwned: Story = {
+	args: {
+		session: { ...upcomingSession, isOwner: true },
+		variant: "list",
+		onJoin: noop,
+	},
+};

@@ -45,6 +45,10 @@ export function isVenueFullyBooked(group: VenueSessionGroup): boolean {
 	);
 }
 
+export function formatSessionDate(session: SessionDiscoveryItem): string {
+	return format(new Date(session.dateTime), "EEE, MMM d");
+}
+
 export function formatSessionTime(
 	session: SessionDiscoveryItem,
 	now = new Date(),
@@ -62,6 +66,12 @@ export function formatSessionTimeRange(session: SessionDiscoveryItem): string {
 	if (!session.endTime) return start;
 	const end = format(new Date(session.endTime), "h:mm a");
 	return `${start} - ${end}`;
+}
+
+export function formatSessionDateTimeRange(
+	session: SessionDiscoveryItem,
+): string {
+	return `${formatSessionDate(session)} · ${formatSessionTimeRange(session)}`;
 }
 
 export interface PanelFilterState {

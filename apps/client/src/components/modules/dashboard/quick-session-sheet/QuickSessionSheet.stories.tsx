@@ -82,6 +82,7 @@ export const ValidationErrors: Story = {
 };
 
 const validInitialValues = {
+	title: "Friday Night Doubles",
 	clubId: mockClubs.clubs[0]?.id ?? "",
 	venue: {
 		name: "Mandaue Sports Complex",

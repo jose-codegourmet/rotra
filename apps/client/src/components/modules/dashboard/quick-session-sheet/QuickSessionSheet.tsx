@@ -113,6 +113,28 @@ export function QuickSessionSheet({
 
 				<FormProvider {...form}>
 					<form onSubmit={onSubmit} className="space-y-4">
+						<Field data-invalid={!!formState.errors.title}>
+							<FieldLabel htmlFor="quick-session-title">
+								Session title
+							</FieldLabel>
+							<FieldContent>
+								<Controller
+									control={control}
+									name="title"
+									render={({ field }) => (
+										<Input
+											id="quick-session-title"
+											placeholder="e.g. Friday Night Doubles"
+											className="w-full"
+											disabled={createMutation.isPending}
+											{...field}
+										/>
+									)}
+								/>
+								<FieldError errors={[formState.errors.title]} />
+							</FieldContent>
+						</Field>
+
 						<Field data-invalid={!!formState.errors.clubId}>
 							<FieldLabel htmlFor="quick-session-club">
 								Club{" "}

@@ -3,7 +3,7 @@ import { Bell, CalendarClock, Gauge, Trophy, User } from "lucide-react";
 export type NavItemId =
 	| "home"
 	| "clubs"
-	| "sessions"
+	| "find-sessions"
 	| "profile"
 	| "notifications";
 
@@ -11,10 +11,10 @@ export const NAV_ITEMS = [
 	{ id: "home" as NavItemId, label: "Home", Icon: Gauge, href: "/dashboard" },
 	{ id: "clubs" as NavItemId, label: "Clubs", Icon: Trophy, href: "/clubs" },
 	{
-		id: "sessions" as NavItemId,
-		label: "Sessions",
+		id: "find-sessions" as NavItemId,
+		label: "Find Sessions",
 		Icon: CalendarClock,
-		href: "/sessions",
+		href: "/find-sessions",
 	},
 	{
 		id: "profile" as NavItemId,
