@@ -264,13 +264,19 @@ Only **Club Owner** may INSERT/DELETE. Multiple rows per session allowed.
 
 ## Table: `session_registrations`
 
-One row per player per session.
+One row per participant per session — registered players (`player_id`) or walk-in guests (`is_guest = true`, `guest_name`).
+
+> **Walk-in players:** See [`../business_logic/client_app/08_queue_session.md`](../business_logic/client_app/08_queue_session.md) §39.
 
 ```sql
 CREATE TABLE session_registrations (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   session_id uuid NOT NULL REFERENCES queue_sessions(id) ON DELETE CASCADE,
-  player_id  uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  player_id  uuid REFERENCES profiles(id) ON DELETE CASCADE,  -- NULL when is_guest = true
+
+  -- Walk-in (guest) identity
+  is_guest   bool NOT NULL DEFAULT false,
+  guest_name text,  -- 1–40 chars; required when is_guest = true
 
   admission_status admission_status_enum NOT NULL,
 
@@ -303,8 +309,19 @@ CREATE TABLE session_registrations (
   registered_at timestamptz NOT NULL DEFAULT now(),
   updated_at    timestamptz NOT NULL DEFAULT now(),
 
-  UNIQUE (session_id, player_id)
+  CONSTRAINT registration_identity_check CHECK (
+    (is_guest = false AND player_id IS NOT NULL AND guest_name IS NULL)
+    OR
+    (is_guest = true  AND player_id IS NULL     AND guest_name IS NOT NULL)
+  )
 );
+```
+
+```sql
+-- Registered players: one row per (session, player). Guest names are not unique.
+CREATE UNIQUE INDEX idx_session_reg_unique_registered
+  ON session_registrations(session_id, player_id)
+  WHERE is_guest = false;
 ```
 
 ### Admission vs player status
@@ -312,6 +329,14 @@ CREATE TABLE session_registrations (
 - **`admission_status`** — capacity / registration concern.
 - **`player_status`** — real-time in-venue attendance (authoritative for **Exited**).
 - Do not use admission `exited` in new code; use `player_status = 'exited'`.
+
+### Walk-in (guest) rows
+
+- `is_guest = true`, `player_id IS NULL`, `guest_name` required (1–40 chars).
+- `admission_status = 'accepted'` on creation; never `pending_approval` or `waitlisted`.
+- `join_method` defaults to `'app'` (host-initiated via Que Master Console).
+- Blocked when `queue_sessions.schedule_type = 'mmr'` (app-enforced).
+- Duplicate `guest_name` values in the same session are allowed.
 
 ### Waitlist FIFO
 

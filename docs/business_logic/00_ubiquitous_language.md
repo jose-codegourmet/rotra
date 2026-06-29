@@ -73,6 +73,8 @@ All users register as **Players**. Elevated roles are additive and **per-club** 
 | **Umpire**     | Per match                                 | Assigned by Que Master per-match (see [§7](#7-umpires))                                                                   |
 | **Admin**      | Platform-wide                             | Internal team only; uses the Admin app; email + MFA login                                                                 |
 
+**Walk-in Player** (synonym: **Guest Player**) is **not** a platform role — it is a **participation type** within a single Que Session. A non-ROTRA-account participant added directly by a Que Master or Club Owner, identified only by a display name. No auth, no profile, no history, no notifications. See [`client_app/08_queue_session.md`](./client_app/08_queue_session.md) §39.
+
 A Club Owner of Club A holds **no elevated privileges** in Club B unless separately granted. Same for Que Master.
 
 ---
@@ -414,6 +416,7 @@ Only `I Am Prepared`, `Waiting`, and (optionally) `Resting` are **rotation-eligi
 | **Current Session Form**   | Performance adjustment within the active Que Session. |
 | **Recent Form**            | Performance adjustment across recent valid matches (expected vs actual). |
 | **Match Difficulty History** | Per-Player record of how difficult recent matches were for that individual. |
+| **Walk-in Player**           | A guest participant with no ROTRA account. Que Master- or Club Owner-added only. Eligible only in **Friendly** and **Club Que Session — Fun Games** sessions (blocked in MMR). Identified by display name only; purely ephemeral. All attendance state changes are host-controlled — walk-ins cannot self-declare **I Am In**, **I Am Prepared**, or **Early Exit**. See [`client_app/08_queue_session.md`](./client_app/08_queue_session.md) §39. |
 
 ### Temporary session skill eligibility (transitional)
 
@@ -736,6 +739,8 @@ Treat the **product term** as authoritative for new docs / UI / code-comments. T
 | Admission status         | `session_registrations.admission_status` (`admission_status_enum`)                                  |                                              |
 | Member state             | `club_members.status` (`member_status_enum`)                                                        |                                              |
 | Session waitlist         | `session_registrations.admission_status = 'waitlisted'` + `waitlist_position`                       | Distinct from `waitlist_signups`!            |
+| Walk-in Player           | `session_registrations.is_guest = true`, `guest_name`; `player_id IS NULL`                          | Non-MMR sessions only; see `08_queue_session.md` §39 |
+| Walk-in in match         | `match_players.is_guest = true`, `guest_name`; `player_id IS NULL`                                    | `review_submitted` true at creation          |
 | Marketing waitlist       | `waitlist_signups` table                                                                            | Pre-launch landing-page email capture        |
 | Calibrating              | `profiles.mmr_matches_played < calibration.required_matches` AND `calibration_completed_at IS NULL` | Derived state, not a stored enum             |
 | Verified                 | `profiles.is_verified` (generated column)                                                           | FB linked + email verified + onboarding done |

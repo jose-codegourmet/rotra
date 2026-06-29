@@ -48,6 +48,7 @@
 36. [API & Backend Responsibilities](#36-api--backend-responsibilities)
 37. [Deferred Decisions](#37-deferred-decisions)
 38. [Cross-Document References & Deliverables](#38-cross-document-references--deliverables)
+39. [Walk-in (Guest) Players](#39-walk-in-guest-players)
 
 ---
 
@@ -285,6 +286,8 @@ Admission is **separate** from attendance.
 | **Reserved** | Host-held slot for specific player | Yes |
 
 Pending requests **do not** occupy slots. A slot is occupied only when the player is **Accepted** (or **Reserved**).
+
+> **Walk-in players:** A **Walk-in Player** (guest) is admitted directly as **Accepted** by the host — no join request flow. Walk-ins occupy a slot the same as registered players. See §39.
 
 ---
 
@@ -834,9 +837,9 @@ See [`../../views/client_app/que_master/que_master_console.md`](../../views/clie
 
 Hosts view and manage all groups:
 
-Pending requests, Accepted, Waitlisted, Not Arrived, I Am In, I Am Prepared, Waiting, Playing, Resting, Eating, Suspended, Exited, Removed.
+Pending requests, Accepted, Waitlisted, Walk-in (guest), Not Arrived, I Am In, I Am Prepared, Waiting, Playing, Resting, Eating, Suspended, Exited, Removed.
 
-Only Club Owner manages assigned Que Masters. Club Owner and Que Masters manage player admission and participation.
+Only Club Owner manages assigned Que Masters. Club Owner and Que Masters manage player admission and participation, including adding and removing **Walk-in Players** (see §39).
 
 ---
 
@@ -1075,6 +1078,8 @@ Abbreviated matrix — see view docs for UI detail.
 | Assign Que Master | — | — | — | — | — | CO only |
 | Edit session | — | — | — | — | — | Yes (rules §24) |
 | Complete session | — | — | — | — | — | Yes |
+| Add walk-in player | — | — | — | — | — | Yes (non-MMR only; §39) |
+| Remove walk-in player | — | — | — | — | — | Yes (§39) |
 
 ---
 
@@ -1150,6 +1155,8 @@ Abbreviated matrix — see view docs for UI detail.
 - Match request lineup size matches format (singles/doubles)
 - Player eligibility for requests and matches
 - Completed-session immutability enforced server-side
+- Walk-in players: `guest_name` 1–40 chars; `is_guest = true` requires `player_id` NULL; blocked when session type is MMR
+- Walk-in removal blocked while player is in an active match
 
 ---
 
@@ -1217,6 +1224,14 @@ Abbreviated matrix — see view docs for UI detail.
 - Cancelled with payments → display only; manual refund outside ROTRA
 - Edit after Completed → **blocked**
 
+### Walk-in players
+- Add walk-in when session is full → rejected (capacity check same as registered admission)
+- Add walk-in to MMR session → rejected server-side; UI hides `+ ADD WALK-IN`
+- Duplicate display names in same session → allowed (two "Marco"s possible)
+- Walk-in in active match when host removes → removal blocked until match ends or player substituted
+- Walk-in selected by Automatic Queueing → never; engine excludes `is_guest` registrations
+- Walk-in match completion → `review_submitted` treated as `true`; does not block match completion
+
 ### Feed & notifications
 - Edited entry → indicator + history
 - Sensitive data → filtered by audience
@@ -1247,7 +1262,7 @@ See [`../../database/03_queue_sessions.md`](../../database/03_queue_sessions.md)
 | Concept | Responsibility |
 | ------- | -------------- |
 | `queue_sessions` | Lifecycle, settings, password hash, visibility flags |
-| `session_registrations` | Admission state, attendance state, timestamps, waitlist position, payment snapshot |
+| `session_registrations` | Admission state, attendance state, timestamps, waitlist position, payment snapshot; walk-in identity (`is_guest`, `guest_name`) |
 | `session_que_masters` | Assigned Que Masters per session |
 | `password_authorizations` | Per-user per-session lobby auth |
 | `password_attempts` | Failed attempt timing / cooldown |
@@ -1267,7 +1282,7 @@ See [`../../database/03_queue_sessions.md`](../../database/03_queue_sessions.md)
 
 Each operation requires authorization check and concurrency handling:
 
-`createSession`, `updateSession`, `publishSession`, `startSession`, `closeSession`, `completeSession`, `cancelSession`, `assignQueMaster`, `removeQueMaster`, `submitJoinRequest`, `withdrawRequest`, `approveRequest`, `declineRequest`, `joinWaitlist`, `promoteWaitlisted`, `confirmPromotion`, `cancelRegistration`, `requestWaitlistSwap`, `markIAmIn`, `markIAmPrepared`, `changeLiveStatus`, `earlyExit`, `submitMatchRequest`, `approveMatchRequest`, `declineMatchRequest`, `cancelMatchRequest`, `manageMatchQueue`, `recordPayment`, `correctPayment`, `addFeedAnnouncement`, `editFeedAnnouncement`, `updateShuttles`, `validatePassword`, `enforcePasswordCooldown`, `readCompletedHistory`.
+`createSession`, `updateSession`, `publishSession`, `startSession`, `closeSession`, `completeSession`, `cancelSession`, `assignQueMaster`, `removeQueMaster`, `submitJoinRequest`, `withdrawRequest`, `approveRequest`, `declineRequest`, `joinWaitlist`, `promoteWaitlisted`, `confirmPromotion`, `cancelRegistration`, `requestWaitlistSwap`, `addWalkInPlayer`, `removeWalkInPlayer`, `markIAmIn`, `markIAmPrepared`, `changeLiveStatus`, `earlyExit`, `submitMatchRequest`, `approveMatchRequest`, `declineMatchRequest`, `cancelMatchRequest`, `manageMatchQueue`, `recordPayment`, `correctPayment`, `addFeedAnnouncement`, `editFeedAnnouncement`, `updateShuttles`, `validatePassword`, `enforcePasswordCooldown`, `readCompletedHistory`.
 
 Server validates all transitions in §31 and immutability after Completed.
 
@@ -1324,6 +1339,7 @@ Server validates all transitions in §31 and immutability after Completed.
 - Players see own payment info; not others'; markup/profit hosts only.
 - Feed records all field changes; notifications for high-impact events.
 - Completed sessions are permanently immutable.
+- Walk-in players: name-only, host-added, non-MMR sessions only; no account, notifications, or reviews.
 
 ### C. Conflict report
 
@@ -1353,6 +1369,114 @@ Listed in §37.
 - [x] Completed history, data-model and API responsibilities
 - [x] Automatic Queueing integration (see `automatic_queueing.md`)
 - [x] TBD items explicitly marked
+- [x] Walk-in (Guest) Players (§39)
+
+---
+
+## 39. Walk-in (Guest) Players
+
+A **Walk-in Player** (synonym: **Guest Player**) is a name-only participant with **no ROTRA account**. They allow a Que Master to add someone who walks into the venue and does not want to register, while still participating in the session queue and matches.
+
+> **Terminology:** See [`../00_ubiquitous_language.md`](../00_ubiquitous_language.md). Distinct from **Quick Umpire (Guest)** — walk-ins play; guest umpires score.
+
+### 39.1 Eligibility
+
+| Session type | Walk-ins allowed? |
+| ------------ | ----------------- |
+| **Friendly Que Session** | Yes |
+| **Club Que Session — Fun Games** | Yes |
+| **Club Que Session — MMR** | **No** — enforced server-side |
+
+Walk-ins are blocked in MMR sessions because EXP, MMR, Rate-and-Review, and skill-based matchmaking require registered profiles.
+
+### 39.2 Who may add walk-ins
+
+Only **Club Owner** or **assigned Que Master** may:
+
+- Add a walk-in player
+- Change a walk-in's attendance state
+- Record walk-in payments
+- Remove a walk-in from the session
+
+Walk-ins are added from the **Players** tab of the Que Master Console via **`+ ADD WALK-IN`**. See [`../../views/client_app/que_master/que_master_console.md`](../../views/client_app/que_master/que_master_console.md).
+
+### 39.3 Identity and data
+
+| Field | Rule |
+| ----- | ---- |
+| Display name | Required; 1–40 characters |
+| Uniqueness | **Not** enforced per session — two walk-ins may share the same name |
+| ROTRA profile | None — `player_id` is NULL; `is_guest = true`; `guest_name` stores the label |
+| Notifications | None |
+| Password authorization | Not applicable |
+| Rate-and-Review | Not applicable |
+| Skill Rating / EXP / MMR | Not applicable |
+| Platform history | None — ephemeral to the session |
+
+On creation:
+
+- `admission_status` → **Accepted** immediately (no Pending Approval or Waitlist flow unless session is at capacity — then add is rejected)
+- `player_status` → **Not Arrived** (default)
+- Walk-in **occupies a slot** the same as any Accepted registered player
+- `join_method` → `'app'` (host-initiated; no player self-join)
+
+### 39.4 Attendance management
+
+Walk-ins have **no app access**. They cannot self-declare:
+
+- **I Am In**
+- **I Am Prepared**
+- **Early Exit**
+
+The host controls **all** attendance transitions for walk-ins, including:
+
+- Setting **I Am In** on their behalf when they arrive
+- Setting **I Am Prepared** to make them rotation-eligible
+- Setting **Waiting**, **Resting**, **Eating**, **Suspended**
+- Initiating **Early Exit** (same payment-confirmation rules as registered players; see §7.3)
+
+### 39.5 Match participation
+
+- Walk-ins appear in the **Player Pool** when `player_status` is **I Am Prepared**, **Waiting**, or (host discretion) **Resting**
+- Walk-ins may be included in **manually built** matches (Add Match interface)
+- **Automatic Queueing** must **exclude** walk-ins — no skill data exists for candidate generation
+- Walk-ins appear by **display name** in match lineups, Match Queue cards, and court cards
+- Walk-ins **cannot** submit **Request a Match**
+- On `match_players` rows for guests: `review_submitted` is set to `true` at creation — guest slots never block match completion
+- `result` (win/loss) is still recorded for session-level display; it has no effect on platform statistics
+
+### 39.6 Payment
+
+- Walk-ins are **financially obligated** the same as Accepted registered players
+- Per-player cost calculation includes walk-ins in `accepted_player_count`
+- Host records payment via **Collections** tab: Unpaid / Partial / Paid
+- No receipt upload or e-wallet validation required (same as all players; see §22)
+
+### 39.7 Removal
+
+- Host may remove a walk-in at any time → `admission_status` **Removed**; slot released; waitlist promotion per §12
+- Removal is **blocked** while the walk-in is in an **active** match (`player_status = Playing`)
+- No password authorization to revoke
+
+### 39.8 Session Feed
+
+| Event | Feed entry |
+| ----- | ---------- |
+| Walk-in added | `[Actor] added walk-in player '[name]'` — `system_event` |
+| Walk-in removed | `[Actor] removed walk-in player '[name]'` — `system_event` |
+| Walk-in status change | Standard attendance change entry when applicable |
+
+Walk-in add/remove does **not** send push/in-app notifications (no recipient account).
+
+### 39.9 Privacy and Lobby display
+
+- Walk-ins appear in host roster views with a **WALK-IN** badge
+- Lobby identity visibility settings apply to walk-in display names the same as registered players
+- Walk-ins have no profile link, avatar, or public profile page
+
+### 39.10 Data model
+
+See [`../../database/03_queue_sessions.md`](../../database/03_queue_sessions.md) (`session_registrations.is_guest`, `guest_name`) and [`../../database/04_matches.md`](../../database/04_matches.md) (`match_players.is_guest`, `guest_name`).
 
 ---
 

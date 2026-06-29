@@ -260,6 +260,7 @@ Roster of all session participants. Shows arrival/payment status. QM can manage 
 
 ```
 │  Search players...  [ 🔍 ]           │
+│  [ + ADD WALK-IN ]                   │  ← secondary outline; hidden when session_type = mmr
 │  12 accepted  ·  2 waitlisted        │  ← Counts
 │                                      │
 │  ┌─────────────────────────────────┐ │
@@ -267,6 +268,10 @@ Roster of all session participants. Shows arrival/payment status. QM can manage 
 │  │      Waiting: 25 min            │ │  ← Wait time
 │  │      Fee: ₱120  ● PAID          │ │  ← Payment status
 │  │                          [ › ] │ │  ← Tap to expand
+│  └─────────────────────────────────┘ │
+│  ┌─────────────────────────────────┐ │
+│  │ [○] Marco  WALK-IN  I Am Prepared│ │  ← Walk-in row (no avatar)
+│  │      Fee: ₱120  ○ UNPAID        │ │
 │  └─────────────────────────────────┘ │
 │  ┌─────────────────────────────────┐ │
 │  │ [av] Maria Cruz   Playing       │ │
@@ -279,9 +284,43 @@ Roster of all session participants. Shows arrival/payment status. QM can manage 
 │  └─────────────────────────────────┘ │
 ```
 
+### Add Walk-in Button
+
+- Label: `+ ADD WALK-IN`
+- Placement: below search input, above count row
+- Style: secondary outline, 40px height; full-width on mobile
+- **Hidden** (not disabled) when `session_type = 'mmr'` or session origin is Club MMR
+- Tap → **Add Walk-in Player** modal
+
+### Add Walk-in Player Modal
+
+Triggered by `+ ADD WALK-IN`.
+
+```
+┌──────────────────────────────────────┐
+│  Add Walk-in Player                  │  ← text-title
+│                                      │
+│  Display name                        │
+│  ┌────────────────────────────────┐  │
+│  │  e.g. Marco                   │  │  ← text input, 1–40 chars, required
+│  └────────────────────────────────┘  │
+│  This player won't need an app.      │  ← text-small, color-text-secondary
+│  You'll manage their status.         │
+│                                      │
+│  [ CANCEL ]    [ ADD TO SESSION ]    │
+└──────────────────────────────────────┘
+```
+
+- Primary: `ADD TO SESSION` — `color-accent`; disabled until name is non-empty
+- Secondary: `Cancel` — outline
+- On success: modal closes; roster refreshes; Session Feed entry created
+- On capacity full: inline error — `Session is at capacity. Remove a player or increase slots.`
+- Server rejects MMR sessions even if UI is bypassed
+
 ### Player Row
 - Height: 72px
 - Avatar (36×36px, `radius-full`) + name (`text-body`, `color-text-primary`) + status badge
+- **Walk-in row:** placeholder icon (no avatar) + display name + `WALK-IN` pill (`color-bg-elevated`, `color-text-secondary`, `text-micro`)
 - Wait time: `text-small`, `color-text-secondary`
 - Payment badge:
   - `PAID` → `color-accent-subtle` bg, `color-accent` text
@@ -292,7 +331,8 @@ Roster of all session participants. Shows arrival/payment status. QM can manage 
   - Mark Paid
   - Mark Partial Payment → Mark Partial Payment modal
   - Early Exit → Early Exit confirm modal
-  - View Profile
+  - View Profile (**registered players only** — omitted for walk-ins)
+  - Remove walk-in (**walk-ins only**) → confirm modal; blocked if `Playing`
 
 **Waitlisted section:** separated by a divider + `WAITLISTED` section label
 

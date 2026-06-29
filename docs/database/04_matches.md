@@ -125,13 +125,19 @@ CREATE INDEX idx_matches_queue_position ON matches(session_id, queue_position);
 
 ## Table: `match_players`
 
-Junction table linking players to a match, recording which team they are on and the outcome.
+Junction table linking participants to a match, recording which team they are on and the outcome. Supports registered players (`player_id`) and walk-in guests (`is_guest`, `guest_name`).
+
+> **Walk-in players:** See [`../business_logic/client_app/08_queue_session.md`](../business_logic/client_app/08_queue_session.md) §39.
 
 ```sql
 CREATE TABLE match_players (
   id        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   match_id  uuid NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
-  player_id uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  player_id uuid REFERENCES profiles(id) ON DELETE CASCADE,  -- NULL when is_guest = true
+
+  -- Walk-in (guest) identity
+  is_guest   bool NOT NULL DEFAULT false,
+  guest_name text,  -- required when is_guest = true
 
   team   team_enum NOT NULL,
 
@@ -144,8 +150,18 @@ CREATE TABLE match_players (
 
   created_at timestamptz NOT NULL DEFAULT now(),
 
-  UNIQUE (match_id, player_id)
+  CONSTRAINT match_player_identity_check CHECK (
+    (is_guest = false AND player_id IS NOT NULL AND guest_name IS NULL)
+    OR
+    (is_guest = true  AND player_id IS NULL     AND guest_name IS NOT NULL)
+  )
 );
+```
+
+```sql
+CREATE UNIQUE INDEX idx_match_players_unique_registered
+  ON match_players(match_id, player_id)
+  WHERE is_guest = false;
 ```
 
 ### Notes
@@ -157,7 +173,8 @@ CREATE TABLE match_players (
   - Both teams same score → `'draw'` (edge case)
   - Match voided or no score submitted → `result` remains NULL; match `status = 'voided'`
 - `review_submitted` is set to `true` when the player submits their `match_reviews` row for this match. The trigger that checks completion condition reads this column.
-- Players can review all other players in the same match (cross-team). Each review is a separate row in `match_reviews`.
+- **Walk-in (guest) slots:** `review_submitted` is set to `true` at row creation — guest slots never block match completion. `result` is still recorded for session-level display; it has no effect on platform statistics, Skill Rating, EXP, or MMR.
+- Players can review all other players in the same match (cross-team). Each review is a separate row in `match_reviews`. Walk-ins do not submit or receive reviews.
 
 ### Indexes
 
