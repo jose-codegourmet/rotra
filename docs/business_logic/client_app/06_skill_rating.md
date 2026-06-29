@@ -4,7 +4,7 @@
 
 The Skill Rating is a **computed numeric score (1–5)** that reflects a player's actual skill level based on match observations and peer assessments. It is separate from the player's self-declared Playing Level, though both are displayed on the profile.
 
-**MMR** (competitive ladder / matchmaking rating) is **separate** from Skill Rating: MMR moves only on **club queue** sessions with **Schedule type = MMR (competitive)** (`08_queue_session.md`, `14_gamification.md`). Skill dimensions here still update from post-match reviews on **all** completed session types (player-organized, Fun Games, and MMR) when raters submit scores.
+**MMR** moves only on **Club Que Sessions** with **Session type = MMR** (`08_queue_session.md`, `14_gamification.md`). Skill dimensions still update from post-match reviews on **all** completed session types (Friendly Regular, Fun Games, and MMR) when raters submit scores.
 
 Skill ratings are **not a single catch-all number**. They are built from six grouped **Skill Dimensions**, each rated independently after a match. The overall 1–5 rating is the weighted average of those dimensions. This gives raters meaningful, observable criteria to evaluate — and gives players a detailed breakdown of where they excel and where they can improve.
 

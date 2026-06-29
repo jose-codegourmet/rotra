@@ -129,9 +129,9 @@ Full-screen scrollable page with persistent bottom navigation bar and a top head
   - Padding: `space-4`
   - Icon (24px stroke) + label (`text-small`, `color-text-primary`)
 - Tiles shown per role:
-  - **Player** (when member of at least one club): `+ Create session` (player-organized under chosen club)
-  - **Que Master**: `+ Create Session` (club queue: MMR or Fun), `Manage Queue`
-  - **Club Owner**: `+ Create Session` (club queue), `Pending Requests` (with badge count if > 0), `Club Stats`
+  - **Que Master**: `+ Create Session`, `Manage Match Queue`
+  - **Club Owner**: `+ Create Session`, `Pending Requests`, `Club Stats`
+- **`+ Create Session`** opens the Quick Session Sheet modal — see [`quick_session_sheet.md`](./quick_session_sheet.md) for fields, duration stepper, and live games-per-player estimate panel.
 
 ### Your Stats Strip
 - Single horizontal strip, no card

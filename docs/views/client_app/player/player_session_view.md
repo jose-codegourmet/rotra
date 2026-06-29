@@ -1,36 +1,68 @@
-# View: Player Session View
+# View: Player Session View (Lobby & Active Session)
 
 ## Purpose
-The in-session experience for Players. A read-only, real-time view of the active session — showing live court activity, queue order, and session standings. Players can also update their own attendance status from this view. All data syncs live via WebSocket.
+The Player-facing Que Session experience — the **Lobby** before the session starts and the read-only **Active Session** view during play. Shows live court activity, Match Queue order, Session Feed, and standings. Players update their own attendance status and may **Request a Match**. All data syncs live via WebSocket.
+
+> **Canonical rules:** [`../../../business_logic/client_app/08_queue_session.md`](../../../business_logic/client_app/08_queue_session.md) §8 Lobby, §16–17 Active Player experience.
 
 ## Route
-`/sessions/:id` (player-facing view) — authenticated players registered for this session
+`/sessions/:id` — authenticated players (and public preview per live-viewing rules)
+
+Que Masters and Club Owners managing the session use `/sessions/:id/manage` instead.
 
 ## Roles
-**Player** (standard view). **Que Masters** and **Club Owners** are redirected to the QM Console (`/sessions/:id/manage`).
+**Player** (standard view). **Public visitor** (limited preview when public live viewing enabled).
+
+---
+
+## Preconditions & Entry States
+
+| State | What the player sees |
+| ----- | -------------------- |
+| **Password required** | Password entry screen — title, date, club only until authorized |
+| **Lobby (Open, not Active)** | Full Lobby per admission state — join CTAs, capacity summary, Feed |
+| **Active Session** | Overview + Courts + Queue + Feed + Standings tabs |
+| **Completed / Cancelled** | Read-only history |
+
+### Admission badge (header)
+Pill below title when registered: `PENDING` · `ACCEPTED` · `WAITLISTED` · `DECLINED` · `REMOVED`
+
+Colors: Pending → `color-warning`; Accepted → `color-accent`; Waitlisted → `color-text-secondary`; Declined/Removed → `color-error`.
+
+### Password entry view
+Shown when session is password-protected and user not authorized.
+
+- Fields: password input, submit button
+- On cooldown: disabled submit + `Try again in [M:SS]`
+- On success: navigate to Lobby content
+- Visible before auth: session title, date, club name only
 
 ---
 
 ## Layout
-Full-screen page with header and a 3-tab navigation row below it. Tab content area is scrollable. Offline banner appears above tabs when connection is lost.
+
+**Lobby (Open):** scrollable single column — session identity, countdown, capacity summary, **session resources (games per player estimate)**, management team, shuttles (per visibility), own payment info, admission CTA, Feed preview.
+
+**Active Session:** full-screen with header and tab row.
 
 ```
 ┌──────────────────────────────────────┐
-│  ← Back       Session · Hall B       │  ← Header bar
-│                 Saturday, Mar 29     │
+│  ← Back       [Session Title]        │
+│  Saturday, Mar 29    [ACCEPTED]      │
 ├──────────────────────────────────────┤
-│  ⚠ OFFLINE – Reconnecting...         │  ← Offline banner (conditional)
+│  ⚠ OFFLINE – Reconnecting...         │
 ├──────────────────────────────────────┤
-│  My Status: [ WAITING ▾ ]            │  ← Player's own status selector
+│  My Status: [ WAITING ▾ ]            │  ← Active only
 ├──────────────────────────────────────┤
-│   COURTS    │    QUEUE    │ STANDINGS │  ← Tab bar
+│ OVERVIEW │ COURTS │ QUEUE │ FEED │ STANDINGS │
 ├──────────────────────────────────────┤
-│                                      │
 │  [Active tab content]                │
-│                                      │
+├──────────────────────────────────────┤
+│  [ Request a Match ]                 │  ← FAB when Active + eligible
 └──────────────────────────────────────┘
-│  [Home] [Clubs] [Sessions] [Profile] [🔔] │
 ```
+
+**Overview tab** = Lobby content adapted for Active session (Live badge instead of countdown).
 
 ---
 
@@ -39,10 +71,9 @@ Full-screen page with header and a 3-tab navigation row below it. Tab content ar
 ### Header Bar
 - Left: back arrow → `/clubs/:id/sessions`
 - Title: `[Session title]` or `Session · [Venue]` when no title (top line) + `[Day], [Date]` (subtitle line, `text-small`, `color-text-secondary`)
-- Right (live session at `/find-sessions/:id`): session action button — **role-dependent**:
-  - **Host** (`host_id` matches current player): `Close session` → typed-title confirmation modal (see below)
-  - **Joined player** (registered, not host): `Leave session` → early exit confirm modal (see below)
-- Right (legacy player view): session info icon (ⓘ) → shows cost breakdown modal on tap
+- Right: session action button — **role-dependent** (Active session only):
+  - **Joined player**: `Leave session` → Early Exit confirm modal
+- Right: `ⓘ` icon → **own** cost breakdown modal (player sees only their obligation; not others' payments)
 - Background: `color-bg-base`, border-bottom: 1px solid `color-border`
 - Height: 64px (taller than standard for two-line title)
 
@@ -67,14 +98,64 @@ Full-screen page with header and a 3-tab navigation row below it. Tab content ar
   - `Eating` → `color-bg-elevated`, `color-text-secondary`
   - `Exited` → `color-error` tint, `color-error`
 - Tap pill → bottom sheet with selectable statuses (only player-controllable ones: I Am In, I Am Prepared, Resting, Eating)
-- Playing/Waiting/Suspended/Exited are read-only (set by system or QM)
+- **I Am In** selection → confirmation modal (irreversible warning) before applying
+- Playing/Waiting/Suspended/Exited are read-only (set by system or host)
 
 ### Tab Bar
-- 3 tabs: **COURTS** · **QUEUE** · **STANDINGS**
-- `text-label` uppercase, 44px height
-- Active: `color-accent`, 2px bottom border
+- **Lobby (Open):** single scroll — no tab bar, or Feed as inline section
+- **Active:** 5 tabs: **OVERVIEW** · **COURTS** · **QUEUE** · **FEED** · **STANDINGS**
+- `text-label` uppercase, 44px height; horizontal scroll on narrow screens
+- Active tab: `color-accent`, 2px bottom border
 - Inactive: `color-text-disabled`
 - Background: `color-bg-surface`, border-bottom: 1px solid `color-border`
+
+### Session Resources Row
+
+Aggregate session planning info shown in the Lobby (Open) and Overview tab (Active). Canonical formula: [`08_queue_session.md`](../../../business_logic/client_app/08_queue_session.md) §9.5.
+
+**Visibility:** All users with authorized Lobby access (not host-only). Hidden when `numCourts`, session duration, or `totalSlots` is missing.
+
+**Content (when available):**
+
+- Number of courts
+- Scheduled duration (or remaining duration when Active)
+- **Estimated games per player:** `4–12 (typical ~8)`
+
+**Layout:**
+
+```
+│  ── Session Resources ───────────────  │
+│  2 courts  ·  2h  ·  16 slots        │
+│  Estimated games per player: 2–6     │
+│  (typical ~4)                        │
+│  Based on 10–30 min avg per game     │
+```
+
+- Courts / duration / slots: `text-small`, `color-text-secondary`
+- Games estimate range: `text-body`, `color-text-primary`
+- Typical label: `text-small`, `color-text-secondary` in parentheses
+- Footnote: `text-micro`, `color-text-disabled`
+
+**When Active:** recalculate using **remaining** scheduled duration (end time minus current time). Update in realtime as time elapses (no page refresh required).
+
+**Purpose:** Informational only. Does not guarantee minimum games or affect Automatic Queueing.
+
+---
+
+## Tab: Feed
+
+Chronological Session Feed entries — field changes, system events, host announcements.
+
+- Each entry: title, description, actor name, timestamp, `Edited` indicator when applicable
+- Tap entry with edit history → sheet showing prior versions (authorized viewers)
+- Empty: `No activity yet.`
+- Realtime: new entries append without refresh
+
+---
+
+## Tab: Overview (Active)
+
+Same content as Lobby adapted for Active session: Live badge, capacity/arrived counts, **session resources (games per player estimate using remaining duration)**, management team, shuttles, own payment status, Feed summary.
 
 ---
 
@@ -150,6 +231,47 @@ Ordered list of upcoming matches. Players can see where they are in the queue.
 
 ---
 
+## Automatic Match Display
+
+When the session enables **match explanation visibility** for Players, queued and upcoming automatic matches show a simplified card. Canonical rules: [`../../../business_logic/client_app/automatic_queueing.md`](../../../business_logic/client_app/automatic_queueing.md) §25.
+
+**Do not show:** Effective Strength values, Rating Confidence, internal suitability scores, risk penalties, or harmful labels.
+
+### Player-facing queue card (enhanced)
+
+```
+│  ┌────────────────────────────────┐  │
+│  │  #1 · Training Match           │  │  ← Mode tag (when enabled)
+│  │  YOU + Maria  vs  Jose + Ana   │  │
+│  │  Balanced · Est. wait: 5 min   │  │  ← Simplified intensity
+│  │  ─── Balanced ───              │  │  ← Simplified balance meter
+│  └────────────────────────────────┘  │
+```
+
+### Player-facing tags
+
+| Tag | When shown |
+| --- | ---------- |
+| Balanced | Normal / Balanced mode |
+| Training Match | Training Style |
+| Recovery Match | Fun / Relaxed recovery assignment |
+| High Intensity | Overload Training or hard carry |
+| Challenge Match | Elevated difficulty for Player |
+| Carry Match | Player is Carrier (respectful wording) |
+| Boss Fight | Optional marketing label for Overload (session setting) |
+| New Partner | First time paired with partner this session |
+| Longest Waiting | Player had highest queue fairness priority |
+
+### Balance meter (Player)
+
+Simplified three-zone meter with text label: `Balanced`, `Slight edge to Team A`, or `Slight edge to Team B`. Optional numeric `~50/50` when session permits — never imply certainty.
+
+### General reason (optional)
+
+When visibility = Summary: one-line reason, e.g. `Rotation fairness — you've waited the longest.`
+
+---
+
 ## Tab 3: Standings
 
 Session leaderboard. Updates live after each completed match.
@@ -198,24 +320,37 @@ Offline banner visible. Last-known state frozen. No interactions allowed that re
 
 ## Modals
 
-### Cost Breakdown Modal
-Triggered by tapping the ⓘ icon in the header.
+### My Cost Breakdown Modal
+Triggered by tapping the ⓘ icon in the header. Shows **only the current player's** estimated/final obligation.
 
-- Background: `color-bg-surface`, `radius-xl`, `shadow-modal`
-- Backdrop: `rgba(0,0,0,0.6)`
-- Title: `Session Cost Breakdown` — `text-title`, `color-text-primary`
-- Rows:
-  - Court cost: `₱[amount]` — `text-body`
-  - Shuttle cost: `[N] tubes × ₱[amount]` — `text-body`
-  - Markup: `₱[amount]` — `text-body`
-  - Divider
-  - Total: `₱[amount]` — `text-title`, `color-text-primary`, Bold
-  - Per player: `₱[amount] / [N] players` — `text-body`, `color-accent`
-- Note: `text-micro`, `color-text-disabled`: `Final amount may change as more shuttles are used.`
+- Title: `Your Session Cost`
+- Rows: court share, shuttle share (if shuttle-cost visibility on), markup line if included in player's amount
+- **Does not show:** other players' payment status, host markup/profit totals
+- Note: `Final amount may change as more shuttles are used.`
 - Close: `CLOSE` — secondary outline button, full-width
 
-### Close Session Confirm Modal (Host only)
-Triggered when the session host taps `Close session` on `/find-sessions/:id`.
+### I Am In Confirm Modal
+- Title: `Confirm Arrival`
+- Body: explains I Am In **cannot be undone** by the player
+- Actions: `Cancel` (secondary) · `I Am In` (primary, requires explicit tap)
+
+### Request a Match Dialog
+FAB or header action when Active and player is registered.
+
+- **Doubles:** requester fixed; pick 1 partner + 2 opponents from session roster
+- **Singles:** requester fixed; pick 1 opponent
+- May select players who are Playing, Waiting, Resting, Eating, Not Prepared, or Not Arrived
+- Submit → `Pending` request; duplicate lineup blocked
+- Player may cancel own request until match starts
+
+### Early Exit Confirm Modal
+Triggered when joined player taps `Leave session`.
+
+- Explains payment obligation and slot release rules
+- Actions: `Stay` · `Request Early Exit` → host confirms payment before exit completes
+
+### Close Session Confirm Modal (Host only — on manage route)
+Hosts use Que Master Console — not this view.
 
 - Title: `Close This Session?` — `text-title`, `color-text-primary`
 - Body: `Closing ends the session for all players. The queue will stop and no new matches can be assigned.` — `text-body`, `color-text-secondary`

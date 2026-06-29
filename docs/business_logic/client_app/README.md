@@ -27,7 +27,8 @@ The Client App is the primary user-facing product. It serves three types of user
 | [05_player_profile.md](./05_player_profile.md) | 5 | Profile fields, play style, gear showcase, statistics |
 | [06_skill_rating.md](./06_skill_rating.md) | 6 | Rating scale, source weights, submission window, anti-sandbagging |
 | [07_review_system.md](./07_review_system.md) | 7 | Review types, anonymity, moderation, match completion logic |
-| [08_queue_session.md](./08_queue_session.md) | 8 | Session origin (player vs club queue), MMR/Fun schedule type, setup, admission, queue flow, real-time sync |
+| [08_queue_session.md](./08_queue_session.md) | 8 | **Canonical** Que Sessions spec — lifecycle, Lobby, admission, waitlist, Feed, payments |
+| [automatic_queueing.md](./automatic_queueing.md) | — | **Canonical** Automatic Queueing — intelligent matchmaking engine, modes, scoring, Que Master controls |
 | [09_cost_system.md](./09_cost_system.md) | 9 | Cost inputs, per-player formula, payment tracking |
 | [10_leaderboard.md](./10_leaderboard.md) | 10 | Scopes, ranking criteria, data sources, display |
 | [11_tournament.md](./11_tournament.md) | 11 | Future tournament module — brackets, tiers, EXP multiplier |
@@ -75,7 +76,7 @@ Assigned by Club Owner
   → Create club queue session (Schedule type: MMR vs Fun Games; courts, cost, format)
     → Open session for player registration
       → Manage player statuses (arrival, readiness)
-        → Build and manage the match queue
+        → Build and manage the match queue (Manual Queueing and/or Automatic Queueing)
           → Assign umpires per match (→ Umpire App)
             → Track payments
               → Finalize matches and close session

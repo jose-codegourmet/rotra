@@ -1,5 +1,7 @@
 # View: Que Master Console
 
+> **Canonical host console spec:** This file mirrors [`../que_master/que_master_console.md`](../que_master/que_master_console.md). Club Owner has additional Que Master assignment and financial markup views per [`08_queue_session.md`](../../../business_logic/client_app/08_queue_session.md) §3.3, §21.
+
 ## Purpose
 The Que Master's active session management interface. Full control over courts, the match queue, player payments, and session lifecycle. This is the operational hub during a live session — designed for fast, one-handed interaction. All data is real-time via WebSocket.
 
@@ -196,7 +198,7 @@ Triggered by `SCORE OVERRIDE` on a court card.
 - Title: `Override Score for Court [N]` — `text-title`
 - Two options presented as radio cards:
   - **Override**: `Enter corrected score` — shows two number inputs (Team A / Team B), 56px height each
-  - **Void Match**: `Mark as unscored` — radio option, no inputs
+  - **Void Match**: `Void match` — radio option (reverses EXP/MMR per rules); never label "unscored"
 - Required: `Reason for override` — textarea, 150 char max
 - Note: `text-micro`, `color-text-disabled`: `This action is logged with your identity.`
 - Actions:

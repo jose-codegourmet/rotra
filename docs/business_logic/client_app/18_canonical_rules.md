@@ -121,17 +121,17 @@ RULE-053: Financial data in the statistics view is visible only to the Club Owne
 ## Sessions & competitive progression
 
 ```
-RULE-064: Any Player may create a player-organized queue session under a club they belong to.
-          Que Master or Club Owner creates club queue sessions and must set Schedule type:
-          MMR (competitive) or Fun Games (no points).
+RULE-064: Only a Club Owner or Que Master may create a Que Session (Club Que Session or Friendly Que Session).
+          Club Que Sessions require Session type: MMR (competitive) or Fun Games (no points).
+          Friendly Que Sessions are always Regular (no Session type setting).
 
-RULE-065: Player-organized sessions: matches are not ranked for progression; no EXP; no MMR change.
+RULE-065: Friendly Que Sessions: matches are not ranked for progression; no EXP; no MMR change.
           Session standings and match history still record wins/losses when scored.
           Post-match skill dimension ratings still apply when reviews are submitted (Skill Ratings section).
 
-RULE-066: Club queue — Fun Games: no EXP; no MMR change; matches and standings are recorded.
+RULE-066: Club Que Session — Fun Games: no EXP; no MMR change; matches and standings are recorded.
 
-RULE-067: Club queue — MMR (competitive): EXP and MMR may increase or decrease per match outcome;
+RULE-067: Club Que Session — MMR (competitive): EXP and MMR may increase or decrease per match outcome;
           matches count as ranked for progression. Asymmetric deltas for mixed-rank pairings
           are defined in product docs and are Admin-configurable (see 14_gamification.md §14.3).
 
@@ -163,20 +163,97 @@ RULE-074: Calibration status does not affect queue priority, session eligibility
 
 ---
 
-## Queue Sessions & Slots
+## Que Sessions & Slots
 
 ```
 RULE-013: Total session slots = players_per_court × number_of_courts.
           This is the maximum number of Accepted players.
 
 RULE-014: Players who register beyond the slot limit are automatically Waitlisted.
-          Waitlist order is FIFO by default; Que Master may reorder manually.
+          Session waitlist order is FIFO by default.
+          Promotion may be automatic (with player confirmation — timeout TBD) or manual by host.
+          Manual reorder of waitlist positions is TBD — see 08_queue_session.md §12.
 
-RULE-015: When an Accepted player's slot opens, the top Waitlisted player
-          is automatically promoted and notified. No manual step required for promotion.
+RULE-015: When an Accepted player's slot opens, the first eligible Waitlisted player
+          is promoted per FIFO rules and notified. See 08_queue_session.md §12.
 
-RULE-016: A player can only have one admission state per session:
-          Accepted, Waitlisted, or Reserved. States are mutually exclusive.
+RULE-016: A player can only have one admission state per session at a time.
+          Valid states: Not Registered, Pending Approval, Accepted, Waitlisted,
+          Declined, Withdrawn, Cancelled Registration, Removed, Reserved.
+          States are mutually exclusive. Pending Approval does not occupy a slot.
+
+RULE-075: Only a Club Owner or Que Master may create a Que Session.
+          A regular Player cannot create a Que Session.
+
+RULE-076: Every Que Session must remain manageable by the Club Owner and/or
+          at least one assigned Que Master. All assigned Que Masters have identical
+          session-management permissions. Only the Club Owner may add, remove,
+          or replace assigned Que Masters — including while the session is Active.
+
+RULE-077: A Que Session may transition to Cancelled from draft, open, or active.
+          Cancelled is terminal. Refunds are handled manually outside ROTRA.
+          See 08_queue_session.md §5.2.
+
+RULE-078: Free player registration cancellation cutoff is exactly 5 hours before
+          session start (default). Before cutoff: slot released, no payment obligation.
+          After cutoff but before I Am In: cancellation allowed but payment obligation
+          remains unless host confirms replacement/swap resolution.
+          See 08_queue_session.md §14.
+
+RULE-079: Password-protected Que Sessions must store password hashes only (never plaintext).
+          Failed password attempts after the first failure are rate-limited to one attempt
+          per 5 minutes, enforced by the authoritative backend.
+          Password authorization is per user per session and revoked on
+          registration cancel, request withdraw, or Early Exit.
+          See 08_queue_session.md §10.
+
+RULE-080: Request a Match creates a player proposal only.
+          It does not create an active match or bypass Match Queue order.
+          Only Que Master approval is required; approved requests follow normal queue placement.
+          See 08_queue_session.md §18.
+
+RULE-081: Every Que Session field change must create a Session Feed entry.
+          Manual host announcements are also recorded in the Feed.
+          See 08_queue_session.md §26.
+
+RULE-082: There is no automatic no-show deadline that removes Accepted players
+          or triggers waitlist promotion. Accepted players who have not marked I Am In
+          retain their slot and payment obligation until host manual action.
+          See 08_queue_session.md §15.
+
+RULE-083: I Am In is irreversible by the Player.
+          A confirmation modal is required before the state is applied.
+          Corrections require Que Master or Club Owner action per audit rules.
+          See 08_queue_session.md §7.1.
+```
+
+---
+
+## Automatic Queueing
+
+```
+RULE-084: Automatic Queueing generates candidate matches only.
+          It does not start a match without Que Master approval
+          unless Full Automatic Queueing is enabled in session settings.
+          See automatic_queueing.md §23.
+
+RULE-085: Hard eligibility rules cannot be overridden by Automatic Queueing.
+          A Player who is Playing, Exited, or Suspended cannot appear in a
+          generated candidate regardless of session settings or Que Master request.
+
+RULE-086: Repeated-match protection is advisory (soft rule).
+          Automatic Queueing reduces the Match Suitability Score for repeated
+          lineups but does not block approval. Que Master override is always allowed.
+          See automatic_queueing.md §21.
+
+RULE-087: A generated candidate match is invalidated when any included Player's
+          eligibility changes before approval. The system must re-validate
+          before queue placement and before match start.
+          See automatic_queueing.md §43.
+
+RULE-088: Voided matches do not affect Automatic Queueing form calculations
+          unless an explicit canonical exception is defined.
+          See automatic_queueing.md §6.3.
 ```
 
 ---
@@ -280,8 +357,10 @@ RULE-032: Early exit requires full session payment.
           The Que Master must confirm payment settlement before the slot is released.
           There is no pro-rated early exit fee — the player owes the full session amount.
 
-RULE-033: Payment status is visible only to Que Masters and Club Owners.
-          Players cannot see other players' payment status.
+RULE-033: Each player sees their own per-player cost breakdown and payment status.
+          Players cannot see other players' payment status, private markup, or profit information.
+          Markup and profit are visible only to Club Owner and assigned Que Masters.
+          See 08_queue_session.md §9.8, §21–22 and 09_cost_system.md §9.3.
 ```
 
 ---
@@ -306,8 +385,8 @@ RULE-036: A player who leaves or is removed from a club retains their historical
 ## Leaderboards & Rankings
 
 ```
-RULE-037: Only scored matches count toward leaderboard rankings.
-          Matches marked Unscored (no score submitted) are excluded entirely.
+RULE-037: Only scored, non-voided matches count toward leaderboard rankings.
+          Voided matches are excluded entirely. Do not use "Unscored" — use Voided.
 
 RULE-038: Leaderboard ranking criteria (in priority order):
           1. Wins (most wins = highest rank)

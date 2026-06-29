@@ -1,13 +1,17 @@
 # View: Que Master Console
 
 ## Purpose
-The Que Master's active session management interface. Full control over courts, the match queue, player payments, and session lifecycle. This is the operational hub during a live session — designed for fast, one-handed interaction. All data is real-time via WebSocket.
+The session host's management interface for an Active Que Session. Full control over courts, the Match Queue, **Automatic Queueing**, player roster, match requests, collections, financials, Session Feed, and session lifecycle. Designed for fast, one-handed interaction. All data is real-time via WebSocket.
+
+> **Canonical rules:** [`../../../business_logic/client_app/08_queue_session.md`](../../../business_logic/client_app/08_queue_session.md) §19 Session Host Interface.
 
 ## Route
-`/sessions/:id/manage` — Que Master and Club Owner only
+`/sessions/:id/manage` — assigned Que Masters and Club Owner only
 
 ## Roles
-**Que Master** (primary), **Club Owner** (read/manage access).
+**Que Master** (primary), **Club Owner** (full access + Que Master assignment).
+
+**Before Active:** same route shows Lobby management view (roster, pending requests, settings) with **Start Session** CTA.
 
 ---
 
@@ -33,9 +37,9 @@ Full-screen page with a top header and a 3-tab console below. Persistent offline
 ## Components
 
 ### Header Bar
-- Left: hamburger / session menu icon → opens a bottom sheet with: Edit Session, View Cost Summary, Announce to Players
-- Center: `[Venue] · [Day, Date]` — `text-body`, `color-text-primary` (venue) + `text-small`, `color-text-secondary` (date)
-- Right: `CLOSE SESSION` — destructive outline button (36px), `color-error` border + label — tap → Close Session + Cost Summary modal
+- Left: hamburger / session menu icon → bottom sheet: **Edit Session**, **Financials**, **Feed / Announce**, **Settings**
+- Center: `[Session title or Venue] · [Day, Date]`
+- Right: `CLOSE SESSION` — destructive outline → Close Session + Cost Summary modal
 - Background: `color-bg-base`
 - Height: 56px
 
@@ -43,11 +47,10 @@ Full-screen page with a top header and a 3-tab console below. Persistent offline
 Same spec as in Player Session View — `color-warning`, slides in from top on disconnect.
 
 ### Tab Bar
-- 3 tabs: **COURTS** · **QUEUE** · **PLAYERS**
-- `text-label` uppercase, 44px height
-- Active tab: `color-accent`, 2px bottom border
-- Inactive: `color-text-disabled`
-- Background: `color-bg-surface`, border-bottom: 1px solid `color-border`
+- **Active session:** **OVERVIEW** · **COURTS** · **QUEUE** · **PLAYERS** · **REQUESTS** · **COLLECTIONS** · **FEED**
+- **Financials** accessible via header menu (or Overview sub-panel) — markup/profit visible here
+- Desktop ≥1280px: Courts + Queue + Players visible simultaneously; Requests/Collections as side panels
+- `text-label` uppercase, 44px height; scrollable on mobile
 
 ---
 
@@ -134,6 +137,85 @@ Horizontally scrollable list of upcoming queued matches. Drag to reorder; swipe 
 
 ---
 
+## Automatic Queueing Panel
+
+Shown when **Automatic Queueing** is enabled on the session. Canonical rules: [`../../../business_logic/client_app/automatic_queueing.md`](../../../business_logic/client_app/automatic_queueing.md).
+
+**Placement:** Sticky panel above the Queue tab content, or dedicated sub-section within the **QUEUE** tab when a candidate is ready. On desktop, may appear as a right-side panel alongside the queue list.
+
+```
+│  ┌────────────────────────────────────────────────────────────┐
+│  │  AUTO MATCH — TRAINING STYLE          [ ⚙ Mode ▾ ]        │
+│  │  ────────────────────────────────────────────────────────  │
+│  │  TEAM A                    TEAM B                          │
+│  │  Advanced High + Beginner  Intermediate High + Inter. High │
+│  │                                                            │
+│  │  Predicted: 47% / 53%    Confidence: High                  │
+│  │  Suitability: 89 / 100   Intensity: High                   │
+│  │  Carrier burden: Acceptable   Variety: Excellent           │
+│  │                                                            │
+│  │  Team A Favored ─── Balanced ─── Team B Favored            │
+│  │                           ▲ 47/53                          │
+│  │                                                            │
+│  │  Why this match?                                           │
+│  │  • Jose has waited the longest.                            │
+│  │  • Anna is due for a developmental match.                  │
+│  │  • No partnership repeated from previous two matches.      │
+│  │                                                            │
+│  │  [ APPROVE ] [ REGENERATE ] [ ALTERNATIVES ] [ MANUAL ]    │
+│  └────────────────────────────────────────────────────────────┘
+```
+
+### Automatic Match Card
+
+| Element | Spec |
+| ------- | ---- |
+| Mode label | `AUTO MATCH — [MODE]` — `text-label`, uppercase; Training/Overload use `color-warning` tint |
+| Teams | Player names + temporary skill level chips; Effective Strength as subtle numeric badge (QM only) |
+| Predicted balance | `47% / 53%` — `text-body`; paired with confidence pill: High / Medium / Low |
+| Match Suitability Score | `89 / 100` — progress bar + numeric |
+| Intensity | Qualitative label: Low / Moderate / High |
+| Carrier burden | Acceptable / Elevated / Warning |
+| Player variety | Poor / Fair / Good / Excellent |
+| Warnings | Amber badges: Repetition, Low confidence, Carry burden, Fatigue, Queue starvation |
+| Balance meter | Horizontal scale with marker; text label required (not color-only) |
+| Explanation | Bulleted list — `text-small`, `color-text-secondary` |
+
+### Que Master actions
+
+| Action | Behavior |
+| ------ | -------- |
+| **Approve Match** | Validates freshness → adds to Match Queue (or marks approved if Assist mode) |
+| **Add to Match Queue** | Explicit queue placement after review |
+| **Regenerate** | New candidate; respects locked Players/teams |
+| **View Alternatives** | Bottom sheet or side panel with 3–5 ranked alternatives |
+| **Swap Player** | Inline picker from eligible Player Pool |
+| **Lock Player** | Pin Player in next regeneration |
+| **Lock Team** | Pin team pairing while searching opponents |
+| **Change Mode** | Next-match override selector |
+| **Override Warning** | Requires confirmation for high-risk overrides |
+| **Reject Candidate** | Discard with optional reason (audit) |
+| **Pause Automatic Queueing** | Session-level pause; Manual Queueing still available |
+| **Switch to Manual** | Opens Add Match interface |
+
+### UI states
+
+| State | Display |
+| ----- | ------- |
+| Disabled | Panel hidden; `+ ADD MATCH` only |
+| Paused | Banner: `Automatic Queueing paused` + Resume |
+| Generating | Skeleton card + `Finding best match…` |
+| Candidate ready | Full card (above) |
+| No quality candidate | `No ideal match available` + show best alternatives + compromise reasons |
+| Candidate stale | `Player status changed — review updated match` + Regenerate CTA |
+| Backend error | Error banner + retry |
+
+### Alternatives sheet
+
+Each alternative row: suitability score, teams, predicted balance, top warning, tap to preview full explanation. Primary action: **Use this match**.
+
+---
+
 ## Tab 3: Players
 
 Roster of all session participants. Shows arrival/payment status. QM can manage each player.
@@ -176,6 +258,56 @@ Roster of all session participants. Shows arrival/payment status. QM can manage 
 
 **Waitlisted section:** separated by a divider + `WAITLISTED` section label
 
+**Pending approval section:** when admission mode = approval required — approve/decline actions per row.
+
+**Club Owner only:** Que Master assignment chip row at top of Players or Settings tab.
+
+---
+
+## Tab: Requests
+
+Stacked list of player **Request a Match** proposals (newest first).
+
+- Row: requester, proposed lineup, format, status badge (`Pending`, `Approved`, etc.)
+- Actions per row: **Approve**, **Modify & Approve** (opens lineup editor), **Decline**
+- Repeated-lineup warning banner (advisory) when setting enabled
+- Approve → host places in Match Queue at chosen position (normal queue rules)
+- Empty: `No match requests yet.`
+
+---
+
+## Tab: Collections
+
+Fast payment tracking — one row per financially obligated player.
+
+- Columns: Player, Owed, Paid, Balance, Status, Method, Recorded by/time
+- Quick actions: **Mark Paid** (one tap + confirm), **Mark Unpaid**, **Record Partial**
+- Filter chips: All · Unpaid · Partial · Paid
+- Tap row → detail sheet with payment audit history
+- Cannot edit after session **Completed**
+
+---
+
+## Tab: Feed
+
+Session Feed management and history.
+
+- Chronological list (same as player view) plus **New Announcement** FAB
+- Announcement composer: title + rich-text body (sanitized)
+- Field-change entries: read-only facts; editable announcements show **Edited** + history
+- Hard delete: **TBD** — prefer edit with history
+
+---
+
+## Financials (menu / Overview panel)
+
+Host-only cost summary:
+
+- Court cost, planned/actual shuttle cost, other costs, markup
+- Estimated vs final totals, collected, outstanding, profit/markup line
+- **Not visible to regular Players**
+- Estimation formulas: display only — calculation **TBD**
+
 ---
 
 ## Modals
@@ -196,7 +328,7 @@ Triggered by `SCORE OVERRIDE` on a court card.
 - Title: `Override Score for Court [N]` — `text-title`
 - Two options presented as radio cards:
   - **Override**: `Enter corrected score` — shows two number inputs (Team A / Team B), 56px height each
-  - **Void Match**: `Mark as unscored` — radio option, no inputs
+  - **Void Match**: `Void match` — radio option (reverses EXP/MMR per rules); never label "unscored"
 - Required: `Reason for override` — textarea, 150 char max
 - Note: `text-micro`, `color-text-disabled`: `This action is logged with your identity.`
 - Actions:
