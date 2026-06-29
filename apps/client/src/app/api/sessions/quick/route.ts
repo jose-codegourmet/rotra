@@ -69,6 +69,9 @@ export async function POST(request: Request) {
 	const totalSlots = values.numCourts * playersPerCourt;
 
 	const dateTime = new Date(`${values.date}T${values.startTime}:00`);
+	const endTime = new Date(
+		dateTime.getTime() + values.durationHours * 60 * 60 * 1000,
+	);
 
 	try {
 		const session = await db.$transaction(async (tx) => {
@@ -87,6 +90,7 @@ export async function POST(request: Request) {
 					venueLng: geocoded?.lng ?? null,
 					venueAddress: geocoded?.formattedAddress ?? null,
 					dateTime,
+					endTime,
 					numCourts: values.numCourts,
 					playersPerCourt,
 					totalSlots,
