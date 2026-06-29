@@ -34,8 +34,9 @@ The base role. Every registered user is a Player.
 |--------|---------|
 | Join clubs | Yes |
 | Leave clubs | Yes |
-| Register for queue sessions | Yes |
-| Create **player-organized** queue sessions (under a club they belong to) | Yes |
+| Register for Que Sessions | Yes |
+| Join Que Sessions (admission, waitlist, Lobby) | Yes |
+| Create Que Sessions | **No** — Club Owner or Que Master only ([`08_queue_session.md`](./08_queue_session.md) §3) |
 | Participate in matches | Yes |
 | Submit post-match reviews and ratings | Yes |
 | View own stats and profile | Yes |
@@ -46,10 +47,10 @@ The base role. Every registered user is a Player.
 
 | Action | Blocked |
 |--------|---------|
-| Create **club queue** sessions with **Schedule type** (MMR vs Fun Games) | Yes — Que Master or Club Owner only (`08_queue_session.md`) |
-| Modify the queue or match order on sessions they do not host | Yes — session host only |
+| Create any Que Session (Club or Friendly) | Yes — Club Owner or Que Master only ([`08_queue_session.md`](./08_queue_session.md) §3) |
+| Modify the Match Queue or match order on sessions they do not host | Yes — session host only |
 | Rate players during a session (not post-match) | No — post-match window only |
-| Access payment or cost data | No — Que Master only |
+| Access other players' payment status or host markup/profit | No — see [`08_queue_session.md`](./08_queue_session.md) §9.8 (players see own cost only) |
 | Approve or reject club join requests | No — Club Owner only |
 
 ---
@@ -131,7 +132,8 @@ A session-level operator role, scoped strictly to the club they are assigned in.
 
 | Action | Details |
 |--------|---------|
-| Create and host **club queue** sessions | Full session setup including **Schedule type** (MMR vs Fun Games) |
+| Create and host **Club Que Sessions** | Full session setup including **Session type** (MMR vs Fun Games) |
+| Create and host **Friendly Que Sessions** | Informal sessions; always Regular |
 | Manage the match queue | Add, reorder, and delete queued matches |
 | Drag-reorder upcoming matches | Via the Queue View slider |
 | Set and update player statuses | All statuses except Exited (requires payment confirmation) |
@@ -217,8 +219,8 @@ A platform-level role with global authority. No club affiliation required.
 | Submit post-match reviews | ✓ | ✓ | ✓ | — | ✓ | — |
 | Score an assigned match (Umpire View) | — | — | — | ✓ | ✓ | — |
 | Rate players after umpiring | — | — | — | — | ✓ | — |
-| Create player-organized sessions | ✓ | ✓ | ✓ | — | — | — |
-| Create club queue sessions + set MMR / Fun schedule | — | ✓ | ✓ | — | — | — |
+| Create Que Sessions | — | ✓ | ✓ | — | — | — |
+| Set Session type (MMR / Fun Games) on Club Que Sessions | — | ✓ | ✓ | — | — | — |
 | Manage queue | — | ✓ | ✓ | — | — | — |
 | Rate players (session) | — | ✓ | ✓ | — | — | — |
 | Track payments | — | ✓ | ✓ | — | — | — |

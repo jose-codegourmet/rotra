@@ -4,6 +4,8 @@
 
 Notifications keep players, Que Masters, umpires, and Club Owners informed of relevant events without requiring them to have the app open. All notifications are in-app (push notifications where enabled). Email notifications are a future consideration.
 
+> **Canonical Que Session notification list:** See [`08_queue_session.md`](./08_queue_session.md) §27. Every session change appears in the Session Feed; the events below **also** trigger push/in-app notifications where listed.
+
 ---
 
 ## 15.1 Notification Categories
@@ -11,7 +13,7 @@ Notifications keep players, Que Masters, umpires, and Club Owners informed of re
 | Category | Audience | Timing |
 |----------|---------|--------|
 | Session reminders | Accepted players | Before session starts |
-| Session status changes | Registered players (Accepted + Waitlisted) | On postpone or cancellation |
+| Session status changes | Registered players (Pending + Accepted + Waitlisted) | On postpone, cancellation, or material field change |
 | In-session events | Players, Que Masters, Umpires | During active session |
 | Post-session | All session participants | After session ends |
 | Club events | Club members | As events occur |
@@ -31,18 +33,57 @@ Sent to all **Accepted** players before the session's configured start time.
 | 30 minutes before start | "Your session starts in 30 minutes. Head over to [venue]." | Accepted players |
 | 5 minutes before start | "Your session is about to start. Head to the court!" | Accepted players |
 | Session opens (start time) | "Your session at [venue] has started. Mark yourself as 'I Am In' when you arrive." | Accepted players |
-| Session postponed | "The session at [venue] on [original date/time] has been moved to [new date/time]. Your spot is still reserved." | All registered players (Accepted + Waitlisted) |
-| Session cancelled | "The session at [venue] on [date] has been cancelled by the host." | All registered players (Accepted + Waitlisted) |
+| Session postponed | "The session at [venue] on [original date/time] has been moved to [new date/time]. Your spot is still reserved." | All registered players (Pending + Accepted + Waitlisted) |
+| Session cancelled | "The session at [venue] on [date] has been cancelled by the host." | All registered players (Pending + Accepted + Waitlisted) |
+| Date change (while registered) | "The session at [venue] has been rescheduled to [new date]." | Pending + Accepted + Waitlisted |
+| Start time change | "The session at [venue] now starts at [new time]." | Pending + Accepted + Waitlisted |
+| Venue change | "The session at [venue] has moved to [new venue]." | Pending + Accepted + Waitlisted |
+| Slot reduction | "Session capacity at [venue] has been reduced. [Details if affected]." | Affected players + Pending + Accepted + Waitlisted |
+| Courts count change | "The number of courts for [venue] on [date] has changed to [N]." | Pending + Accepted + Waitlisted |
+| Allowed skill levels change | "Skill eligibility for [venue] on [date] has been updated." | Pending + Accepted + Waitlisted |
+| Player removed from session | "You have been removed from the session at [venue] on [date]." | Removed player |
 
 * Reminders are sent based on session start time, not when the player arrives
 * If a player exits (or is removed) before the session starts, their scheduled reminders are cancelled
 * If a session is postponed or cancelled, all pending pre-session reminders are cancelled and the relevant notice is sent immediately
+* **Postpone rules** (who may postpone, from which states): **TBD** — see [`08_queue_session.md`](./08_queue_session.md) §37
+* **Cancellation context:** Players who cancel their own registration after the 5-hour cutoff remain financially obligated; no automatic refund notification — see [`08_queue_session.md`](./08_queue_session.md) §14
+
+---
+
+## 15.2a Admission & Waitlist Notifications
+
+| Trigger | Recipient | Message |
+|---------|-----------|---------|
+| Join request submitted | Host(s) | "[Player] requested to join [session] at [venue]." |
+| Join request approved | Requesting player | "You're in! Your request for [venue] on [date] was approved." |
+| Join request declined | Requesting player | "Your request to join [venue] on [date] was not approved." |
+| Player moved to waitlist (approval while full) | Player | "You're on the waitlist for [venue] on [date]. We'll notify you if a spot opens." |
+| Waitlisted — asked to confirm slot | Waitlisted player | "A spot opened at [venue]! Confirm within [time] to secure your place." |
+| Waitlisted — promoted (manual) | Promoted player | "You're in! You've been accepted into the session at [venue]." |
+| Waitlist confirmation timeout | Player who timed out | "Your spot at [venue] was offered to the next player on the waitlist." |
+| Session becomes Active | Accepted (+ Waitlisted per live-view rules) | "Your session at [venue] is now live." |
+
+---
+
+## 15.2b Match Request Notifications
+
+| Trigger | Recipient | Message |
+|---------|-----------|---------|
+| Match request approved | Requesting player | "Your match request for [venue] was approved." |
+| Match request modified and approved | Requesting player | "Your match request was approved with lineup changes." |
+| Match request declined | Requesting player | "Your match request for [venue] was declined." |
+| Match request invalidated | Requesting player | "Your match request is no longer valid." |
+| Match request cancelled by player | Host(s) | "[Player] cancelled their match request." |
+| Player assigned to match (from request or queue) | Assigned players | "You're up next on Court [X]. Get ready!" |
+
+See [`08_queue_session.md`](./08_queue_session.md) §18.
 
 ---
 
 ## 15.3 In-Session Notifications
 
-Sent during an active queue session.
+Sent during an active Que Session.
 
 | Trigger | Recipient | Message |
 |---------|-----------|---------|
@@ -53,11 +94,15 @@ Sent during an active queue session.
 | Match ends (score submitted) | All match participants | "Your match is complete. Submit your review now." |
 | Match completed (all reviews in or finalized) | All match participants | "Match finalized. Check the leaderboard." |
 | Waitlisted player promoted to Accepted | Promoted player | "A spot opened up! You've been accepted into the session at [venue]." |
+| Waitlisted player asked to confirm (auto promotion) | Waitlisted player | "A spot opened at [venue]! Confirm within [time] to secure your place." |
 | Waitlisted player not promoted (session ended) | Waitlisted player | "The session at [venue] has ended. Unfortunately, a slot did not open up for you this time." |
+| Player removed from session | Removed player | "You have been removed from the session at [venue] on [date]." |
+| Payment status confirmed | Player | "Your payment for [venue] on [date] has been confirmed." |
+| Session Feed manual announcement | Players with Lobby access | "[Announcement title]: [preview]" |
 | Player's status set to Suspended | Suspended player | "Your participation has been temporarily suspended by the Que Master." |
 | Payment reminder — automatic (player has not paid and session is within 24 hours) | Unpaid player | "You have an outstanding fee for the session at [venue] on [date]. Please settle before the session." |
 | Payment reminder — manual (Que Master triggers) | Specific player | "Please settle your session fee for today's session at [venue]." |
-| No-show alert (Que Master's view only) | Que Master | "Player [name] has not checked in. Session started [X] minutes ago." |
+| No-show reminder (optional, host only) | Que Master | "Player [name] has not marked I Am In. Session started [X] minutes ago." |
 
 ---
 
@@ -88,7 +133,7 @@ Sent when club-level events occur.
 | Que Master role assigned | Assigned player | "You've been made a Que Master for [club name]. You can now host sessions." |
 | Que Master role revoked | Player | "Your Que Master role for [club name] has been removed." |
 | Removed from club | Removed player | "You have been removed from [club name]." |
-| New session created | Club members | "[Host name] has created a new session at [venue] on [date]. Join now." (host = player-organized creator, Que Master, or Club Owner) |
+| New session created | Club members | "[Host name] has created a new session at [venue] on [date]. Join now." (Club Owner or Que Master host) |
 
 ---
 

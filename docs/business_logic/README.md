@@ -7,7 +7,7 @@ This platform is split into **three separate applications**, each with a distinc
 ## The Three Apps
 
 ### 1. Client App — `client_app/`
-The primary user-facing product. Players join clubs, attend queue sessions, view their stats, and interact with their badminton community. Club Owners manage their clubs and members. Que Masters run sessions from setup to close.
+The primary user-facing product. Players join clubs, attend Que Sessions, view their stats, and interact with their badminton community. Club Owners manage their clubs and members. Que Masters run sessions from setup to close.
 
 **Primary users**: Players, Club Owners, Que Masters
 **Scope**: Everything a badminton player or club operator needs
@@ -42,7 +42,7 @@ A minimal, focused scoring interface. Opened via a one-time token/QR generated b
 |---------|-----------|-----------|------------|
 | Player registration & profile | ✓ | — | — |
 | Club creation & membership | ✓ | — | — |
-| Queue session management | ✓ | — | — |
+| Que Session management | ✓ | — | — |
 | Player view (courts / queue / standings) | ✓ | — | — |
 | Skill ratings & reviews | ✓ | — | — |
 | Leaderboards & gamification | ✓ | — | — |

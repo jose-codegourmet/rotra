@@ -2,7 +2,11 @@
 
 ## Purpose
 
-The post-login **Home** screen and primary session discovery surface. Players browse open and active queue sessions near their location on a full-screen map (default), or switch to List or Grid views. From here they can join a session, start a Quick Session, or resume an in-progress session if already in a queue.
+The post-login **Home** screen and primary **Que Session** discovery surface. Players browse open and active sessions near their location on a full-screen map (default), or switch to List or Grid views. From here they can join a session (Lobby) or resume an in-progress session.
+
+**Club Owners** and **Que Masters** may create sessions from here or club hubs. Regular Players cannot create Que Sessions.
+
+> **Canonical rules:** [`../../../business_logic/client_app/08_queue_session.md`](../../../business_logic/client_app/08_queue_session.md)
 
 **Inspiration:** Airbnb (map + list discovery, location search), Nomad Table (nearby activity pins).
 
@@ -14,7 +18,7 @@ The post-login **Home** screen and primary session discovery surface. Players br
 
 ## Roles
 
-All authenticated roles: **Player**, **Que Master**, **Club Owner**. Quick Session creates player-organized sessions; QM/Owner may also use club session setup for ranked schedules.
+All authenticated roles: **Player**, **Que Master**, **Club Owner**. **Create Session** CTA visible only to **Que Master** and **Club Owner**.
 
 ---
 
@@ -260,13 +264,13 @@ Opened via "See more" button in `VenuePinTooltip`.
 - **Hover:** Expand padding; background → `primary-container`; reveal chevron
 - **Guarded variant:** See Active Session Guard below
 
-### QuickSessionSheet
+### CreateSessionSheet (Que Master / Club Owner only)
 
-- existing `MobileDrawer` from bottom (mobile) or `Dialog` (desktop) — no `Sheet` primitive exists
-- Form fields: **session title** (required, max 80 chars), club (**optional** — `No club — casual` + user's clubs), venue (`VenuePicker` — search confirmed places or pin a new location), date (today or any future date), start time, courts, players per court, match format, score limit, visibility
-- A club is not required: users with no clubs can still create a clubless casual session. Clubless sessions are always `visibility = open`.
-- Submit label: `OPEN SESSION`
-- Subcopy: "Set up a casual session. A club is optional — either way, Quick Sessions are informal and earn no EXP or Rank."
+- Visible only when current user is Que Master or Club Owner
+- `MobileDrawer` from bottom (mobile) or `Dialog` (desktop)
+- Form fields: session title, club, origin (Club / Friendly), Session type (Club only), venue (`VenuePicker`), date, start time, courts, players per court, match format, score limit, visibility
+- Submit label: `PUBLISH SESSION` or `OPEN SESSION`
+- Subcopy: Friendly Que Sessions are Regular (no EXP/MMR). Club Que Sessions require Session type.
 
 ### ActiveSessionBanner
 
@@ -299,13 +303,13 @@ Shown when user in active session taps Join on a different session.
 
 - Map centered on user location
 - Pins for nearby `open` and `active` sessions with coordinates
-- Quick Session CTA visible bottom-left
+- **Create Session** CTA visible bottom-left (Que Master / Club Owner only)
 - No active banner
 
 ### In active session
 
 - Active Session Banner at top
-- Quick Session CTA becomes **RESUME SESSION**
+- **Create Session** CTA hidden; **RESUME SESSION** if applicable
 - Join on other sessions → blocking dialog
 - Map pins still visible for context
 
@@ -362,8 +366,8 @@ Shown when user in active session taps Join on a different session.
 | Select place suggestion | Both | Apply place; close dropdown; flyTo |
 | Type in Club search | Both | Filter venue pins by club name (debounced 300ms; no re-center) |
 | Tap location row (empty input) | Both | Re-request geolocation; re-center map |
-| Tap Quick Session | Both | Open sheet (or Resume if guarded) |
-| Submit Quick Session | Both | Create session; redirect to `/sessions/[id]` |
+| Tap Create Session | QM / CO only | Open create sheet |
+| Submit new session | QM / CO only | Create session; redirect to `/sessions/[id]` |
 
 ---
 
@@ -406,7 +410,7 @@ Follow **No-Line rule:** no 1px list dividers; use spacing and tonal backgrounds
 |----------|---------|
 | `GET /api/sessions/discover` | Nearby sessions |
 | `GET /api/sessions/active` | Current user's active registration |
-| `POST /api/sessions/quick` | Create player-organized session |
+| `POST /api/sessions` | Create Que Session (Club Owner or Que Master only) |
 | `GET /api/places/search` | Typeahead search for confirmed places (Phase 4a) |
 | `POST /api/places/submit` | Player submits a new unreviewed place (Phase 4a) |
 

@@ -1,7 +1,7 @@
 # View: Session List
 
 ## Purpose
-Lists all queue sessions under a specific club. Players browse and register for upcoming sessions here. Each session card shows its date, venue, slot availability, status, and the player's registration status. This is the primary entry point to joining or viewing a session.
+Lists all **Que Sessions** under a specific club. Players browse and register via the Lobby. **Que Masters** and **Club Owners** see **Create session** to publish new sessions.
 
 ## Route
 `/clubs/:id/sessions` — authenticated users (club members only for private sessions; public for open sessions)
@@ -12,7 +12,7 @@ All authenticated roles: **Player**, **Que Master**, **Club Owner**.
 ---
 
 ## Layout
-Full-screen scrollable page with header. Content: filter tabs at top, vertical list of session cards. **All club members** (including **Players**) see a floating `+` (or desktop **Create session**) to start a new session: **Players** create **player-organized** sessions; **Que Masters** and **Club Owners** create **club queue** sessions (MMR vs Fun Games). Session cards may show a compact badge for **Informal**, **Fun**, or **MMR** when useful for discovery.
+Full-screen scrollable page with header. Filter tabs + session cards. **Create session** FAB: **Que Master** and **Club Owner** only. Badges: **Regular** (Friendly), **Fun Games**, **MMR**.
 
 ```
 ┌──────────────────────────────────────┐
@@ -98,7 +98,7 @@ Full-screen scrollable page with header. Content: filter tabs at top, vertical l
 **Cost + format row:**
 - `₱[amount]/player · Doubles / Singles` — `text-small`, `color-text-secondary`
 - If cost not set: format only
-- Optional pill: **Informal** / **Fun** / **MMR** — `text-label`, muted or accent tint by type (MMR = competitive emphasis)
+- Optional pill: **Regular** / **Fun Games** / **MMR**
 
 **CTA (conditional — only on upcoming/open sessions, not active member):**
 - `REGISTER` — Primary button, 36px height, right-aligned
@@ -110,7 +110,7 @@ Full-screen scrollable page with header. Content: filter tabs at top, vertical l
 - Circular FAB, 56×56px, `color-accent` background, `color-bg-base` `+` icon (24px)
 - `shadow-accent`
 - Fixed bottom-right, above bottom nav bar + `space-6` margin
-- Tap → session setup flow: **Player** → player-organized create (no Schedule type); **Que Master / Club Owner** → club queue create (Schedule type **MMR** vs **Fun Games**). Implementation may use one route with role-gated fields or separate paths (`business_logic/client_app/08_queue_session.md`).
+- Tap → `/sessions/new` (Que Master / Club Owner only). See [`08_queue_session.md`](../../../business_logic/client_app/08_queue_session.md).
 
 ---
 

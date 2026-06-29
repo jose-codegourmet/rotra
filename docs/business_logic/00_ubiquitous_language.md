@@ -107,10 +107,12 @@ A Club Owner of Club A holds **no elevated privileges** in Club B unless separat
 
 A **Que Session** (synonym: **Que Schedule**) is the core operational unit. Two variants by **origin** (who created it):
 
-| Origin                   | Created by                              | Session type options                                             | EXP / MMR                      |
-| ------------------------ | --------------------------------------- | ---------------------------------------------------------------- | ------------------------------ |
-| **Club Que Session**     | Que Master or Club Owner of that club   | **Required:** `MMR` (competitive) **or** `Fun Games` (no points) | EXP and MMR move only on `MMR` |
-| **Friendly Que Session** | Any Player who is a member of that club | Always **Regular** (no setting exposed)                          | **Never** — no EXP, no MMR     |
+| Origin                   | Created by                            | Session type options                                             | EXP / MMR                      |
+| ------------------------ | ------------------------------------- | ---------------------------------------------------------------- | ------------------------------ |
+| **Club Que Session**     | Que Master or Club Owner of that club | **Required:** `MMR` (competitive) **or** `Fun Games` (no points) | EXP and MMR move only on `MMR` |
+| **Friendly Que Session** | Que Master or Club Owner of that club | Always **Regular** (no setting exposed)                          | **Never** — no EXP, no MMR     |
+
+> **Creation rule (2026-06):** Only a **Club Owner** or **Que Master** may create any Que Session. A regular **Player** cannot create a Que Session. See [`client_app/08_queue_session.md`](./client_app/08_queue_session.md) §3.
 
 **"Que Session" used alone** is valid and means "either variant" (umbrella). Use the explicit prefix when the origin matters.
 
@@ -148,9 +150,22 @@ When multiple Que Masters co-manage a Club Que Session, all of them act as host 
 
 ```text
 Draft → Open → Active → Closed → Completed
+                ↘
+              Cancelled   (terminal; session will not proceed)
 ```
 
-See [`client_app/08_queue_session.md`](./client_app/08_queue_session.md) §8.1 for state-by-state actor permissions.
+`Cancelled` may also be reached from `Draft` or `Open`. See [`client_app/08_queue_session.md`](./client_app/08_queue_session.md) §5 for state-by-state actor permissions, triggers, and immutability rules.
+
+### Schedule context (timing classification)
+
+Separate from **session origin** and **session type**:
+
+| Classification | Meaning |
+| -------------- | ------- |
+| **Regular club schedule** | A recurring or planned club session tied to the club's normal programming |
+| **Quick session** | A one-time or ad-hoc session created outside a fixed recurring schedule |
+
+This is a display and organization concept — not a substitute for session origin or session type.
 
 ### Session visibility
 
@@ -339,13 +354,19 @@ Club setting (`clubs.auto_approve`). When **ON**, join requests via Invite Link 
 
 A player in an active Que Session is described by **two independent states** at once:
 
-**Admission state** — _"Am I in this session at all?"_
+**Admission state** — _"Am I in this session at all?"_ (distinct from attendance / player status)
 
-| State          | Meaning                                         |
-| -------------- | ----------------------------------------------- |
-| **Accepted**   | Within capacity; confirmed seat                 |
-| **Waitlisted** | Over capacity; FIFO promotion when a slot opens |
-| **Reserved**   | Slot held manually by the Que Master            |
+| State                      | Meaning                                                                 |
+| -------------------------- | ----------------------------------------------------------------------- |
+| **Not Registered**         | No join request or registration exists for this player                  |
+| **Pending Approval**       | Join request submitted; awaiting Club Owner or Que Master decision      |
+| **Accepted**               | Within capacity; confirmed seat (occupies a slot)                       |
+| **Waitlisted**             | Over capacity or promoted to waitlist; FIFO promotion when a slot opens |
+| **Declined**               | Join request rejected by host                                           |
+| **Withdrawn**              | Player withdrew a pending request                                       |
+| **Cancelled Registration** | Player cancelled their accepted registration                            |
+| **Removed**                | Host removed the player from the session                                |
+| **Reserved**               | Slot held manually by the Que Master (legacy / host-held slot)          |
 
 **Player status** (a.k.a. **player session status**) — _"What am I doing right now?"_
 
@@ -368,7 +389,45 @@ Only `I Am Prepared`, `Waiting`, and (optionally) `Resting` are **rotation-eligi
 | **"Match nearing end"**    | The notification fired by Smart Monitoring at the threshold (default 90%).                                                                                                                                                      |
 | **"Match point"**          | Secondary alert at one point from match-completing score.                                                                                                                                                                       |
 | **Average match duration** | Rolling average of completed match durations in the current session, used to estimate wait times.                                                                                                                               |
-| **Estimated wait time**    | `matches_ahead × average_match_duration`.                                                                                                                                                                                       |
+| **Estimated wait time**    | Display estimate when available; calculation method **TBD** for Que Session Lobby (see [`client_app/08_queue_session.md`](./client_app/08_queue_session.md)).                                                                    |
+| **Lobby**                  | The main Player-facing Que Session detail view before and during a session. Before **Active**, it is the primary entry point. When **Active**, it remains available as the **Overview** tab. See [`client_app/08_queue_session.md`](./client_app/08_queue_session.md) §8. |
+| **Session Feed**           | The per-session activity stream visible from the Lobby and Active Session Overview. Records field changes, system events, and manual host announcements. See [`client_app/08_queue_session.md`](./client_app/08_queue_session.md) §25. |
+| **Request a Match**        | A Player-facing action that proposes a lineup to the Que Master. Does not create an active match or bypass the Match Queue. See [`client_app/08_queue_session.md`](./client_app/08_queue_session.md) §17. |
+| **Early Exit**             | The required workflow for leaving a session after marking **I Am In**. Replaces ordinary registration cancellation. |
+| **I Am In**                | Player self-declaration of physical arrival at the venue. Irreversible by the Player; requires confirmation modal. |
+| **I Am Prepared**          | Player self-declaration of readiness for Match Queue rotation after **I Am In**. |
+| **Automatic Queueing**     | ROTRA's intelligent matchmaking engine. Generates **candidate matches** for Que Master review or automatic Match Queue placement. Distinct from Manual Queueing and from sorting by rank or wait time alone. See [`client_app/automatic_queueing.md`](./client_app/automatic_queueing.md). |
+| **Manual Queueing**        | Que Master builds or modifies matches without Automatic Queueing. Always available. |
+| **Matchmaking mode**       | One of: Fun / Relaxed, Normal / Balanced, Training Style, Overload Training. Selected per session or overridden for the next match. |
+| **Candidate match**        | A generated lineup with teams, scores, warnings, and explanation — not yet approved or in the Match Queue. Synonym: **Proposed match**. |
+| **Effective Strength**     | Estimated Player strength **for the next match**. Combines base rating with temporary adjustments. Not permanent MMR, Skill Rating, or Tier. |
+| **Rating Confidence**      | How reliable ROTRA considers a Player's strength estimate. Not a strength bonus. |
+| **Challenge Index**        | Temporary target (0–10) for how difficult the Player's next match should be. Not Player skill. |
+| **Queue Priority**         | How urgently a Player needs a match. Separate from skill, strength, EXP, and Tier. |
+| **Fatigue and Readiness**  | Whether a Player should be selected for the next match now. |
+| **Match Suitability Score**| Overall quality score (0–100) for a candidate under the selected matchmaking mode. |
+| **Carrier**                | The stronger Player in a Training Style or Overload Training matchup. |
+| **Development Player**     | The lower-ranked partner in a Training Style matchup. |
+| **Carry burden**           | How often a Player has been expected to carry weaker partners. |
+| **Repeated-match warning** | Advisory alert when a lineup repeats recent partnerships or opponents. Does not block approval. |
+| **Predicted win probability** | Estimated chance each team wins (e.g. 52% / 48%). |
+| **Current Session Form**   | Performance adjustment within the active Que Session. |
+| **Recent Form**            | Performance adjustment across recent valid matches (expected vs actual). |
+| **Match Difficulty History** | Per-Player record of how difficult recent matches were for that individual. |
+
+### Temporary session skill eligibility (transitional)
+
+Until the dedicated ROTRA tiers / MMR / Skill Rating eligibility module ships, Que Sessions use **temporary assigned skill levels** for join gating:
+
+`Beginner Low`, `Beginner Mid`, `Beginner High`, `Intermediate Low`, `Intermediate Mid`, `Intermediate High`, `Advanced Low`, `Advanced Mid`, `Advanced High`, `Professional`
+
+| Rule | Detail |
+| ---- | ------ |
+| Assignment | Assigned by a Que Master — not self-declared by the Player for this feature |
+| Allowed levels | Host may select any combination of levels for a session (not limited to one level or a single range) |
+| Ineligible players | May still submit a request but require manual Que Master approval |
+
+**Do not** call these values MMR, Skill Rating, ROTRA Tier, or competitive rank. They are temporary session eligibility classifications. See [`client_app/08_queue_session.md`](./client_app/08_queue_session.md) §13.
 
 ---
 
@@ -590,6 +649,7 @@ Naming patterns used for screen / view types:
 | **Discovery** | _Club Discovery_                | A search/explore surface for finding things.                                  |
 | **Ledger**    | _EXP Ledger_                    | An append-only transaction log (player can review their history).             |
 | **List**      | _Session List_                  | A simple enumeration view.                                                    |
+| **Lobby**     | _Que Session Lobby_             | Main Player-facing Que Session detail view; becomes **Overview** tab when Active. |
 | **Profile**   | _Own Profile_, _Player Profile_ | "Own" = first-person view, "Player" = third-person public view of any player. |
 | **Setup**     | _Session Setup_                 | A configuration / wizard surface.                                             |
 | **Approvals** | _Approvals (Admin)_             | Admin queue for pending approvals.                                            |
@@ -727,6 +787,12 @@ These terms appeared in earlier docs or specs. Don't use them in new writing —
 | Que Schedule used as if distinct from Que Session | (no replacement — they're synonyms)                             | Either word is fine; both refer to the same `queue_sessions` row.                                                   |
 | Review used to mean a numeric star rating         | **Rating**                                                      | Rating = stars. Review = written text. They're different things in the same form.                                   |
 | Review used to mean the whole submission          | **Rate and Review** (the action) or **Submission** (the record) | "Review" is reserved for the written-text part.                                                                     |
+| **Queue Session**                                 | **Que Session**                                                 | Brand spelling — use **Que** for ROTRA session terminology                                                          |
+| **Attended** (generic)                            | Specific attendance state (**I Am In**, **I Am Prepared**, etc.) | One generic value must not represent all in-session conditions                                                      |
+| **Ranked Match** (as session type label)          | **Club Que Session — MMR** or **Session type = MMR**            | Use canonical session type naming                                                                                   |
+| **Queue** used interchangeably with **Que**       | **Match Queue** (upcoming matches) or **Que Session** (the session) | "Que" is the brand prefix; "Queue" names the ordered match list only                                               |
+| **Auto queue** / **smart queue**                  | **Automatic Queueing**                                          | Canonical feature name                                                                                              |
+| **Unfair Training Style**                         | **Overload Training**                                           | Canonical matchmaking mode name                                                                                     |
 
 ---
 
@@ -742,6 +808,8 @@ Items still pending after the 2026-04-27 interview pass.
 | **Tournament wins last year**       | The schema has `tournament_wins_last_year` (`'none'` / `'1_to_3'` / `'4_plus'`) — confirm this is intentional self-reported gating with no verification path.                                                                         |
 | **Substitution review weighting**   | When a Substitution happens in a Friendly / Fun Games match, do the substitute and substituted player both rate each other / get rated? Or only the players who finished the match?                                                   |
 | **Review window length**            | The glossary documents a 24h Rate-and-Review window after Finalize. Confirm this is the actual product rule (not inferred).                                                                                                           |
+| **Automatic Queueing tuning constants** | Weights, thresholds, and probability ranges in [`client_app/automatic_queueing.md`](./client_app/automatic_queueing.md) §41 are recommended defaults — final values await product approval.                                      |
+| **Adaptive Mode**                   | Future Automatic Queueing extension documented in `automatic_queueing.md` §42 — not required for initial implementation.                                                                                                              |
 
 ### Resolved on 2026-04-27 (paper trail)
 
