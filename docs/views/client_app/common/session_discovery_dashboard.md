@@ -257,12 +257,19 @@ Opened via "See more" button in `VenuePinTooltip`.
 
 - **Position:** `absolute bottom-10 left-10 z-30`
 - **Shape:** `rounded-full` pill
-- **Left icon:** 56px gradient circle (`from-primary to-primary-container`) with `+`
-- **Labels:**
-  - `SCHEDULE SESSION` — micro uppercase, `text-primary-container`
-  - `START QUICK SESSION` — `text-sm font-black`
+- **Variants** (mutually exclusive — see § Active-Session Guard — Date/Time Gate):
+
+| Variant | When | Icon | Micro label | Main label |
+|---------|------|------|-------------|------------|
+| `create` | No enrolled session | `Plus` | `SCHEDULE SESSION` | `START QUICK SESSION` |
+| `scheduled` | Enrolled in future `open` session (`dateTime > now`) | `Calendar` | `UPCOMING SESSION` | `VIEW SESSION` |
+| `resume` | Enrolled in **current** session (see gate below) | `Play` | `ACTIVE SESSION` | `RESUME SESSION` |
+
+- **`create`:** 56px gradient circle (`from-primary to-primary-container`) with `+`; opens `QuickSessionSheet`
+- **`scheduled`:** Muted accent styling (no pulsing glow); tap → `/find-sessions/[id]`
+- **`resume`:** Accent glow; tap → `/find-sessions/[id]`
 - **Hover:** Expand padding; background → `primary-container`; reveal chevron
-- **Guarded variant:** See Active Session Guard below
+- **Guard:** Cannot open `create` while user has any enrolled session (`current` or `scheduled`)
 
 ### CreateSessionSheet (Que Master / Club Owner only)
 
@@ -274,17 +281,42 @@ Opened via "See more" button in `VenuePinTooltip`.
 
 ### ActiveSessionBanner
 
-Visible when user has active registration in `open` or `active` session.
+Visible **only** when the user has a **current** enrolled session (see § Active-Session Guard — Date/Time Gate). Not shown for **scheduled** (future) enrollments.
 
 | Element | Spec |
 |---------|------|
 | Background | `primary-container/10` |
 | Left stripe | 3px `primary-container` |
 | Live dot | 8px pulse, `primary-container` |
-| Label | `LIVE` (active) or `IN QUEUE` (open) — uppercase micro |
+| Label | `LIVE` (DB `active`) or `IN QUEUE` (DB `open` + `dateTime <= now`) — uppercase micro |
 | Body | Club name + optional court hint |
 | CTA | `VIEW SESSION →` — `text-label text-accent` |
-| Tap | Entire banner → `/sessions/[id]` |
+| Tap | Entire banner → `/find-sessions/[id]` |
+
+### Active-Session Guard — Date/Time Gate
+
+A user may be **enrolled** in a session (registration exists) without being **in session** for dashboard UI purposes. Enrollment and "current session" are separate concepts.
+
+| Sub-state | Criteria | Dashboard UI |
+|-----------|----------|--------------|
+| **`current`** | DB status `active`, **or** DB status `open` with `dateTime <= now` | `ActiveSessionBanner` + `QuickSessionButton` `resume` variant |
+| **`scheduled`** | DB status `open` with `dateTime > now` | `QuickSessionButton` `scheduled` variant only — no banner, no LIVE strip |
+| **none** | No qualifying enrollment | `QuickSessionButton` `create` variant |
+
+**Why:** Creating a Quick Session enrolls the host immediately (`accepted` / `not_arrived`) but the session may be scheduled for a future time. The host must not see "ACTIVE SESSION" or LIVE indicators until the scheduled start time arrives or the host explicitly starts the session (DB → `active`).
+
+**`GET /api/sessions/active` response:**
+
+```json
+{
+  "current": { "...ActiveSessionSummary" } | null,
+  "scheduled": { "...ActiveSessionSummary" } | null
+}
+```
+
+**Selection priority** (when multiple enrollments match): prefer DB `active` over `open`; prefer higher `player_status` priority (`playing` → `waiting` → `i_am_in` → … → `not_arrived`); prefer most recent `dateTime`. Apply the date/time gate **after** selecting the best enrollment to assign `current` vs `scheduled`.
+
+**Join guard:** `AlreadyInSessionDialog` blocks joining a different session when the user has **either** `current` or `scheduled` enrollment (enrollment exists regardless of timing).
 
 ### AlreadyInSessionDialog
 
@@ -306,11 +338,19 @@ Shown when user in active session taps Join on a different session.
 - **Create Session** CTA visible bottom-left (Que Master / Club Owner only)
 - No active banner
 
-### In active session
+### In current session
 
 - Active Session Banner at top
-- **Create Session** CTA hidden; **RESUME SESSION** if applicable
+- **Create Session** CTA hidden; **RESUME SESSION** (`resume` variant)
 - Join on other sessions → blocking dialog
+- Map pins still visible for context
+
+### Enrolled in scheduled (future) session
+
+- No Active Session Banner
+- **QuickSessionButton** shows `scheduled` variant (`UPCOMING SESSION` / `VIEW SESSION`)
+- **Create Session** CTA hidden (already enrolled)
+- Join on other sessions → blocking dialog (`AlreadyInSessionDialog`)
 - Map pins still visible for context
 
 ### Geolocation denied
@@ -409,7 +449,7 @@ Follow **No-Line rule:** no 1px list dividers; use spacing and tonal backgrounds
 | Endpoint | Purpose |
 |----------|---------|
 | `GET /api/sessions/discover` | Nearby sessions |
-| `GET /api/sessions/active` | Current user's active registration |
+| `GET /api/sessions/active` | Current user's enrolled session split into `current` and `scheduled` (date/time gate) |
 | `POST /api/sessions` | Create Que Session (Club Owner or Que Master only) |
 | `GET /api/places/search` | Typeahead search for confirmed places (Phase 4a) |
 | `POST /api/places/submit` | Player submits a new unreviewed place (Phase 4a) |
@@ -421,7 +461,7 @@ Follow **No-Line rule:** no 1px list dividers; use spacing and tonal backgrounds
 ## References
 
 - Master plan: [`PLAN_session_discovery_dashboard.md`](../../../PLAN_session_discovery_dashboard.md)
-- Phase plans at repo root: `PLAN_phase_0`, `PLAN_phase_1a`/`1b`/`1c`, `PLAN_phase_2`, `PLAN_phase_3`, `PLAN_phase_4`
+- Phase plans at repo root: [`PLAN_qm_session_active_state.md`](../../../PLAN_qm_session_active_state.md) (master), `PLAN_phase_0_qm_session_docs` through `PLAN_phase_7_qm_live_chrome`
 - Business rules: [`docs/business_logic/client_app/08_queue_session.md`](../../../business_logic/client_app/08_queue_session.md)
 - Maps tech: [`docs/techstack/04_tech_stack_reference.md §3.10`](../../../techstack/04_tech_stack_reference.md#310-maps--geolocation)
 - DB fields: [`docs/database/03_queue_sessions.md`](../../../database/03_queue_sessions.md)

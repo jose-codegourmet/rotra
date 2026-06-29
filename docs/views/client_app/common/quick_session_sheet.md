@@ -133,7 +133,26 @@ Uses §9.5 formula with:
 | Action | Result |
 | ------ | ------ |
 | Cancel | Close dialog; discard unsaved values |
-| Open Session | Validate → create session → status `open` → close dialog |
+| Open Session | Validate → create session → status `open` → close dialog → redirect to `/find-sessions/[id]` |
+
+---
+
+## Post-submission dashboard state
+
+After **Open Session**:
+
+1. Session is created with DB status `open`.
+2. Creator is auto-enrolled (`admission_status: accepted`, `player_status: not_arrived`).
+3. User is redirected to the session Lobby at `/find-sessions/[id]`.
+
+**Dashboard indicators depend on scheduled time:**
+
+| `dateTime` vs now | Dashboard on return to `/dashboard` |
+| ----------------- | ----------------------------------- |
+| Future (`dateTime > now`) | `QuickSessionButton` **`scheduled`** variant (`UPCOMING SESSION` / `VIEW SESSION`). No Active Session Banner. No LIVE navbar strip. |
+| Past or now (`dateTime <= now`) | `QuickSessionButton` **`resume`** variant + Active Session Banner (`IN QUEUE`). LIVE strip after host starts session (DB `active`). |
+
+Creating a Quick Session for a future slot is **scheduling**, not entering an active session. See [`session_discovery_dashboard.md`](./session_discovery_dashboard.md) § Active-Session Guard — Date/Time Gate.
 
 ---
 

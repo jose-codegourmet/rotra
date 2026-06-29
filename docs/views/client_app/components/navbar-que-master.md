@@ -105,7 +105,9 @@ Standard inner page back navigation — same spec as Player.
 
 Identical to Player bottom nav — no additional tabs.
 
-### Active session state (QM is currently managing a session)
+### Active session state (QM is currently managing a **current** session)
+
+> **Date/time gate:** LIVE indicators require a **current** enrollment per [`../common/session_discovery_dashboard.md`](../common/session_discovery_dashboard.md) § Active-Session Guard — Date/Time Gate. Future scheduled sessions do not show the pulse dot or Live Console shortcut. Wire chrome via `useEnrolledSessionState().live` (DB `active`) or `current` as appropriate.
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -146,7 +148,7 @@ When the QM is on the console view (`/sessions/:id/manage`), the standard bottom
 - Standard navbar/bottom nav — identical to Player
 - No live indicators shown
 
-### QM Is Managing an Active Session
+### QM Is Managing a Current Session
 - Sessions tab shows green pulse dot
 - Desktop sidebar shows Live Console shortcut strip (see `sidebar-que-master.md`)
 - Bottom nav hidden while on `/sessions/:id/manage`
