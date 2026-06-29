@@ -27,6 +27,30 @@ The LIVE strip appears only after the session transitions to DB `active` (host t
 
 See [`../common/session_discovery_dashboard.md`](../common/session_discovery_dashboard.md) § Active-Session Guard — Date/Time Gate.
 
+### Pre-Active Lobby layout (`status: open`)
+
+Implemented at `/find-sessions/:id` when `isOwner` and session is not yet `active`. No operational tab bar.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  FUERZA FRIDAY                              [ Close ]    │
+│  Cebu Sports Center  ·  Fri, Jul 4  ·  Starts in 4d    │
+├──────────────────────────────────────────────────────────┤
+│  CAPACITY          8 / 16 accepted                       │
+│  ████████░░░░░░░░                                        │
+├──────────────────────────────────────────────────────────┤
+│  ROSTER (8)                                              │
+│  Jose Adrian · not arrived                               │
+│  …                                                       │
+├──────────────────────────────────────────────────────────┤
+│              [ START SESSION ]                           │  ← primary CTA
+└──────────────────────────────────────────────────────────┘
+```
+
+- **Start Session** transitions DB `open` → `active`; page re-renders into Active console tabs.
+- **Close** uses existing close-session flow (host only).
+- No courts, queue, or LIVE badges in this state.
+
 ---
 
 ## Layout
