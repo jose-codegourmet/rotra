@@ -13,6 +13,44 @@ The session host's management interface for an Active Que Session. Full control 
 
 **Before Active:** same route shows Lobby management view (roster, pending requests, settings) with **Start Session** CTA.
 
+### Pre-Active dashboard affordances
+
+When the session is `open` but not yet `active`:
+
+| Condition | Dashboard (`/dashboard`) | Navbar / sidebar LIVE strip |
+|-----------|------------------------|----------------------------|
+| `dateTime > now` (scheduled) | `QuickSessionButton` **`scheduled`** variant — tap opens session Lobby. No Active Session Banner. | **Hidden** — QM is enrolled but not in a current session |
+| `dateTime <= now` (start time reached) | `QuickSessionButton` **`resume`** variant + Active Session Banner (`IN QUEUE`) | **Hidden** until host taps **Start Session** |
+| DB status `active` | `resume` variant + banner (`LIVE`) | **Visible** — pulsing LIVE strip |
+
+The LIVE strip appears only after the session transitions to DB `active` (host taps **Start Session** from this console). Scheduling a future Quick Session must never show LIVE indicators on the dashboard or in chrome.
+
+See [`../common/session_discovery_dashboard.md`](../common/session_discovery_dashboard.md) § Active-Session Guard — Date/Time Gate.
+
+### Pre-Active Lobby layout (`status: open`)
+
+Implemented at `/find-sessions/:id` when `isOwner` and session is not yet `active`. No operational tab bar.
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  FUERZA FRIDAY                              [ Close ]    │
+│  Cebu Sports Center  ·  Fri, Jul 4  ·  Starts in 4d    │
+├──────────────────────────────────────────────────────────┤
+│  CAPACITY          8 / 16 accepted                       │
+│  ████████░░░░░░░░                                        │
+├──────────────────────────────────────────────────────────┤
+│  ROSTER (8)                                              │
+│  Jose Adrian · not arrived                               │
+│  …                                                       │
+├──────────────────────────────────────────────────────────┤
+│              [ START SESSION ]                           │  ← primary CTA
+└──────────────────────────────────────────────────────────┘
+```
+
+- **Start Session** transitions DB `open` → `active`; page re-renders into Active console tabs.
+- **Close** uses existing close-session flow (host only).
+- No courts, queue, or LIVE badges in this state.
+
 ---
 
 ## Layout

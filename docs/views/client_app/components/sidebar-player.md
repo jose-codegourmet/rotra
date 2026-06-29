@@ -70,7 +70,9 @@ The primary navigation shell for the **Player** role on desktop (≥1024px). A f
 
 ### 2. Live Session Strip (Conditional)
 
-Only rendered when the player is currently registered and active in an ongoing session. Positioned between the wordmark and the nav items.
+Only rendered when the player has a **current** enrolled session (DB status `active`, or DB status `open` with `dateTime <= now`). **Not** shown for future scheduled enrollments. Positioned between the wordmark and the nav items.
+
+> **Date/time gate:** See [`../common/session_discovery_dashboard.md`](../common/session_discovery_dashboard.md) § Active-Session Guard — Date/Time Gate. Wire via `useEnrolledSessionState().current` (not `scheduled`).
 
 ```
 ┌───────────────────────┐
@@ -96,7 +98,7 @@ Only rendered when the player is currently registered and active in an ongoing s
 - **Tap anywhere on strip** → navigates to `/sessions/:id`
 
 #### Hidden state
-When no active session: strip is fully unmounted (not hidden with CSS — no reserved space).
+When no **current** session (including future scheduled enrollments): strip is fully unmounted (not hidden with CSS — no reserved space).
 
 ---
 

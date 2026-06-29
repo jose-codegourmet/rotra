@@ -14,7 +14,7 @@ import { SessionLiveClient } from "./SessionLiveClient";
 
 export const metadata: Metadata = {
 	title: "Session — ROTRA",
-	description: "Live queue, standings, and session dashboard.",
+	description: "Session lobby, queue management, and live dashboard.",
 };
 
 export default async function SessionLivePage({

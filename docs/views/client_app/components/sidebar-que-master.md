@@ -86,7 +86,9 @@ Same as `sidebar-player.md`:
 
 ### 2. Live Console Strip (Conditional)
 
-Only rendered when the QM has an **active, ongoing session they are assigned to manage**. Positioned directly below the wordmark, before the nav items.
+Only rendered when the QM has a **current** session they are assigned to manage (DB status `active`, or DB status `open` with `dateTime <= now`). **Not** shown for future scheduled enrollments (`dateTime > now`). Positioned directly below the wordmark, before the nav items.
+
+> **Date/time gate:** See [`../common/session_discovery_dashboard.md`](../common/session_discovery_dashboard.md) § Active-Session Guard — Date/Time Gate. Enrollment alone does not trigger the LIVE strip.
 
 ```
 ┌────────────────────────────┐
@@ -128,7 +130,7 @@ Only rendered when the QM has an **active, ongoing session they are assigned to 
 If the QM is managing more than one session simultaneously, each session gets its own strip stacked vertically. Sessions are ordered by start time (most recent first).
 
 #### Hidden state
-When no active session: strip is fully unmounted (no reserved space).
+When no **current** session (including future scheduled enrollments): strip is fully unmounted (no reserved space). Wire via `useEnrolledSessionState().live` (DB `active` only) or `current` for pre-start queue state per product decision.
 
 ---
 
@@ -144,7 +146,7 @@ When no active session: strip is fully unmounted (no reserved space).
 
 #### Sessions item — Live dot indicator
 
-When the QM is managing an active session:
+When the QM is managing a **current** session (DB `active`, or `open` with start time reached):
 - A small **green pulsing dot** (8px, `color-accent`, same animation as the strip) appears right-aligned on the Sessions row
 - Not a number badge — purely a presence indicator
 - The dot is hidden when no active session

@@ -1,5 +1,8 @@
 "use client";
 
+// TODO: Wire LiveSessionStrip / LiveConsoleStrip via useEnrolledSessionState()
+// when building LIVE chrome — see PLAN_phase_7_qm_live_chrome.md
+
 import type { AdminRole } from "@prisma/client";
 import { Plus } from "lucide-react";
 import Link from "next/link";

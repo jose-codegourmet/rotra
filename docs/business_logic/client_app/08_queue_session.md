@@ -119,7 +119,25 @@ One Que Master **cannot** remove another Que Master.
 
 The Club Owner may add, remove, or replace Que Masters **while the Que Session is Active**.
 
-### 3.4 Player permissions
+### 3.4 Enrolled vs in-session (dashboard)
+
+Creating or joining a Que Session creates a **registration** (enrollment). Enrollment alone does **not** mean the user is "in session" for dashboard indicators (Active Session Banner, LIVE navbar strip, `resume` Quick Session button).
+
+| Concept | Meaning |
+| ------- | ------- |
+| **Enrolled** | `session_registrations` row exists with qualifying `admission_status` and `player_status` ≠ `exited` |
+| **In session (current)** | Enrolled **and** either DB status is `active`, or DB status is `open` with `dateTime <= now` |
+
+**Quick Session / host creation:** Publishing a Friendly Que Session sets status `open` and enrolls the creator as `accepted` / `not_arrived`. If `dateTime` is in the future, the host is **enrolled** but **not in session** until:
+
+1. The host taps **Start Session** in the Que Master Console (DB → `active`), **or**
+2. `dateTime` passes while the session remains `open`
+
+Until then, dashboard UI shows the **scheduled** Quick Session affordance — not `ACTIVE SESSION` / `RESUME SESSION` or LIVE indicators.
+
+See [`../../views/client_app/common/session_discovery_dashboard.md`](../../views/client_app/common/session_discovery_dashboard.md) § Active-Session Guard — Date/Time Gate.
+
+### 3.5 Player permissions
 
 Players may join, view according to privacy rules, mark I Am In / I Am Prepared, submit **Request a Match**, and use **Early Exit**. They **cannot**:
 
@@ -236,6 +254,17 @@ See [`../../views/client_app/common/session_discovery_dashboard.md`](../../views
 ### 5.4 Active session guard
 
 A player registered (`admission_status` in `accepted`, `waitlisted`, `pending_approval`, or `reserved`; `player_status` not `exited`) in a session with `status` `open` or `active` **cannot** join a different session without leaving the current one first.
+
+This guard applies to **all enrollments** — including future `open` sessions where `dateTime > now` (scheduled).
+
+### 5.5 Dashboard "current session" gate
+
+Separate from §5.4: dashboard **current-session** indicators (Active Session Banner, `resume` Quick Session button, LIVE navbar/sidebar strip) apply only when the enrollment is **current** per §3.4 — not merely enrolled.
+
+| Enrollment timing | Join guard (§5.4) | Dashboard "in session" UI |
+| ----------------- | ----------------- | ------------------------- |
+| Future `open` (`dateTime > now`) | Yes — cannot join another | No — show `scheduled` affordance only |
+| Past `open` or DB `active` | Yes | Yes — banner + `resume` + LIVE strip |
 
 ---
 
