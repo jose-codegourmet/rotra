@@ -52,3 +52,10 @@ export const Resume: Story = {
 		onClick: noop,
 	},
 };
+
+export const Scheduled: Story = {
+	args: {
+		variant: "scheduled",
+		onClick: noop,
+	},
+};

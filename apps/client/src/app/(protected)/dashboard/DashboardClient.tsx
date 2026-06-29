@@ -20,7 +20,7 @@ import {
 	DEFAULT_RADIUS_KM,
 	USER_LOCATION_ZOOM,
 } from "@/constants/dashboard";
-import { useActiveSession } from "@/hooks/useActiveSession/client";
+import { useEnrolledSessionState } from "@/hooks/useActiveSession/client";
 import { useGeolocation } from "@/hooks/useGeolocation/client";
 import {
 	sessionDiscoveryQueryKey,
@@ -104,14 +104,7 @@ export function DashboardClient() {
 		filters,
 	);
 
-	console.log("[+] DEBUG", {
-		data,
-		effectiveCenter,
-		filters,
-	});
-
-	const { data: activeData } = useActiveSession();
-	const active = activeData?.active ?? null;
+	const { current, scheduled, enrolled } = useEnrolledSessionState();
 
 	const sessions = data?.sessions ?? [];
 	const venueGroups = data?.venueGroups ?? [];
@@ -121,7 +114,7 @@ export function DashboardClient() {
 
 	const handleJoinSession = useCallback(
 		async (sessionId: string) => {
-			if (active && active.sessionId !== sessionId) {
+			if (enrolled && enrolled.sessionId !== sessionId) {
 				setBlockedDialogOpen(true);
 				return;
 			}
@@ -144,7 +137,7 @@ export function DashboardClient() {
 				setUnavailableDialogOpen(true);
 			}
 		},
-		[router, active],
+		[router, enrolled],
 	);
 
 	const handleRefreshNearby = useCallback(() => {
@@ -277,25 +270,27 @@ export function DashboardClient() {
 
 			{viewMode === "map" ? searchOverlay : null}
 
-			{active ? (
+			{current ? (
 				<ActiveSessionBanner
-					session={active}
-					onNavigate={() => router.push(active.href)}
+					session={current}
+					onNavigate={() => router.push(current.href)}
 					className="absolute top-4 left-4 right-4 z-[25]"
 				/>
 			) : null}
 
 			<QuickSessionButton
-				variant={active ? "resume" : "create"}
+				variant={current ? "resume" : scheduled ? "scheduled" : "create"}
 				onClick={() => {
-					if (active) {
-						router.push(active.href);
+					if (current) {
+						router.push(current.href);
+					} else if (scheduled) {
+						router.push(scheduled.href);
 					} else {
 						setSheetOpen(true);
 					}
 				}}
 			/>
-			{!active ? (
+			{!enrolled ? (
 				<QuickSessionSheet open={sheetOpen} onOpenChange={setSheetOpen} />
 			) : null}
 
@@ -308,14 +303,14 @@ export function DashboardClient() {
 				onJoin={handleJoinSession}
 			/>
 
-			{active ? (
+			{enrolled ? (
 				<AlreadyInSessionDialog
 					open={blockedDialogOpen}
 					onOpenChange={setBlockedDialogOpen}
-					activeSession={active}
+					activeSession={enrolled}
 					onGoToSession={() => {
 						setBlockedDialogOpen(false);
-						router.push(active.href);
+						router.push(enrolled.href);
 					}}
 				/>
 			) : null}

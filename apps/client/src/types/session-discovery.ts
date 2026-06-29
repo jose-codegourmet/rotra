@@ -66,6 +66,7 @@ export interface ActiveSessionSummary {
 	// Null for clubless (player-organized) sessions; UI falls back to location.
 	clubName: string | null;
 	location: string;
+	dateTime: string;
 	status: "open" | "active";
 	playerStatus: string;
 	admissionStatus: string;
@@ -74,7 +75,10 @@ export interface ActiveSessionSummary {
 }
 
 export interface ActiveSessionResponse {
-	active: ActiveSessionSummary | null;
+	/** Operating or start time reached — dashboard "in session" */
+	current: ActiveSessionSummary | null;
+	/** Enrolled but dateTime in the future */
+	scheduled: ActiveSessionSummary | null;
 }
 
 export interface SessionDiscoveryResponse {

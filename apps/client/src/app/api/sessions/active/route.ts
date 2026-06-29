@@ -30,6 +30,24 @@ function buildCourtHint(playerStatus: string): string | null {
 	return null;
 }
 
+function isCurrentSession(
+	session: { status: string; dateTime: Date },
+	now = new Date(),
+): boolean {
+	if (session.status === "active") return true;
+	if (
+		session.status === "open" &&
+		session.dateTime.getTime() <= now.getTime()
+	) {
+		return true;
+	}
+	return false;
+}
+
+function emptyResponse(): ActiveSessionResponse {
+	return { current: null, scheduled: null };
+}
+
 function toActiveSessionSummary(
 	reg: {
 		sessionId: string;
@@ -41,6 +59,7 @@ function toActiveSessionSummary(
 			title: string | null;
 			hostId: string;
 			location: string;
+			dateTime: Date;
 			club: { name: string } | null;
 		};
 	},
@@ -55,6 +74,7 @@ function toActiveSessionSummary(
 		isOwner: reg.session.hostId === profileId,
 		clubName: reg.session.club?.name ?? null,
 		location: reg.session.location,
+		dateTime: reg.session.dateTime.toISOString(),
 		status: sessionStatus,
 		playerStatus: reg.playerStatus,
 		admissionStatus: reg.admissionStatus,
@@ -87,8 +107,7 @@ export async function GET() {
 		});
 
 		if (registrations.length === 0) {
-			const response: ActiveSessionResponse = { active: null };
-			return NextResponse.json(response);
+			return NextResponse.json(emptyResponse());
 		}
 
 		registrations.sort((a, b) => {
@@ -107,13 +126,13 @@ export async function GET() {
 
 		const best = registrations[0];
 		if (!best) {
-			const response: ActiveSessionResponse = { active: null };
-			return NextResponse.json(response);
+			return NextResponse.json(emptyResponse());
 		}
 
-		const response: ActiveSessionResponse = {
-			active: toActiveSessionSummary(best, profile.id),
-		};
+		const summary = toActiveSessionSummary(best, profile.id);
+		const response: ActiveSessionResponse = isCurrentSession(best.session)
+			? { current: summary, scheduled: null }
+			: { current: null, scheduled: summary };
 		return NextResponse.json(response);
 	} catch (e) {
 		console.error("[sessions/active GET]", e);
