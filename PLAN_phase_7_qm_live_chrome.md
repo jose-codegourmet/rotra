@@ -2,7 +2,7 @@
 
 > **Goal:** Document and wire LIVE indicators (QM + Player) to use `current` / `live` selectors — not raw enrollment.
 >
-> **Status:** 🔲 Pending (components largely **spec-only** today)
+> **Status:** ✅ Done (minimal deliverable — TODO comment in Sidebar.tsx; full chrome build deferred)
 >
 > **Depends on:** [Phase 4](./PLAN_phase_4_qm_active_session_hook.md)
 
@@ -90,10 +90,10 @@ const { live } = useEnrolledSessionState();
 
 If full chrome build is out of scope, Phase 7 **minimum**:
 
-- [ ] `useEnrolledSessionState` exists (Phase 4)
-- [ ] Docs reference correct selectors (Phase 0 — done)
-- [ ] No premature LIVE UI wired to `active` / enrollment without gate
-- [ ] Add TODO comment in `Sidebar.tsx` pointing to this plan
+- [x] `useEnrolledSessionState` exists (Phase 4)
+- [x] Docs reference correct selectors (Phase 0 — done)
+- [x] No premature LIVE UI wired to `active` / enrollment without gate
+- [x] Add TODO comment in `Sidebar.tsx` pointing to this plan
 
 **Full chrome build** can be a follow-up ticket: `PLAN_phase_7b_live_chrome_components.md` if needed.
 

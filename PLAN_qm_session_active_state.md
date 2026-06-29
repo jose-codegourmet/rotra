@@ -2,7 +2,7 @@
 
 > **Feature:** Refine dashboard and chrome so a Que Master / host who creates a **future** Quick Session is **enrolled** but not shown as **in an active session** until timing or lifecycle criteria are met.
 >
-> **Status:** Phase 0 (docs) complete · Phases 1–7 pending implementation
+> **Status:** ✅ All phases (0–7) complete
 >
 > **Do not implement code until each phase plan is reviewed.**
 

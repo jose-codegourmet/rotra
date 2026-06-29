@@ -2,7 +2,7 @@
 
 > **Goal:** Wire `current` / `scheduled` / `enrolled` into `/dashboard` — the primary user-facing fix.
 >
-> **Status:** 🔲 Pending
+> **Status:** ✅ Done
 >
 > **Depends on:** [Phase 3](./PLAN_phase_3_qm_quick_session_button.md), [Phase 4](./PLAN_phase_4_qm_active_session_hook.md)
 >
@@ -144,12 +144,12 @@ const handleJoinSession = useCallback(async (sessionId: string) => {
 
 ## Acceptance criteria
 
-- [ ] Future Quick Session → `scheduled` button, no banner
-- [ ] Past `open` session → banner (`IN QUEUE`) + `resume`
-- [ ] DB `active` → banner (`LIVE`) + `resume`
-- [ ] Join elsewhere while scheduled → dialog blocks
-- [ ] No `active` field references remain in file
-- [ ] Debug `console.log` removed
+- [x] Future Quick Session → `scheduled` button, no banner
+- [x] Past `open` session → banner (`IN QUEUE`) + `resume`
+- [x] DB `active` → banner (`LIVE`) + `resume`
+- [x] Join elsewhere while scheduled → dialog blocks
+- [x] No `active` field references remain in file
+- [x] Debug `console.log` removed
 
 ---
 

@@ -2,7 +2,7 @@
 
 > **Goal:** Change `GET /api/sessions/active` to split enrollment into `current` and `scheduled` using a date/time gate.
 >
-> **Status:** 🔲 Pending
+> **Status:** ✅ Done
 >
 > **Depends on:** [Phase 0](./PLAN_phase_0_qm_session_docs.md)
 >
@@ -145,12 +145,12 @@ User with DB `active` session tomorrow **and** `open` session today → `active`
 
 ## Acceptance criteria
 
-- [ ] Response shape is `{ current, scheduled }` never `{ active }`
-- [ ] Future `open` enrollment → `scheduled` only
-- [ ] Past `open` or DB `active` → `current` only
-- [ ] `dateTime` included in summary ISO string
-- [ ] Sort/priority logic unchanged from current route
-- [ ] 401/500 behavior unchanged
+- [x] Response shape is `{ current, scheduled }` never `{ active }`
+- [x] Future `open` enrollment → `scheduled` only
+- [x] Past `open` or DB `active` → `current` only
+- [x] `dateTime` included in summary ISO string
+- [x] Sort/priority logic unchanged from current route
+- [x] 401/500 behavior unchanged
 
 ---
 

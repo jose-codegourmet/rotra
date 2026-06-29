@@ -2,7 +2,7 @@
 
 > **Goal:** Update TypeScript types to match Phase 1 API response.
 >
-> **Status:** 🔲 Pending
+> **Status:** ✅ Done
 >
 > **Depends on:** [Phase 1](./PLAN_phase_1_qm_active_session_api.md)
 >
@@ -109,9 +109,9 @@ Files:
 
 ## Acceptance criteria
 
-- [ ] `ActiveSessionResponse` has `current` and `scheduled` only
-- [ ] `ActiveSessionSummary` includes `dateTime: string`
-- [ ] `tsc --noEmit` passes after Phases 1–5 complete (will fail mid-migration — expected)
+- [x] `ActiveSessionResponse` has `current` and `scheduled` only
+- [x] `ActiveSessionSummary` includes `dateTime: string`
+- [x] `tsc --noEmit` passes after Phases 1–5 complete (will fail mid-migration — expected)
 
 ---
 

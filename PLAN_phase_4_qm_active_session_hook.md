@@ -2,7 +2,7 @@
 
 > **Goal:** Consume new API shape and expose ergonomic selectors for dashboard and future LIVE chrome.
 >
-> **Status:** 🔲 Pending
+> **Status:** ✅ Done
 >
 > **Depends on:** [Phase 2](./PLAN_phase_2_qm_session_types.md)
 >
@@ -82,11 +82,11 @@ Server is source of truth. Client selectors only derive convenience values. Opti
 
 ## Acceptance criteria
 
-- [ ] `fetchActiveSession` typed as `ActiveSessionResponse` with `current`/`scheduled`
-- [ ] `useEnrolledSessionState` exported from `client.ts`
-- [ ] `enrolled` = `current ?? scheduled`
-- [ ] `live` = `current` only when `status === "active"`
-- [ ] No consumers updated yet (Phase 5)
+- [x] `fetchActiveSession` typed as `ActiveSessionResponse` with `current`/`scheduled`
+- [x] `useEnrolledSessionState` exported from `client.ts`
+- [x] `enrolled` = `current ?? scheduled`
+- [x] `live` = `current` only when `status === "active"`
+- [x] No consumers updated yet (Phase 5)
 
 ---
 

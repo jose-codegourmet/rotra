@@ -2,7 +2,7 @@
 
 > **Goal:** Confirm banner only appears for `current` sessions; update stories for new type shape.
 >
-> **Status:** 🔲 Pending
+> **Status:** ✅ Done
 >
 > **Depends on:** [Phase 5](./PLAN_phase_5_qm_dashboard_client.md)
 
@@ -74,9 +74,9 @@ Consider adding story `ScheduledEnrollment` using future `dateTime` — dialog c
 
 ## Acceptance criteria
 
-- [ ] Stories compile with `dateTime` field
-- [ ] No banner rendered in dashboard for scheduled-only state (manual QA via Phase 5)
-- [ ] `ActiveSessionBanner.tsx` diff is zero or comment-only
+- [x] Stories compile with `dateTime` field
+- [x] No banner rendered in dashboard for scheduled-only state (manual QA via Phase 5)
+- [x] `ActiveSessionBanner.tsx` diff is zero or comment-only
 
 ---
 

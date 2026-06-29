@@ -2,7 +2,7 @@
 
 > **Goal:** Add a third button variant for future enrolled sessions — muted styling, no "active session" language.
 >
-> **Status:** 🔲 Pending
+> **Status:** ✅ Done
 >
 > **Depends on:** [Phase 2](./PLAN_phase_2_qm_session_types.md)
 >
@@ -97,11 +97,11 @@ Keep existing: `Default`, `Hover`, `Disabled`, `Resume`.
 
 ## Acceptance criteria
 
-- [ ] Three variants render correct labels and icons
-- [ ] `scheduled` has no accent glow / pulse
-- [ ] Accessible `aria-label` per variant
-- [ ] Storybook `Scheduled` story added
-- [ ] No dashboard wiring yet (Phase 5)
+- [x] Three variants render correct labels and icons
+- [x] `scheduled` has no accent glow / pulse
+- [x] Accessible `aria-label` per variant
+- [x] Storybook `Scheduled` story added
+- [x] No dashboard wiring yet (Phase 5)
 
 ---
 
