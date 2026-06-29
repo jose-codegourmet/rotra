@@ -29,6 +29,7 @@ export function defaultQuickSessionValues(): QuickSessionFormValues {
 		},
 		date: getTodayIsoDate(),
 		startTime: getNextRoundedHour(),
+		durationHours: 2,
 		numCourts: 1,
 		playersPerCourt: "4",
 		matchFormat: "best_of_1",

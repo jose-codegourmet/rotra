@@ -93,6 +93,7 @@ const validInitialValues = {
 	},
 	date: "2026-06-09",
 	startTime: "18:00",
+	durationHours: 2,
 	numCourts: 1,
 	playersPerCourt: "4" as const,
 	matchFormat: "best_of_1" as const,

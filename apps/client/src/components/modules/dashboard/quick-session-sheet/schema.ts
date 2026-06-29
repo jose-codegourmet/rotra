@@ -36,6 +36,12 @@ export const quickSessionFormSchema = z.object({
 			"Session date must be today or in the future",
 		),
 	startTime: z.string().min(1, "Start time is required"),
+	durationHours: z
+		.number()
+		.refine(
+			(v) => [1, 1.5, 2, 2.5, 3, 3.5, 4].includes(v),
+			"Duration must be between 1h and 4h in 0.5h steps",
+		),
 	numCourts: z.coerce.number().int().min(1).max(12),
 	playersPerCourt: z.enum(["2", "4"]),
 	matchFormat: z.enum(["best_of_1", "best_of_3"]),
