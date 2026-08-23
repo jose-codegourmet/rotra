@@ -16,3 +16,11 @@ export function admissionBadgeLabel(status: string | null | undefined): string {
 	if (!status) return "NOT REGISTERED";
 	return status.replaceAll("_", " ").toUpperCase();
 }
+
+/** Accepted slots = courts × players/court. Overflow is waitlisted. */
+export function acceptedCapacity(
+	courts: number,
+	playersPerCourt: number,
+): number {
+	return courts * playersPerCourt;
+}

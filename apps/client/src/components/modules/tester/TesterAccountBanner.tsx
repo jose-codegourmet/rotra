@@ -1,17 +1,21 @@
 "use client";
 
 import { X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { isSessionStandaloneRoute } from "@/lib/sessions/session-standalone-route";
 import { cn } from "@/lib/utils";
 
 const DISMISS_KEY = "rotra_tester_banner_dismissed";
 
 export function TesterAccountBanner() {
+	const pathname = usePathname();
 	const [dismissed, setDismissed] = useState(() => {
 		if (typeof window === "undefined") return false;
 		return sessionStorage.getItem(DISMISS_KEY) === "1";
 	});
 
+	if (isSessionStandaloneRoute(pathname)) return null;
 	if (dismissed) return null;
 
 	return (

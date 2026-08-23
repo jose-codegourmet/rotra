@@ -11,6 +11,7 @@ import { LogoutDialogProvider } from "@/hooks/useLogoutDialog/client";
 import { useNotificationsQuery } from "@/hooks/useNotifications/client";
 import { adaptNotificationToUiItem } from "@/hooks/useNotifications/server";
 import type { CurrentProfileDisplay } from "@/lib/server/current-profile";
+import { isSessionStandaloneRoute } from "@/lib/sessions/session-standalone-route";
 
 const SHELL_NOTIFICATION_FILTERS = { page: 1, limit: 5 } as const;
 
@@ -33,6 +34,7 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
 	const pathname = usePathname();
 	const isFullBleed = pathname === "/dashboard";
+	const hideChrome = isSessionStandaloneRoute(pathname);
 
 	const { data: notificationsData } = useNotificationsQuery(
 		SHELL_NOTIFICATION_FILTERS,
@@ -41,6 +43,14 @@ export function DashboardLayout({
 	const shellNotifications =
 		notificationsData?.rows.map((row) => adaptNotificationToUiItem(row)) ?? [];
 	const notificationUnreadCount = notificationsData?.unreadCount ?? 0;
+
+	if (hideChrome) {
+		return (
+			<LogoutDialogProvider>
+				<div className="min-h-screen bg-bg-base">{children}</div>
+			</LogoutDialogProvider>
+		);
+	}
 
 	return (
 		<LogoutDialogProvider>
