@@ -19,6 +19,7 @@ export interface DatePickerProps {
 	placeholder?: string;
 	className?: string;
 	popoverContainer?: HTMLElement | null;
+	displayFormat?: string;
 }
 
 export function DatePicker({
@@ -29,6 +30,7 @@ export function DatePicker({
 	placeholder = "Pick a date",
 	className,
 	popoverContainer,
+	displayFormat = "PPP",
 }: DatePickerProps) {
 	const [open, setOpen] = useState(false);
 
@@ -44,7 +46,7 @@ export function DatePicker({
 						disabled={disabled}
 						className={cn("w-full justify-start font-normal", className)}
 					>
-						{selected ? format(selected, "PPP") : placeholder}
+						{selected ? format(selected, displayFormat) : placeholder}
 					</Button>
 				}
 			/>
