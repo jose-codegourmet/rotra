@@ -1,5 +1,4 @@
 import { MOCK_SESSION_DISCOVERY } from "@/constants/mock-session-discovery";
-import { groupSessionsByVenue } from "@/lib/api/session-discovery";
 import type {
 	SessionDiscoveryItem,
 	VenueSessionGroup,
@@ -20,9 +19,51 @@ function findMockSession(id: string): SessionDiscoveryItem {
 	return session;
 }
 
-export const MOCK_VENUE_GROUPS: VenueSessionGroup[] = groupSessionsByVenue(
-	withDistance(MOCK_SESSION_DISCOVERY),
-);
+export const MOCK_VENUE_GROUPS: VenueSessionGroup[] = [
+	{
+		venueKey: "10.316_123.885",
+		coordinates: { lat: 10.316, lng: 123.885 },
+		venueName: "Sunrise Badminton Center",
+		venueAddress: "Juan Luna Ave, Cebu City, Cebu",
+		distanceKm: 1.2,
+		sessions: withDistance([
+			findMockSession("sess-sunrise-today"),
+			findMockSession("sess-sunrise-weekend"),
+		]),
+	},
+	{
+		venueKey: "10.324_123.923",
+		coordinates: { lat: 10.324, lng: 123.923 },
+		venueName: "Mandaue City Sports Complex",
+		venueAddress: "Cebu North Rd, Mandaue City, Cebu",
+		distanceKm: 1.2,
+		sessions: withDistance([findMockSession("sess-mandaue-live")]),
+	},
+	{
+		venueKey: "10.310_123.949",
+		coordinates: { lat: 10.31, lng: 123.949 },
+		venueName: "Hoops Dome Lapu-Lapu",
+		venueAddress: "Gun-ob, Lapu-Lapu City, Cebu",
+		distanceKm: 1.2,
+		sessions: withDistance([findMockSession("sess-lapulapu-open")]),
+	},
+	{
+		venueKey: "10.329_123.905",
+		coordinates: { lat: 10.329, lng: 123.905 },
+		venueName: "Cebu IT Park Courts",
+		venueAddress: "Jose Maria del Mar St, Cebu City, Cebu",
+		distanceKm: 1.2,
+		sessions: withDistance([findMockSession("sess-cebu-downtown")]),
+	},
+	{
+		venueKey: "10.244_123.848",
+		coordinates: { lat: 10.244, lng: 123.848 },
+		venueName: "Talisay Sports Center",
+		venueAddress: "Tabunok, Talisay City, Cebu",
+		distanceKm: 1.2,
+		sessions: withDistance([findMockSession("sess-talisay-weekend")]),
+	},
+];
 
 export const MOCK_SINGLE_LIVE_GROUP: VenueSessionGroup = {
 	venueKey: "10.324_123.923",
