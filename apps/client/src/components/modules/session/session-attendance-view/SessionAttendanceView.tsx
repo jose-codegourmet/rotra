@@ -71,7 +71,10 @@ export function SessionAttendanceView({
 					<p className="text-micro font-medium uppercase tracking-widest text-text-secondary">
 						{session.statusLabel}
 					</p>
-					<Pill variant="accent" className="gap-1.5 font-semibold shadow-accent">
+					<Pill
+						variant="accent"
+						className="gap-1.5 font-semibold shadow-accent"
+					>
 						<span className="size-1.5 rounded-full bg-accent" aria-hidden />
 						{session.acceptedBadge}
 					</Pill>
