@@ -7,6 +7,7 @@ import {
 	MOCK_SESSION_JOIN,
 	MOCK_SESSION_JOINED_QUEUE,
 	SESSION_QUEUE_LEGEND,
+	type SessionJoinFixture,
 	type SessionQueuePlayer,
 	type SessionQueueStatus,
 } from "@/constants/mock-session-join";
@@ -26,7 +27,7 @@ const LEGEND_DOT: Record<SessionQueueStatus, string> = {
 };
 
 export type SessionJoinedViewProps = {
-	session?: typeof MOCK_SESSION_JOIN;
+	session?: SessionJoinFixture;
 	queue?: SessionQueuePlayer[];
 };
 

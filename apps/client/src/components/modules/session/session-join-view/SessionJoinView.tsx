@@ -7,6 +7,7 @@ import {
 	MOCK_SESSION_JOIN,
 	MOCK_SESSION_JOIN_META,
 	MOCK_SESSION_JOIN_QUEUE,
+	type SessionJoinFixture,
 	type SessionJoinMetaCard,
 	type SessionQueuePlayer,
 } from "@/constants/mock-session-join";
@@ -22,7 +23,7 @@ const META_ICONS = {
 } as const;
 
 export type SessionJoinViewProps = {
-	session?: typeof MOCK_SESSION_JOIN;
+	session?: SessionJoinFixture;
 	meta?: SessionJoinMetaCard[];
 	queue?: SessionQueuePlayer[];
 	joinedHref?: string;
@@ -41,7 +42,9 @@ export function SessionJoinView({
 			<h1 className="mt-4 text-display font-bold tracking-tight text-text-primary">
 				{session.venue}
 			</h1>
-			<p className="mt-2 text-body text-text-secondary">{session.headlineSub}</p>
+			<p className="mt-2 text-body text-text-secondary">
+				{session.headlineSub}
+			</p>
 
 			<ul className="mt-6 grid grid-cols-2 gap-3">
 				{meta.map((card) => {

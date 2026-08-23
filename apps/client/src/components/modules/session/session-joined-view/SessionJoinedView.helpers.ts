@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { MOCK_SESSION_JOIN } from "@/constants/mock-session-join";
+import type { SessionJoinFixture } from "@/constants/mock-session-join";
 
 export function resolveShareUrl(path: string): string {
 	if (path.startsWith("http://") || path.startsWith("https://")) return path;
@@ -8,7 +8,7 @@ export function resolveShareUrl(path: string): string {
 }
 
 export async function shareJoinLink(
-	session: typeof MOCK_SESSION_JOIN,
+	session: SessionJoinFixture,
 ): Promise<void> {
 	const url = resolveShareUrl(session.sharePath);
 	try {

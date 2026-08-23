@@ -1,8 +1,8 @@
 import { SESSION_QUEUE_STATUS_LABELS } from "@/constants/mock-session-join";
 import { cn } from "@/lib/utils";
 import {
-	sessionQueueStatusBadgeVariants,
 	type SessionQueueStatusBadgeVariants,
+	sessionQueueStatusBadgeVariants,
 } from "./SessionQueueStatusBadge.variants";
 
 export type SessionQueueStatusBadgeProps = {
@@ -15,7 +15,9 @@ export function SessionQueueStatusBadge({
 	className,
 }: SessionQueueStatusBadgeProps) {
 	return (
-		<span className={cn(sessionQueueStatusBadgeVariants({ status }), className)}>
+		<span
+			className={cn(sessionQueueStatusBadgeVariants({ status }), className)}
+		>
 			{SESSION_QUEUE_STATUS_LABELS[status]}
 		</span>
 	);

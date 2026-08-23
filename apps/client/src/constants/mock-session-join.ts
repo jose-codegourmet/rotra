@@ -49,6 +49,8 @@ export const MOCK_SESSION_JOIN = {
 	shareText: "Scan to join Smash Hub Ortigas.",
 } as const;
 
+export type SessionJoinFixture = typeof MOCK_SESSION_JOIN;
+
 export const MOCK_SESSION_JOIN_META: SessionJoinMetaCard[] = [
 	{
 		id: "date",
