@@ -63,6 +63,42 @@ Account editing lives in `settings`.
 - WHEN the header card renders
 - THEN the displayed rank/tier is the hardcoded header values, not `mmr` from the API
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/client_app/05_player_profile.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current pages still render mock stats, gear, matches, and rank.
+
+### Requirement: Profile fields and visibility
+Display name, photo, playing-since, play style, gear, and (after gates) stats SHALL be public. Phone SHALL be private to the player except Que Master and Club Owner operational contact. Age SHALL never be public. Payment records SHALL be Que Master / Club Owner only. Received text reviews SHALL be player-only after acknowledgment. Playing level is documented as public in `05` and as self-only in `00_ubiquitous_language.md` — both statements are recorded; this fold follows `05` for public display unless anti-sandbagging overrides it.
+
+#### Scenario: Phone on public profile
+- GIVEN a player has a phone number
+- WHEN another player opens `/profile/[userId]`
+- THEN phone is not shown
+
+### Requirement: Play style is informational
+Format (Singles / Doubles / Both), court position (Front / Back / All-Around), and play mode (Competitive / Social / Both) SHALL be informational only and MUST NOT affect queue priority or matching.
+
+#### Scenario: Competitive preference
+- GIVEN a player set play mode Competitive
+- WHEN they join a Fun Games session
+- THEN preference does not change admission or rotation
+
+### Requirement: Gear showcase
+Players MAY add multiple public items in Rackets, Shoes, and Bags. Each item SHALL act as a mini post (title, description, optional purchase links). Gear SHALL have no gameplay effect. Shoe fit type Standard is documented as future.
+
+#### Scenario: Multiple rackets
+- GIVEN a player adds two racket items
+- WHEN their public profile is viewed
+- THEN both items can appear in the gear showcase
+
+### Requirement: Stat unlock gates
+Win rate and skill rating SHALL show only after ≥ 5 scored matches; otherwise “Not enough data”. Advanced stats SHALL unlock after ≥ 20 completed matches. Rating trend SHALL compare the last 5 ratings to the prior 5 with a 0.3 threshold (Ascending / Stable / Descending). Sessions attended SHALL count distinct sessions where the player was Accepted and marked I Am In.
+
+#### Scenario: New player stats
+- GIVEN a player has 3 scored matches
+- WHEN basic stats render
+- THEN win rate and skill rating show “Not enough data”
+
 ## Source
 
 - `apps/client/src/app/(protected)/profile/page.tsx`

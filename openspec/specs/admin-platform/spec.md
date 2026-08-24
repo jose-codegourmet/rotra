@@ -55,6 +55,44 @@ Admin pages for dashboard, kill switches, platform config, analytics, MMR, skill
 - WHEN the admin clicks Resolve
 - THEN no moderation record is updated in the database
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/admin_app/02_kill_switches.md`, `03_environment_management.md`, `05_platform_config.md`, and `07_mmr_and_skills_management.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current pages for these modules are mock or in-memory.
+
+### Requirement: Kill switches persist and fail closed
+Documented kill switches SHALL persist in platform config and take effect without a deploy. Client features SHALL hide or show a graceful fallback, not an error screen. Documented keys include `auth.facebook_login`, `auth.new_registrations`, `clubs.*`, `sessions.*`, `umpire.*`, and `ratings.*` as listed in `02_kill_switches.md`.
+
+#### Scenario: Ratings kill switch
+- GIVEN `ratings.post_match_review` is OFF
+- WHEN a match ends
+- THEN the review prompt is skipped and the match can complete on score only
+
+### Requirement: Environment isolation
+Each Admin App instance SHALL manage only its paired environment (dev / staging / prod). There SHALL be no in-app cross-environment switch. Staging config SHALL NOT affect production. Prod destructive/config actions SHALL require an explicit production confirmation. Environment indicator colors: dev grey, staging amber, prod red.
+
+#### Scenario: Staging EXP change
+- GIVEN an admin changes EXP rates in staging
+- WHEN production calculates EXP
+- THEN production uses production config
+
+### Requirement: Platform config guardrails
+EXP rate, MMR asymmetry, calibration, and EXP-tier threshold changes SHALL apply to future transactions only. Historical ledgers SHALL NOT be rewritten. Tier thresholds SHALL NOT be lowered below the highest sub-rank any player has achieved. Apex / Apex Predator SHALL be position-based (`apex.min_exp_to_qualify` default 27,000; snapshot interval default 24h). Config saves SHALL require password confirmation. Bulk skill-dimension edits SHALL require Super Admin. Dimension IDs SHALL be immutable; retiring a dimension SHALL hide it without deleting history.
+
+#### Scenario: Demoting threshold blocked
+- GIVEN a player has reached Warrior 1
+- WHEN an admin tries to raise the Warrior 1 minimum above that player's EXP in a way that would demote them
+- THEN the save is blocked
+
+### Requirement: System threshold defaults
+Documented platform defaults: no-show window 15 minutes, smart monitoring 90%, review window 24 hours, consistent-member sessions 3, rating unlock 5, win-rate unlock 5, advanced stats 20, global leaderboard min matches 20, reapply after rejection 30 days.
+
+> `18` RULE-082 says there is no automatic no-show removal. The 15-minute value is a default alert window, not an automatic slot release.
+
+#### Scenario: Review window default
+- GIVEN platform config is at defaults
+- WHEN a match completes
+- THEN the documented review window is 24 hours
+
 ## Source
 
 - `apps/admin/src/app/(protected)/dashboard/page.tsx`

@@ -166,6 +166,52 @@ OAuth callback and invite-accept redirects SHALL accept `next` only when it star
 - WHEN the callback succeeds
 - THEN the browser is redirected to `/dashboard` instead of the external URL
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/client_app/03_authentication.md` and `22_tester_login.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact.
+
+### Requirement: Facebook is the player identity anchor
+Documented player registration SHALL use Facebook OAuth (scopes `public_profile` and optional `email`) and/or Email Invitation that then links Facebook. One Facebook account SHALL map to exactly one Player (`facebook_id` unique). Duplicate Facebook login SHALL return the existing account. There SHALL be no merge-accounts flow. Name and avatar SHALL be seeded from Facebook and then read from `profiles`, not stale Auth metadata.
+
+#### Scenario: Second Facebook login
+- GIVEN an existing `facebook_id`
+- WHEN the same Facebook user signs in
+- THEN the existing Player session is used
+
+### Requirement: Email invitation path
+An admin or Club Owner MAY send a tokenized email invite with TTL 7 days, stored as `email_invitations` status `pending`. The token SHALL be single-use. Linking email alone SHALL NOT set `email_verified`. A user with a linked and verified email SHALL NOT have it replaced by a new invitation unless the current email is unverified. Expired tokens SHALL show an error and prompt to request a new invite.
+
+#### Scenario: Reuse accepted invite
+- GIVEN `email_invitations.status` is `accepted`
+- WHEN the same token is opened again
+- THEN it cannot be reused
+
+### Requirement: Composite verification
+A player SHALL be unverified by default. `is_verified` SHALL be server-computed true only when Facebook is linked, email is verified, and onboarding is completed. Clients MUST NOT compute verification independently. Documented unverified restrictions: cannot join a queue session, submit match reviews, appear on leaderboards, or create a club; they MAY view/explore. Restricted actions SHALL show which conditions are unsatisfied.
+
+> Current implemented session join remains mock (`queue-session`). This verification gate is documented intent.
+
+#### Scenario: Unverified cannot join (documented)
+- GIVEN `is_verified` is false
+- WHEN the player tries to join a queue session
+- THEN the documented rule refuses the join and lists missing conditions
+
+### Requirement: Tester invite must not set password at send time
+Admin tester invite SHALL NOT call `updateUserById({ password })` immediately after `inviteUserByEmail` (that invalidates `token_hash`). ROTRA SHALL NOT store plaintext passwords in Postgres. Tag slugs assigned to profiles MUST exist in `tag_definitions` and be active. Tester routes SHALL be unlisted / `noindex` and not linked from public `/login`.
+
+#### Scenario: Invite password anti-pattern
+- GIVEN an admin sends a tester invite
+- WHEN the invite email is generated
+- THEN the auth password is not set at send time
+
+### Requirement: Session lifetimes (documented)
+Documented JWT access-token expiry is 1 hour and refresh-token expiry is 7 days. Flagged/suspended accounts SHALL NOT log in. Fake Facebook accounts are out of scope for MVP. Phase 2+ MAY add Google/Apple and multi-provider linking.
+
+#### Scenario: Suspended account
+- GIVEN Admin flagged the account
+- WHEN the player attempts Facebook login
+- THEN login is refused
+
 ## Source
 
 - `apps/client/src/middleware.ts`

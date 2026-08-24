@@ -64,6 +64,26 @@ Client adapters SHALL map known `NotificationType` values to UI kinds (session, 
 - WHEN it is adapted for the UI
 - THEN its kind is `system`
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/client_app/15_notifications.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current inbox list/mark-all-read is implemented; scheduled session reminders and in-session pushes are not.
+
+### Requirement: Session reminder schedule
+Accepted players SHALL receive reminders at 2 hours, 1 hour, 30 minutes, 5 minutes, and session start. If a player exits or is removed before start, scheduled reminders SHALL be cancelled. Postpone/cancel SHALL cancel pending pre-session reminders and notify Pending + Accepted + Waitlisted immediately.
+
+#### Scenario: Exit cancels reminders
+- GIVEN an accepted player with a 2-hour reminder scheduled
+- WHEN they leave before start
+- THEN that reminder is not sent
+
+### Requirement: Admission, match, and club events
+Documented in-app/push notifications SHALL also cover join approve/decline, waitlist confirm/promote/timeout, match request outcomes, “you’re up next”, umpire assignment, smart-monitoring 90% alert, payment reminders, session feed announcements, club join/invite/QM assign/remove, review window 2-hour warning, EXP awarded, club application outcomes, and sandbagging level-adjust notices. Email notifications are future. Preference controls are Phase 3; until then all eligible recipients SHALL receive all notifications.
+
+#### Scenario: Review window warning
+- GIVEN a player has unsubmitted reviews and 2 hours remain
+- WHEN the reminder fires
+- THEN they are notified the window is closing
+
 ## Source
 
 - `apps/client/src/app/(protected)/notifications/page.tsx`

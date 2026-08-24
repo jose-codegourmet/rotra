@@ -154,6 +154,70 @@ Session APIs under `/api/sessions/*` MUST require a current profile. Missing aut
 - WHEN they request `/home`
 - THEN they are redirected to `/dashboard`
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/client_app/08_queue_session.md` (canonical Que Sessions). They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current discovery/create/start/close/leave and live reads are implemented; join, waitlist, and attendance screens remain mock.
+
+Automatic Queueing is specified separately in `automatic-queueing`.
+
+### Requirement: Who may create (documented)
+Documented product rule: only a Club Owner or Que Master may create a Club or Friendly Que Session. A regular Player cannot. Club Que Sessions SHALL require Session type MMR or Fun Games. Friendly Que Sessions SHALL be Regular (no EXP/MMR). Session type SHALL NOT change after Active or after any match has started.
+
+> Current `POST /api/sessions/quick` allows any signed-in player to create a player-organized session. That Current behavior stands. `docs/business_logic.md` also still describes player-organized creation.
+
+#### Scenario: Type locked after Active (documented)
+- GIVEN a Club Que Session is Active
+- WHEN a host tries to change Session type from MMR to Fun Games
+- THEN the documented rule refuses the change
+
+### Requirement: Lifecycle
+Documented states SHALL be Draft → Open → Active → Closed → Completed, with Cancelled terminal from Draft, Open, or Active. Refunds SHALL be handled manually outside ROTRA. Enrollment alone SHALL NOT mean “in session” for dashboard LIVE/resume indicators until status is `active` or `open` with `dateTime <= now`.
+
+#### Scenario: Future open Quick Session
+- GIVEN the host published an `open` session with future `dateTime`
+- WHEN the dashboard evaluates “in session”
+- THEN the host is enrolled but not in-session until Start Session or start time
+
+### Requirement: Admission, waitlist, and slots
+Capacity SHALL be `players_per_court × number_of_courts`. Overflow SHALL be waitlisted FIFO. A player SHALL have exactly one admission state: Not Registered, Pending Approval, Accepted, Waitlisted, Declined, Withdrawn, Cancelled Registration, Removed, or Reserved. Pending Approval SHALL not occupy a slot.
+
+#### Scenario: Ninth player
+- GIVEN capacity 8
+- WHEN a ninth player is approved
+- THEN they are waitlisted
+
+### Requirement: I Am In and cancellation
+I Am In SHALL require a confirmation modal and SHALL be irreversible by the Player. There SHALL be no automatic no-show that removes Accepted players. Free cancellation cutoff SHALL be 5 hours before start; after cutoff and before I Am In, cancellation remains allowed but payment obligation remains unless the host confirms replacement. Early Exit after I Am In SHALL require payment confirmation.
+
+#### Scenario: Player cannot undo I Am In
+- GIVEN the player confirmed I Am In
+- WHEN they try to revert themselves to Not Arrived
+- THEN the documented rule requires Que Master or Club Owner correction
+
+### Requirement: Password-protected sessions
+Password-protected sessions SHALL store hashes only. After the first failed attempt, retries SHALL be rate-limited to one per 5 minutes on the backend. Authorization SHALL be per user per session and revoked on cancel, withdraw, or Early Exit.
+
+#### Scenario: Rapid password guesses
+- GIVEN one failed password attempt
+- WHEN the player retries immediately
+- THEN the backend refuses until 5 minutes have passed
+
+### Requirement: Request a Match and Feed
+Request a Match SHALL create a proposal only — it MUST NOT create an active match or bypass Match Queue order. Every field change and manual host announcement SHALL write a Session Feed entry.
+
+#### Scenario: Request is not a match
+- GIVEN a player submits Request a Match
+- WHEN it is pending
+- THEN no active match is created until Que Master approval
+
+### Requirement: Multi-QM and realtime
+All assigned Que Masters SHALL have identical session-management permissions. Only the Club Owner MAY add, remove, or replace Que Masters, including while Active. The server SHALL be authoritative; multi-QM edits SHALL be last-write-wins with an audit trail.
+
+#### Scenario: QM cannot remove another QM
+- GIVEN two assigned Que Masters
+- WHEN one tries to remove the other
+- THEN the documented rule refuses
+
 ## Source
 
 - `apps/client/src/app/(protected)/dashboard/page.tsx`

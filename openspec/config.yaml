@@ -7,9 +7,13 @@ context: |
   Packages: packages/db (Prisma), packages/config, packages/legal-content
 
   OpenSpec specs under openspec/specs/ are the source of truth for CURRENT
-  implemented behavior. Do not invent planned features. If code and business
-  docs disagree, code wins. If a feature is only a stub, mock, or placeholder,
-  say so in the spec rather than describing intended product behavior.
+    implemented behavior. Documented product rules from docs/business_logic
+    may appear in a clearly labeled "Documented product rules" section on an
+    existing spec, or in a standalone spec whose Status says they are not
+    implemented. Do not claim planned rules are implemented. If code and
+    business docs disagree, Current requirements win for what the product
+    does now. Do not invent APIs or screens that are not in the docs or
+    existing specs.
 
   Spec format: openspec/specs/<domain>/spec.md with Purpose, Requirements
   (SHALL/MUST), and Given/When/Then scenarios. Cite key source file paths
@@ -24,5 +28,6 @@ rules:
     - Include a "Skipped / unimplemented" section when code is stub-only
   specs:
     - Use SHALL/MUST for invariants that exist in code
+    - Documented product rules from docs/business_logic must be labeled and not claimed as implemented
     - Each requirement needs at least one Given/When/Then scenario
     - End each spec with a Source note listing key file paths

@@ -82,6 +82,26 @@ The login page SHALL map query errors including `forbidden`, `admin_profile_miss
 - WHEN the login page renders
 - THEN a forbidden/access message is shown
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/admin_app/01_admin_overview.md` and `08_user_management.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact.
+
+### Requirement: No Facebook on Admin App
+Admin App login SHALL be email + password after Super Admin invite. There SHALL be no Facebook OAuth, social provider, or public sign-up. Documented extras not in Current middleware: 4-hour inactivity expiry, IP restriction, and failed-login rate limits.
+
+#### Scenario: Player Facebook session
+- GIVEN a Player Facebook session
+- WHEN they open the Admin App
+- THEN they are not an admin unless the three admin checks pass
+
+### Requirement: Three-part session check
+Every authenticated Admin App request SHALL require JWT role `admin`, `profiles.admin_role IS NOT NULL`, and `admin_is_active = true`. Current middleware already enforces session + role metadata and `requireAdminSession()` for the provisioned active profile.
+
+#### Scenario: Invited but inactive
+- GIVEN `admin_role` is set and `admin_is_active` is false
+- WHEN they hit a protected admin API
+- THEN access is denied
+
 ## Source
 
 - `apps/admin/src/middleware.ts`

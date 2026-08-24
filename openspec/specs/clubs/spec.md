@@ -90,6 +90,52 @@ An authenticated player SHALL create at most one `pending` club application via 
 - THEN only a client toast/local state change occurs
 - AND no club-member API is called
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/client_app/04_club_system.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Browse/join/manage pages remain mock; application create/approve is Current in this spec and `admin-approvals`.
+
+### Requirement: Club states
+Clubs SHALL be Active (sessions and joins allowed), Paused (visible; new sessions and join requests blocked; reversible), or Archived (read-only; no unarchive in MVP; never hard-deleted). Club Owner MAY toggle active ↔ paused. Archiving after demotion SHALL notify all members `club_closed`.
+
+#### Scenario: Paused blocks joins
+- GIVEN a club is Paused
+- WHEN a player submits a join request
+- THEN the request is blocked
+
+### Requirement: Join methods
+Players SHALL join via Invite Link/QR (one active link; disable or rotate invalidates the old), Direct Invite (bypasses Auto-Approve; accept/decline), or Request to Join. Auto-Approve ON SHALL immediately activate link/QR and requests. Direct invite acceptance SHALL always create an Active Member. Club names MAY duplicate; identity is `clubs.id`.
+
+> Minted-club default in Current `admin-approvals` is `autoApprove: true`. `00` and `04` settings table document Auto-Approve default OFF. Both are recorded; Current approve behavior wins for what code does now.
+
+#### Scenario: Direct invite bypass
+- GIVEN Auto-Approve is OFF
+- WHEN a player accepts a Club Owner direct invite
+- THEN they become an Active Member without the request queue
+
+### Requirement: Que Master assignment
+Only the Club Owner SHALL assign or revoke Que Masters, with no cap, including bulk assign of active members. Revocation SHALL remove session-management immediately; in-progress server state SHALL not roll back. The same player MAY be Que Master in multiple clubs.
+
+#### Scenario: Bulk assign
+- GIVEN three active members
+- WHEN the Club Owner assigns all three as Que Masters
+- THEN all three receive the role in that club
+
+### Requirement: Blacklist
+Blacklist SHALL silently block invite link (“This invite is no longer valid.”), join request (“Your request could not be processed.”), and direct invite (control unavailable). Active members MUST be removed first. Un-blacklist SHALL NOT re-add. Per-club only. Actions SHALL be logged with timestamp, actor, and optional internal note. A blacklisted Que Master’s role SHALL be revoked at removal.
+
+#### Scenario: Un-blacklist
+- GIVEN a player is removed from the blacklist
+- WHEN the action completes
+- THEN they are not automatically a member
+
+### Requirement: Club Owner statistics
+Statistics SHALL be read-only. Consistent members SHALL default to ≥ 3 sessions in the last 30 days (Club Owner-configurable). Financial aggregates (spent, collected, outstanding, markup “profit”) SHALL be Club Owner only. Que Masters MAY see per-session cost totals but not the aggregate financial view. Markup profit SHALL exclude tax and overhead.
+
+#### Scenario: QM cannot open aggregate financials
+- GIVEN a Que Master who is not the Club Owner
+- WHEN they try to open aggregate club financials
+- THEN access is denied
+
 ## Source
 
 - `apps/client/src/app/(protected)/clubs/**`
