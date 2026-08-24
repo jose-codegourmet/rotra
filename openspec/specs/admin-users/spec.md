@@ -84,6 +84,42 @@ Any admin MAY list and view `/admins` and `/admins/[id]`. Invite, role change, d
 - THEN the table and stats are shown
 - AND no mutation API is called
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/admin_app/08_user_management.md`, `10_tag_definitions.md`, `11_tester_management.md`, and `customer-detail-and-tags.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current customer/tester/admin/tag/waitlist APIs are implemented.
+
+### Requirement: Single profiles table
+Admins and players SHALL share `profiles`. Platform admin is `admin_role` non-null. Testers SHALL have `is_tester_account = true` and `admin_role IS NULL`. Granting admin SHALL NOT create a second identity row. Last-active time SHALL be derived from `admin_action_log`, shown as Never when absent.
+
+#### Scenario: Promote existing player
+- GIVEN a player profile with `admin_role` null
+- WHEN they are invited as Admin
+- THEN the same `profiles.id` receives `admin_role`
+
+### Requirement: Reserved tester tag
+Slug `tester-login-as-guest` SHALL be seeded and MUST NOT be deactivated via API or UI.
+
+#### Scenario: Deactivate reserved tag
+- GIVEN slug `tester-login-as-guest`
+- WHEN a Super Admin tries to deactivate it
+- THEN the documented rule refuses
+
+### Requirement: Tester revoke deletes password-only auth user
+Revoke SHALL be pending-only. When the tester has no `facebook_id`, revoke SHALL delete the auth user. Tester operations SHALL live under `/testers`, not `/customers`. Invite `redirectTo` SHALL be `{CLIENT_ORIGIN}/login-tester` with no trailing path.
+
+#### Scenario: Revoke email-only tester
+- GIVEN a pending tester with null `facebook_id`
+- WHEN an admin revokes
+- THEN the invitation is revoked and the auth user is deleted
+
+### Requirement: Customer tags are a public client contract
+All assigned tags SHALL be returned on Client `GET /api/profile/[userId]` and `getCurrentProfile()`. Slugs SHALL be treated as a public contract once assigned. Verification, onboarding completion, MMR, and EXP SHALL remain read-only on customer detail.
+
+#### Scenario: Client reads tags
+- GIVEN a customer has tag `tester-login-as-guest`
+- WHEN the client public profile API is called
+- THEN that slug is included
+
 ## Source
 
 - `apps/admin/src/app/(protected)/customers/**`

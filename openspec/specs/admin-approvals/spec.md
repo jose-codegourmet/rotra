@@ -70,6 +70,26 @@ Admin review of club owner applications. Approving creates a `clubs` row. Reject
 - WHEN they open `/approvals/demotions`
 - THEN only placeholder text is shown
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/admin_app/04_approvals_and_moderation.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current club-application approve/reject/SLA helper is implemented; demotions remain a placeholder; moderation queue is mock (`admin-platform`).
+
+### Requirement: Complaints and demotions
+Complaints SHALL be distinct from `moderation_flags`. Only members of the relevant club MAY file. Complainants SHALL NOT receive resolution notifications. Escalation MAY create `club_demotion_requests`. Demotion/transfer SHALL affect one club at a time. After ownership transfer, the former owner SHALL remain an active member with role `member`.
+
+#### Scenario: Complaint has no resolution ping
+- GIVEN a member filed a complaint
+- WHEN an admin resolves it
+- THEN the complainant is not notified of the outcome
+
+### Requirement: Account actions (documented)
+Documented moderation account actions: Warn; Suspend temporary (reversible); Suspend permanent (reversible by Super Admin only); Delete account (irreversible; PII removed; match records anonymized). Suspended players SHALL be logged out immediately. A suspended Club Owner’s clubs SHALL remain active for a configurable grace period (default 7 days). Content-policy categories for review removal are documented in `04_approvals_and_moderation.md`.
+
+#### Scenario: Temporary suspend
+- GIVEN an admin issues a temporary suspension
+- WHEN it takes effect
+- THEN the player cannot log in until lifted or the period ends
+
 ## Source
 
 - `apps/admin/src/app/(protected)/approvals/page.tsx`

@@ -51,6 +51,18 @@ Admin management of venue/place records. Any authenticated active admin can list
 - THEN the place row is removed
 - AND an admin action log row is written
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/admin_app/12_places_management.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current list/create/edit/confirm/delete APIs are implemented.
+
+### Requirement: Map visibility
+`confirmed` places SHALL be visible on the player map. `unreviewed` player-submitted places SHALL be hidden until confirmed or deleted. Confirm action SHALL be disabled for already-confirmed rows. Delete SHALL be a hard delete. Audit actions SHALL include `place_created`, `place_updated`, `place_confirmed`, and `place_deleted` with `entityType` `place`.
+
+#### Scenario: Unreviewed hidden from map
+- GIVEN a place with status `unreviewed`
+- WHEN the player dashboard map loads
+- THEN that place is not shown
+
 ## Source
 
 - `apps/admin/src/app/(protected)/places/page.tsx`

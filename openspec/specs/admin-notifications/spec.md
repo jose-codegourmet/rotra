@@ -57,6 +57,26 @@ Other admin modules SHALL create admin inbox notifications when they mutate cust
 - WHEN the customer mutation succeeds
 - THEN other admins can receive an inbox notification about that change
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/admin_app/09_notification_broadcasts.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current inbox and super-admin broadcast APIs are implemented; there is still no compose UI.
+
+### Requirement: Audience union and scopes
+Broadcast audience SHALL be the union of tag slugs and admin-role selectors, deduped by profile id, then exclusions applied. `admin_notifications` SHALL go only to profiles with `admin_role IS NOT NULL` and `admin_is_active`. Client `notifications` SHALL go to every resolved profile when `client` scope is requested, including admins-as-players. `targetUrl` SHALL be required when `admin` is in `appScopes`.
+
+#### Scenario: Inactive admin excluded from admin inbox
+- GIVEN a resolved profile with `admin_is_active` false
+- WHEN a broadcast includes `admin` scope
+- THEN no `admin_notifications` row is created for that profile
+
+### Requirement: Super Admin lifecycle severities
+Documented severities for other Super Admins: invite/resend/reactivate `info`; role change/deactivate/force sign-out `warning`; delete `urgent`.
+
+#### Scenario: Delete alert
+- GIVEN a Super Admin deletes an `admin` account
+- WHEN the fan-out runs
+- THEN other active Super Admins receive an `urgent` `admin_profile_changed` notice
+
 ## Source
 
 - `apps/admin/src/app/(protected)/notifications/page.tsx`

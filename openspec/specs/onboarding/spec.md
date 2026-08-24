@@ -104,6 +104,28 @@ If `profileCompletedBonusClaimed` is false at submit time, the same transaction 
 - WHEN a completion transaction would otherwise succeed
 - THEN no additional EXP or `expTransaction` is granted
 
+## Documented product rules
+
+The following rules come from `docs/business_logic/client_app/20_onboarding.md`. They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current requirements already describe the nine-step wizard, validation, admin/tester skip, and +20 EXP bonus.
+
+### Requirement: Non-dismissable wizard for regular players
+For non-admin, non-tester players with `onboarding_completed = false`, the wizard SHALL NOT be dismissable, skippable, or swipe-closed. The server-side guard SHALL redirect to `/onboarding` on every authenticated request until completion. The wizard SHALL always restart at Step 0 on each app open (no mid-wizard resume). Back SHALL be unavailable on Steps 0 and 1.
+
+#### Scenario: Deep link while incomplete
+- GIVEN `onboarding_completed` is false and the player is not an admin or tester
+- WHEN they request `/profile`
+- THEN they are redirected to `/onboarding`
+
+### Requirement: Phone and age privacy
+Phone SHALL be private (account recovery / operational contact). Age SHALL be 13–99 and never shown publicly. Playing-since and tournament-wins-last-year (`none` / `1–3` / `4+`) SHALL be public; tournament badge SHALL be omitted when `none`.
+
+> `00_ubiquitous_language.md` uses court position Both; `05_player_profile.md` uses All-Around. Current onboarding stores `front` | `back` | `both`.
+
+#### Scenario: Age stays private
+- GIVEN a completed profile with age 28
+- WHEN another player opens the public profile
+- THEN age is not shown
+
 ## Source
 
 - `apps/client/src/app/(protected)/layout.tsx`
