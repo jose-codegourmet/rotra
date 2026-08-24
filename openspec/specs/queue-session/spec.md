@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Client queue-session discovery, casual session creation, and live lobby/console reads in `apps/client`. Players can find open/active sessions, create a Quick Session, start/close as host, and leave. There is no implemented API to register for someone else's existing session. Umpire/QR scoring is not implemented in the client.
+Client queue-session discovery, casual session creation, live lobby/console reads, and mock join/waitlist screens in `apps/client`. Players can find open/active sessions, create a Quick Session, start/close as host, and leave. Standalone `/sessions/join` and `/sessions/joined` screens render the Smash Hub Ortigas fixture; JOIN does not persist a registration. `GET /api/sessions/[id]` is still mock discovery only. There is no POST register/waitlist API. Umpire/QR scoring is not implemented in the client.
 
 ## Requirements
 
@@ -87,8 +87,30 @@ Session APIs under `/api/sessions/*` MUST require a current profile. Missing aut
 - AND when status is `active` the host sees the QM console and others see the player active view
 - AND `closed` / `completed` / `cancelled` show the closed view
 
-### Requirement: Join of an existing session is not implemented
-`GET /api/sessions/[id]` SHALL look up `MOCK_SESSION_DISCOVERY` only (HTTP 404 if absent, 410 if status is not `open` or `active`). There is no POST register/waitlist endpoint. The register button on the live page SHALL be a no-op stub. Dashboard join that depends on the mock GET MAY report real database sessions as unavailable.
+### Requirement: Mock join and waitlist screens
+`/sessions/join` and `/sessions/joined` SHALL render standalone mock UI: dashboard chrome and the tester banner MUST be hidden via `isSessionStandaloneRoute`. Copy, capacity, and queue SHALL come from `MOCK_SESSION_JOIN` (Smash Hub Ortigas). Queue player statuses SHALL be `accepted`, `waitlisted`, or `reserved`. Accepted slot max SHALL be `courts × playersPerCourt` via `acceptedCapacity()`. JOIN on `/sessions/join` SHALL be a client `Link` to `/sessions/joined` and MUST NOT POST a register or waitlist API. `/sessions/joined` SHALL show the accepted state, a decorative (non-encoded) QR, and SHARE QR that uses Web Share or clipboard of the mock join path `/sessions/join`.
+
+#### Scenario: Join listing is standalone mock
+- GIVEN a signed-in player
+- WHEN they open `/sessions/join`
+- THEN the Smash Hub Ortigas listing renders (status, meta cards, capacity, queue)
+- AND dashboard chrome and the tester banner are hidden
+
+#### Scenario: JOIN navigates without persisting
+- GIVEN the player is on `/sessions/join`
+- WHEN they activate JOIN
+- THEN the client navigates to `/sessions/joined`
+- AND no register or waitlist API is called
+- AND no session-registration row is created
+
+#### Scenario: Accepted share screen
+- GIVEN a signed-in player
+- WHEN they open `/sessions/joined`
+- THEN the accepted state is shown with a decorative QR and SHARE QR
+- AND SHARE QR uses Web Share when available, otherwise copies `/sessions/join` to the clipboard
+
+### Requirement: Session-id join check remains mock-only
+`GET /api/sessions/[id]` SHALL look up `MOCK_SESSION_DISCOVERY` only (HTTP 404 if absent, 410 if status is not `open` or `active`). There is no POST register/waitlist endpoint. The register button on the live `/find-sessions/[sessionId]` page SHALL be a no-op stub. Dashboard join that depends on the mock GET MAY report real database sessions as unavailable.
 
 #### Scenario: Real session id on mock join check
 - GIVEN a database session id that is not in `MOCK_SESSION_DISCOVERY`
@@ -114,7 +136,17 @@ Session APIs under `/api/sessions/*` MUST require a current profile. Missing aut
 - `apps/client/src/app/(protected)/find-sessions/page.tsx`
 - `apps/client/src/app/(protected)/find-sessions/[sessionId]/page.tsx`
 - `apps/client/src/app/(protected)/home/page.tsx`
+- `apps/client/src/app/(protected)/sessions/join/page.tsx`
+- `apps/client/src/app/(protected)/sessions/joined/page.tsx`
 - `apps/client/src/app/api/sessions/**`
+- `apps/client/src/app/api/sessions/[id]/route.ts`
+- `apps/client/src/constants/mock-session-join.ts`
+- `apps/client/src/lib/sessions/session-standalone-route.ts`
+- `apps/client/src/lib/sessions/session-display-utils.ts`
+- `apps/client/src/components/modules/session/session-join-view/SessionJoinView.tsx`
+- `apps/client/src/components/modules/session/session-joined-view/SessionJoinedView.tsx`
+- `apps/client/src/components/modules/session/session-join-view/SessionJoinView.stories.tsx`
+- `apps/client/src/components/modules/session/session-joined-view/SessionJoinedView.stories.tsx`
 - `apps/client/src/lib/api/session-discovery.ts`
 - `apps/client/src/lib/api/session-live.ts`
 - `apps/client/src/lib/api/session-roster.ts`
