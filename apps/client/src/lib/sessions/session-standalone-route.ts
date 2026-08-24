@@ -2,6 +2,7 @@ export const SESSION_STANDALONE_ROUTES = [
 	"/sessions/join",
 	"/sessions/joined",
 	"/sessions/attendance",
+	"/sessions/court",
 ] as const;
 
 export function isSessionStandaloneRoute(pathname: string | null): boolean {
