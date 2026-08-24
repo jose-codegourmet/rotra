@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Client queue-session discovery, casual session creation, live lobby/console reads, and mock join/waitlist screens in `apps/client`. Players can find open/active sessions, create a Quick Session, start/close as host, and leave. Standalone `/sessions/join` and `/sessions/joined` screens render the Smash Hub Ortigas fixture; JOIN does not persist a registration. `GET /api/sessions/[id]` is still mock discovery only. There is no POST register/waitlist API. Umpire/QR scoring is not implemented in the client.
+Client queue-session discovery, casual session creation, live lobby/console reads, mock join/waitlist screens, and a mock attendance check-in screen in `apps/client`. Players can find open/active sessions, create a Quick Session, start/close as host, and leave. Standalone `/sessions/join` and `/sessions/joined` screens render the Smash Hub Ortigas fixture; JOIN does not persist a registration. Standalone `/sessions/attendance` renders the Smash Hub Ortigas attendance fixture; I AM IN is a client-only toast and local arrived flip. `GET /api/sessions/[id]` is still mock discovery only. There is no POST register/waitlist or attendance API. The prepared-flow step is shown locked and is not implemented. Umpire/QR scoring is not implemented in the client.
 
 ## Requirements
 
@@ -109,6 +109,30 @@ Session APIs under `/api/sessions/*` MUST require a current profile. Missing aut
 - THEN the accepted state is shown with a decorative QR and SHARE QR
 - AND SHARE QR uses Web Share when available, otherwise copies `/sessions/join` to the clipboard
 
+### Requirement: Mock attendance check-in screen
+`/sessions/attendance` SHALL render standalone mock UI: dashboard chrome and the tester banner MUST be hidden via `isSessionStandaloneRoute`. The header SHALL be ROTRA / Run the game. with no tester chip. Copy and session details SHALL come from `MOCK_SESSION_ATTENDANCE` and `MOCK_SESSION_ATTENDANCE_META` (Smash Hub Ortigas). Default state SHALL be Accepted + Not arrived: YOUR STATUS `Joined • not arrived` with ACCEPTED, orange NOT ARRIVED, event 2×2 (Smash Hub Ortigas, Sun, Aug 23, 7:00—9:00 PM, Doubles • 2 x 4), `8 accepted • rest waitlisted`, and ATTENDANCE Step 1 of 2 with I am in (NOW) and I am prepared (LOCKED). Sticky I AM IN SHALL toast and flip local arrived state only. It MUST NOT call an attendance API or write the database. The prepared step SHALL stay locked; the prepared flow is not implemented.
+
+#### Scenario: Attendance screen is standalone mock
+- GIVEN a signed-in player
+- WHEN they open `/sessions/attendance`
+- THEN the Smash Hub Ortigas attendance fixture renders (Accepted + Not arrived, event meta, Step 1 of 2)
+- AND dashboard chrome and the tester banner are hidden
+- AND no tester chip is shown
+
+#### Scenario: I AM IN is local only
+- GIVEN the player is on `/sessions/attendance` in the default not-arrived state
+- WHEN they activate I AM IN
+- THEN a client toast reports check-in
+- AND the UI flips locally to arrived (ARRIVED, `Joined • arrived`, Step 1 DONE / IN, CTA YOU’RE IN disabled)
+- AND no attendance API is called
+- AND no registration or attendance row is written
+
+#### Scenario: Prepared step stays locked
+- GIVEN the player is on `/sessions/attendance`
+- WHEN they view ATTENDANCE Step 1 of 2
+- THEN I am prepared is shown as LOCKED
+- AND there is no implemented prepared-flow action
+
 ### Requirement: Session-id join check remains mock-only
 `GET /api/sessions/[id]` SHALL look up `MOCK_SESSION_DISCOVERY` only (HTTP 404 if absent, 410 if status is not `open` or `active`). There is no POST register/waitlist endpoint. The register button on the live `/find-sessions/[sessionId]` page SHALL be a no-op stub. Dashboard join that depends on the mock GET MAY report real database sessions as unavailable.
 
@@ -138,15 +162,19 @@ Session APIs under `/api/sessions/*` MUST require a current profile. Missing aut
 - `apps/client/src/app/(protected)/home/page.tsx`
 - `apps/client/src/app/(protected)/sessions/join/page.tsx`
 - `apps/client/src/app/(protected)/sessions/joined/page.tsx`
+- `apps/client/src/app/(protected)/sessions/attendance/page.tsx`
 - `apps/client/src/app/api/sessions/**`
 - `apps/client/src/app/api/sessions/[id]/route.ts`
 - `apps/client/src/constants/mock-session-join.ts`
+- `apps/client/src/constants/mock-session-attendance.ts`
 - `apps/client/src/lib/sessions/session-standalone-route.ts`
 - `apps/client/src/lib/sessions/session-display-utils.ts`
 - `apps/client/src/components/modules/session/session-join-view/SessionJoinView.tsx`
 - `apps/client/src/components/modules/session/session-joined-view/SessionJoinedView.tsx`
+- `apps/client/src/components/modules/session/session-attendance-view/SessionAttendanceView.tsx`
 - `apps/client/src/components/modules/session/session-join-view/SessionJoinView.stories.tsx`
 - `apps/client/src/components/modules/session/session-joined-view/SessionJoinedView.stories.tsx`
+- `apps/client/src/components/modules/session/session-attendance-view/SessionAttendanceView.stories.tsx`
 - `apps/client/src/lib/api/session-discovery.ts`
 - `apps/client/src/lib/api/session-live.ts`
 - `apps/client/src/lib/api/session-roster.ts`
