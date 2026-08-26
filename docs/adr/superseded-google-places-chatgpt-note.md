@@ -1,3 +1,8 @@
+> **SUPERSEDED 2026-08-26.** Code uses **Mapbox** (zero Google Places/Maps references).
+> Kept for historical context only. Do not implement from this note.
+>
+> See `.agents/context/known-drift.md` and `apps/*/lib/geo/geocode.ts`.
+
 # Mapbox Missing Establishments — Problem, Options, and Recommended Solution
 
 ## Problem

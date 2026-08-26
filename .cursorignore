@@ -1,0 +1,25 @@
+# Cursor / agent ignore — keep greps cheap
+
+.next/
+**/.next/
+**/storybook-static/
+**/node_modules/
+exported/
+otf-web-fonts/
+**/public/fonts/
+pnpm-lock.yaml
+packages/db/src/generated/
+**/supabase-database.types.ts
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.webp
+**/*.gif
+**/*.svg
+**/*.woff
+**/*.woff2
+**/*.otf
+**/*.ttf
+.DS_Store
+**/.turbo/
+**/dist/

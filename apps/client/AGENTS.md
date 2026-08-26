@@ -1,0 +1,27 @@
+# AGENTS.md — `@rotra/client`
+
+> Nested entry for `apps/client`. Root: `/AGENTS.md`. Status: `.agents/context/implementation-status.md`.
+
+**Port:** 3000 · **Auth:** Facebook OAuth + tester / admin-gate paths · middleware session.
+
+## Do not confuse these routes
+
+| Path | Truth |
+|------|-------|
+| `/find-sessions`, `/find-sessions/[sessionId]` | **REAL** live session |
+| `/sessions/join|joined|queue|court|attendance` | **MOCK** — do not wire “for real” here without a deliberate migration |
+| `/clubs/apply` | **REAL** |
+| Other `/clubs/*` | **MOCK** / ProvisionBox |
+| `/profile` | **PARTIAL** — identity real; cards mock |
+
+## Patterns
+
+- Hooks: `src/hooks/useFeature/{client,server,queryKey}.ts`
+- Fixtures: `src/constants/`
+- Redux: `authSlice` + `uiSlice` only
+- Theme: dark default + light toggle — use tokens, not hex
+- Mapbox: `dynamic({ ssr: false })`
+
+## Quick Session
+
+`POST /api/sessions/quick` is REAL. Product conflict with Owner/QM-only create — do not “fix” without OpenSpec.
