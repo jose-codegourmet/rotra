@@ -59,11 +59,10 @@ Prefer `Controller` + `Field` for new work. Cleanup targets:
 Prefer `@/constants/...`. Many of ~181 stories inline mocks; data-heavy module stories should migrate
 when touched. Do not block PRs solely for primitive `args`-only stories.
 
-## 5. CI does not run `type-check`
+## 5. CI does not run `type-check` — **done**
 
-Highest ROI automation gap. Snippet in `docs/ways-of-working.md` §6.1 — add a `type-check` job
-alongside Biome in `.github/workflows/biome.yml` (or a sibling workflow). Requires `pnpm db:generate`
-before `tsc`.
+Resolved: `.github/workflows/biome.yml` now has a `type-check` job (`pnpm db:generate` then
+`pnpm type-check`) alongside Biome. Snippet remains in `docs/ways-of-working.md` §6.1.
 
 ## 6. Missing verification recipes
 

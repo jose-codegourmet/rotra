@@ -17,7 +17,7 @@ pnpm dev / make dev          # all apps; ngrok → client unless SKIP_NGROK=1
 make dev-client | dev-admin | dev-umpire | dev-landing
 
 pnpm lint                    # biome
-pnpm type-check              # tsc — NOT in CI
+pnpm type-check              # tsc — CI gate (after pnpm db:generate)
 pnpm build                   # NOT in CI; pre-push runs it
 make check-fix               # biome autofix
 
@@ -54,7 +54,8 @@ Do not `--no-verify` to skip the build gate.
 
 - Matrix: `client`, `admin`, `umpire` (landing **excluded**)
 - Job: `pnpm --filter @rotra/<app> lint`
-- **No** `type-check`, **no** `build` in CI
+- Job: `type-check` — `pnpm db:generate` then `pnpm type-check`
+- **No** `build` in CI
 
 ## Environment variables
 
