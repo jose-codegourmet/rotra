@@ -206,8 +206,8 @@ pnpm approve-builds            # first install only
 make dev                       # all apps (+ ngrok); SKIP_NGROK=1 to skip
 make dev-client                # or dev-admin / dev-umpire / dev-landing
 
-pnpm lint                      # biome — the only CI gate
-pnpm type-check                # tsc --noEmit — NOT in CI, run it yourself
+pnpm lint                      # biome — CI gate (client/admin/umpire)
+pnpm type-check                # tsc --noEmit — CI gate (after pnpm db:generate)
 pnpm build                     # NOT in CI, but pre-push hook runs it
 make check-fix                 # biome autofix
 
@@ -215,13 +215,13 @@ pnpm db:generate | db:push | db:migrate | db:studio | db:seed
 ```
 
 Hooks: `pre-commit` = lint · `pre-push` = lint + build · `commit-msg` = commitlint.
-CI runs **Biome lint only**, on PRs, for client/admin/umpire (landing excluded).
+CI runs **Biome lint** (client/admin/umpire; landing excluded) and **`pnpm type-check`** on PRs.
 
 ---
 
 ## 9. Definition of done
 
-- [ ] `pnpm lint` and `pnpm type-check` pass — type-check is not in CI, so it is on you
+- [ ] `pnpm lint` and `pnpm type-check` pass — both run in CI on PRs
 - [ ] `pnpm build` passes for every app you touched
 - [ ] New/changed components have a `.stories.tsx`; prefer fixtures from `src/constants/`
 - [ ] Forms use `FormProvider` + `Field` + `Controller`, colocated Zod schema, toast on success

@@ -12,7 +12,7 @@
 Three facts shape every process decision here:
 
 1. **There are almost no automated tests, by decision.** Broad unit testing is deliberately
-   deferred while behavior is still moving (§6.1). CI runs Biome lint and nothing else. Every
+   deferred while behavior is still moving (§6.1). CI runs Biome lint and `pnpm type-check`. Every
    safety net in this repo is a human eye, a type, or a manual check.
 2. **The schema and specs run ahead of the UI.** 36 OpenSpec domains, 36 Prisma models, and a large
    surface of screens that render mock constants. "It exists in the repo" and "it works" are
@@ -94,7 +94,7 @@ Co-Authored-By: <agent name/model>
 ### Done
 
 - [ ] `pnpm lint` passes
-- [ ] `pnpm type-check` passes — **CI does not run this; you must**
+- [ ] `pnpm type-check` passes — CI runs this on PRs after `pnpm db:generate`
 - [ ] `pnpm build` passes for every app touched
 - [ ] Stories exist for new/changed components, fixtures pulled from `app/constants/`
 - [ ] Forms: `Form` + `Controller`, colocated `schema.ts` + `default.ts`, disabled-while-pending,
@@ -136,10 +136,10 @@ behavior has stopped moving and broader tests start holding their value.
 **Agents:** do not add test files or a test runner outside the Required rows above without asking.
 An unsolicited vitest setup is scope creep.
 
-Minimum CI addition:
+CI job in `.github/workflows/biome.yml` (alongside the Biome lint matrix):
 
 ```yaml
-# .github/workflows/biome.yml — add alongside the existing lint job
+# .github/workflows/biome.yml — type-check job alongside the lint matrix
 type-check:
   runs-on: ubuntu-latest
   steps:
