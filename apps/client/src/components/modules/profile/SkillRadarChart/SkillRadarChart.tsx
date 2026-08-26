@@ -18,10 +18,9 @@ interface SkillRadarChartProps {
 	data: SkillRadarChartData[];
 }
 
-// Dark-mode accent and grid colours — fixed values since the app is always dark.
-const ACCENT = "#00FF88";
+const ACCENT = "var(--color-accent)";
 const GRID_STROKE = "rgba(255,255,255,0.06)";
-const LABEL_COLOR = "#849585";
+const LABEL_COLOR = "var(--color-text-secondary)";
 
 export function SkillRadarChart({ data }: SkillRadarChartProps) {
 	return (

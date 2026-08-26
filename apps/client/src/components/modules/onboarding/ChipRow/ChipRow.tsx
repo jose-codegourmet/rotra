@@ -31,17 +31,17 @@ export function ChipRow({ value, onChange, options }: ChipRowProps) {
 						type="button"
 						onClick={() => onChange(opt.v)}
 						className={cn(
-							"w-full rounded-lg border text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#201f20]",
+							"w-full rounded-lg border text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg-surface",
 							"min-h-[44px]",
 							Icon && "group",
 							rich &&
-								"flex items-center justify-between gap-3 p-4 md:p-6 md:focus-visible:ring-offset-[#201f20]",
+								"flex items-center justify-between gap-3 p-4 md:p-6 md:focus-visible:ring-offset-bg-surface",
 							!rich && "p-3 text-body",
 							selected && rich && "shadow-[0_0_24px_rgba(0,255,136,0.08)]",
 							selected && !rich && "border-accent bg-accent/10 text-accent",
 							selected &&
 								rich &&
-								"border-accent bg-[#2a2a2b] text-accent md:bg-[#2a2a2b]",
+								"border-accent bg-bg-elevated text-accent md:bg-bg-elevated",
 							!selected &&
 								!rich &&
 								"border-border bg-bg-surface text-text-primary hover:bg-bg-elevated",
@@ -62,7 +62,7 @@ export function ChipRow({ value, onChange, options }: ChipRowProps) {
 										"flex size-9 shrink-0 items-center justify-center rounded-full transition-colors md:size-10",
 										selected
 											? "bg-accent/20"
-											: "bg-bg-base md:bg-[#131314] group-hover:bg-accent/10",
+											: "bg-bg-base group-hover:bg-accent/10",
 									)}
 								>
 									<Icon
@@ -95,12 +95,12 @@ export function ChipRow({ value, onChange, options }: ChipRowProps) {
 									"flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
 									selected
 										? "border-accent bg-accent"
-										: "border-border md:border-[#3b4b3d]",
+										: "border-border md:border-border-strong",
 								)}
 								aria-hidden
 							>
 								{selected ? (
-									<span className="size-2 rounded-full bg-[#00210c]" />
+									<span className="size-2 rounded-full bg-bg-base" />
 								) : null}
 							</div>
 						) : null}

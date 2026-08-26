@@ -41,8 +41,8 @@ function UserLocationMarker({ location }: { location: SessionGeoPoint }) {
 	return (
 		<Marker longitude={location.lng} latitude={location.lat} anchor="center">
 			<div className="relative flex items-center justify-center">
-				<span className="absolute h-8 w-8 animate-ping rounded-full bg-[#00cc6a] opacity-20" />
-				<span className="relative h-4 w-4 rounded-full border-2 border-white bg-[#00cc6a] shadow-md" />
+				<span className="absolute h-8 w-8 animate-ping rounded-full bg-accent opacity-20" />
+				<span className="relative h-4 w-4 rounded-full border-2 border-white bg-accent shadow-md" />
 			</div>
 		</Marker>
 	);
@@ -197,6 +197,7 @@ export function DashboardMap({
 						type="geojson"
 						data={createRadiusCircle(center, radiusKm)}
 					>
+						{/* Mapbox GL paint props require resolved hex/rgba; CSS vars are not interpolated. */}
 						<Layer
 							id="radius-circle-fill"
 							type="fill"
