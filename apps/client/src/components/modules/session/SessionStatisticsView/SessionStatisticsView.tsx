@@ -15,9 +15,9 @@ import { cn } from "@/lib/utils";
 
 import { KpiCard } from "../KpiCard/KpiCard";
 
-const ACCENT = "#00ff88";
+const ACCENT = "var(--color-accent)";
 const MUTED = "rgba(255,255,255,0.12)";
-const LABEL = "#9090a0";
+const LABEL = "var(--color-text-secondary)";
 
 export interface SessionStatisticsViewProps {
 	title?: string;
@@ -85,8 +85,8 @@ export function SessionStatisticsView({
 							/>
 							<Tooltip
 								contentStyle={{
-									background: "#1a1a1d",
-									border: "1px solid #2a2a2e",
+									background: "var(--color-bg-surface)",
+									border: "1px solid var(--color-border)",
 									borderRadius: 8,
 								}}
 								labelStyle={{ color: LABEL }}

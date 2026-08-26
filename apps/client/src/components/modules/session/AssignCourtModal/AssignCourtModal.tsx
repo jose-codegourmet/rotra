@@ -170,7 +170,7 @@ export function AssignCourtModal({
 
 					<Button
 						type="button"
-						className="h-11 w-full bg-gradient-to-br from-[#f1ffef] to-accent font-black uppercase tracking-widest text-bg-base shadow-accent"
+						className="h-11 w-full bg-gradient-to-br from-accent to-accent-dim font-black uppercase tracking-widest text-bg-base shadow-accent"
 						onClick={() => {
 							onConfirm?.();
 							onOpenChange(false);

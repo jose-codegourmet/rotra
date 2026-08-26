@@ -145,7 +145,7 @@ export function SessionFinancialsView({
 						</div>
 						<Button
 							type="button"
-							className="w-full h-11 uppercase font-black tracking-widest text-bg-base bg-gradient-to-br from-[#f1ffef] to-accent shadow-accent"
+							className="w-full h-11 uppercase font-black tracking-widest text-bg-base bg-gradient-to-br from-accent to-accent-dim shadow-accent"
 						>
 							Generate invoice
 						</Button>
