@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Client queue-session discovery, casual session creation, live lobby/console reads, mock join/waitlist screens, and a mock attendance check-in screen in `apps/client`. Players can find open/active sessions, create a Quick Session, start/close as host, and leave. Standalone `/sessions/join` and `/sessions/joined` screens render the Smash Hub Ortigas fixture; JOIN does not persist a registration. Standalone `/sessions/attendance` renders the Smash Hub Ortigas attendance fixture; I AM IN is a client-only toast and local arrived flip. `GET /api/sessions/[id]` is still mock discovery only. There is no POST register/waitlist or attendance API. The prepared-flow step is shown locked and is not implemented. Umpire/QR scoring is not implemented in the client.
+Client queue-session discovery, casual session creation, live lobby/console reads, mock join/waitlist screens, a mock attendance check-in screen, a mock QM Court View, and a mock QM Queue View in `apps/client`. Players can find open/active sessions, create a Quick Session, start/close as host, and leave. Standalone `/sessions/join` and `/sessions/joined` screens render the Smash Hub Ortigas fixture; JOIN does not persist a registration. Standalone `/sessions/attendance` renders the Smash Hub Ortigas attendance fixture; I AM IN is a client-only toast and local arrived flip. Standalone `/sessions/court` renders the Smash Hub Ortigas court fixture; HOLD COURT 1 is a client-only toast and local On Hold flip. Standalone `/sessions/queue` renders the Smash Hub Ortigas queue fixture; SEND TO COURT 2 is a client-only toast. `GET /api/sessions/[id]` is still mock discovery only. There is no POST register/waitlist, attendance, court, or queue API. The prepared-flow step is shown locked and is not implemented. Umpire/QR scoring is not implemented in the client.
 
 ## Requirements
 
@@ -133,6 +133,61 @@ Session APIs under `/api/sessions/*` MUST require a current profile. Missing aut
 - THEN I am prepared is shown as LOCKED
 - AND there is no implemented prepared-flow action
 
+### Requirement: Mock QM Court View screen
+`/sessions/court` SHALL render standalone mock UI: dashboard chrome and the tester banner MUST be hidden via `isSessionStandaloneRoute`. The header SHALL be ROTRA / Run the game. with no tester chip and no QUE MASTER pill. Copy and court cards SHALL come from `MOCK_SESSION_COURT` and `MOCK_SESSION_COURTS` (Smash Hub Ortigas). Default state SHALL be Court view, `Smash Hub Ortigas • 7:00—9:00 PM • Doubles`, `1 LIVE COURT`, Court 1 ACTIVE (TEAM A Jae Lim / Mia Reyes vs TEAM B Kai Tan / Lia Santos, `11—8`, `08:24 elapsed`), and Court 2 EMPTY (`No match on this court. It's free for the next pairing.`). The STATUS legend SHALL show ACTIVE, EMPTY, and ON HOLD. Sticky HOLD COURT 1 SHALL toast and flip Court 1 to ON HOLD locally (RESUME COURT 1 reverses that flip). It MUST NOT call a court API or write the database. There is no ADD MATCH control.
+
+#### Scenario: Court view is standalone mock
+- GIVEN a signed-in player
+- WHEN they open `/sessions/court`
+- THEN the Smash Hub Ortigas court fixture renders (`1 LIVE COURT`, Court 1 ACTIVE `11—8`, Court 2 EMPTY)
+- AND dashboard chrome and the tester banner are hidden
+- AND no tester chip is shown
+- AND there is no ADD MATCH control
+
+#### Scenario: HOLD COURT 1 is local only
+- GIVEN the player is on `/sessions/court` with Court 1 ACTIVE
+- WHEN they activate HOLD COURT 1
+- THEN a client toast reports Court 1 is on hold
+- AND Court 1 flips locally to ON HOLD
+- AND the sticky CTA becomes RESUME COURT 1
+- AND the live-court label updates from remaining ACTIVE courts
+- AND no court API is called
+- AND no match or court row is written
+
+#### Scenario: RESUME COURT 1 is local only
+- GIVEN Court 1 is ON HOLD on `/sessions/court`
+- WHEN they activate RESUME COURT 1
+- THEN a client toast reports Court 1 is active
+- AND Court 1 flips locally to ACTIVE
+- AND no court API is called
+- AND no match or court row is written
+
+### Requirement: Mock QM Queue View screen
+`/sessions/queue` SHALL render standalone mock UI: dashboard chrome and the tester banner MUST be hidden via `isSessionStandaloneRoute`. The header SHALL be ROTRA / Run the game. with a QUE MASTER pill and no tester chip. Copy, next-up pairing, and upcoming matches SHALL come from `MOCK_SESSION_QUEUE`, `MOCK_QUEUE_NEXT_UP_PLAYERS`, and `MOCK_QUEUE_UPCOMING_MATCHES` (Smash Hub Ortigas). Default state SHALL be NEXT UP, Queue, `Smash Hub Ortigas • 7:00—9:00 PM • 2 courts • Doubles`, MATCH 1 • COURT 2 FREE (`Nico + Bea vs Eli + Sam`) with four READY rows (Nico Cruz / Bea Ortiz / Eli Park / Sam Cruz, 2 min), and NEXT MATCHES: rank 2 Ana + Jun vs Pat + Rio READY 8 min, rank 3 Ken + Val vs Drew + Pia WAITING 14 min. Drag grips and the “Drag to reorder” hint SHALL be visual only. Sticky SEND TO COURT 2 SHALL toast only and MUST NOT change the next-up or upcoming lists. It MUST NOT call a queue or court API or write the database. There is no ADD MATCH control.
+
+#### Scenario: Queue view is standalone mock
+- GIVEN a signed-in player
+- WHEN they open `/sessions/queue`
+- THEN the Smash Hub Ortigas queue fixture renders (NEXT UP pairing, upcoming matches)
+- AND the QUE MASTER pill is shown
+- AND dashboard chrome and the tester banner are hidden
+- AND no tester chip is shown
+- AND there is no ADD MATCH control
+
+#### Scenario: SEND TO COURT 2 is local only
+- GIVEN the player is on `/sessions/queue`
+- WHEN they activate SEND TO COURT 2
+- THEN a client toast reports Sent to Court 2
+- AND the next-up and upcoming lists do not change
+- AND no queue or court API is called
+- AND no match or court row is written
+
+#### Scenario: Reorder grips do not persist
+- GIVEN the player is on `/sessions/queue`
+- WHEN they view NEXT MATCHES
+- THEN drag grips and “Drag to reorder” are shown
+- AND reordering is not implemented
+
 ### Requirement: Session-id join check remains mock-only
 `GET /api/sessions/[id]` SHALL look up `MOCK_SESSION_DISCOVERY` only (HTTP 404 if absent, 410 if status is not `open` or `active`). There is no POST register/waitlist endpoint. The register button on the live `/find-sessions/[sessionId]` page SHALL be a no-op stub. Dashboard join that depends on the mock GET MAY report real database sessions as unavailable.
 
@@ -156,7 +211,7 @@ Session APIs under `/api/sessions/*` MUST require a current profile. Missing aut
 
 ## Documented product rules
 
-The following rules come from `docs/business_logic/client_app/08_queue_session.md` (canonical Que Sessions). They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current discovery/create/start/close/leave and live reads are implemented; join, waitlist, and attendance screens remain mock.
+The following rules come from `docs/business_logic/client_app/08_queue_session.md` (canonical Que Sessions). They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current discovery/create/start/close/leave and live reads are implemented; join, waitlist, attendance, court, and queue screens remain mock.
 
 Automatic Queueing is specified separately in `automatic-queueing`.
 
@@ -227,18 +282,26 @@ All assigned Que Masters SHALL have identical session-management permissions. On
 - `apps/client/src/app/(protected)/sessions/join/page.tsx`
 - `apps/client/src/app/(protected)/sessions/joined/page.tsx`
 - `apps/client/src/app/(protected)/sessions/attendance/page.tsx`
+- `apps/client/src/app/(protected)/sessions/court/page.tsx`
+- `apps/client/src/app/(protected)/sessions/queue/page.tsx`
 - `apps/client/src/app/api/sessions/**`
 - `apps/client/src/app/api/sessions/[id]/route.ts`
 - `apps/client/src/constants/mock-session-join.ts`
 - `apps/client/src/constants/mock-session-attendance.ts`
+- `apps/client/src/constants/mock-session-court.ts`
+- `apps/client/src/constants/mock-session-queue.ts`
 - `apps/client/src/lib/sessions/session-standalone-route.ts`
 - `apps/client/src/lib/sessions/session-display-utils.ts`
 - `apps/client/src/components/modules/session/session-join-view/SessionJoinView.tsx`
 - `apps/client/src/components/modules/session/session-joined-view/SessionJoinedView.tsx`
 - `apps/client/src/components/modules/session/session-attendance-view/SessionAttendanceView.tsx`
+- `apps/client/src/components/modules/session/session-court-view/SessionCourtView.tsx`
+- `apps/client/src/components/modules/session/session-queue-view/SessionQueueView.tsx`
 - `apps/client/src/components/modules/session/session-join-view/SessionJoinView.stories.tsx`
 - `apps/client/src/components/modules/session/session-joined-view/SessionJoinedView.stories.tsx`
 - `apps/client/src/components/modules/session/session-attendance-view/SessionAttendanceView.stories.tsx`
+- `apps/client/src/components/modules/session/session-court-view/SessionCourtView.stories.tsx`
+- `apps/client/src/components/modules/session/session-queue-view/SessionQueueView.stories.tsx`
 - `apps/client/src/lib/api/session-discovery.ts`
 - `apps/client/src/lib/api/session-live.ts`
 - `apps/client/src/lib/api/session-roster.ts`
