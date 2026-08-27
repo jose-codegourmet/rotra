@@ -18,7 +18,7 @@ export function OnboardingStepPanel({
 		<div
 			className={cn(
 				"relative flex w-full flex-1 flex-col",
-				"md:overflow-hidden md:rounded-xl md:border md:border-white/5 md:bg-[#201f20]/90 md:px-8 md:py-10 md:shadow-2xl md:backdrop-blur-xl",
+				"md:overflow-hidden md:rounded-xl md:border md:border-white/5 md:bg-bg-surface/90 md:px-8 md:py-10 md:shadow-2xl md:backdrop-blur-xl",
 				"lg:px-12 lg:py-12",
 				className,
 			)}
