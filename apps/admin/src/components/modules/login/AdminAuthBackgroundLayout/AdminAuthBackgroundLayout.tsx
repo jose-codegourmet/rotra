@@ -38,10 +38,7 @@ export function AdminAuthBackgroundLayout({
 					style={{ animation: "fadeUp 500ms ease-out both" }}
 				>
 					<Logo variant="dark" className="w-48" />
-					<p
-						className="mt-3 text-xs font-medium uppercase"
-						style={{ color: "#9090A0", letterSpacing: "0.2em" }}
-					>
+					<p className="mt-3 text-xs font-medium uppercase tracking-[0.2em] text-text-secondary">
 						{tagline}
 					</p>
 				</div>

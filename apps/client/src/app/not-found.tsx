@@ -29,7 +29,7 @@ export default function NotFoundPage() {
 			<div className="flex items-center gap-3 mt-8">
 				<Link
 					href="/dashboard"
-					className="h-11 px-6 flex items-center text-small font-black uppercase tracking-widest text-bg-base bg-gradient-to-br from-[#f1ffef] to-accent rounded-md shadow-accent transition-transform active:scale-95"
+					className="h-11 px-6 flex items-center text-small font-black uppercase tracking-widest text-bg-base bg-gradient-to-br from-accent to-accent-dim rounded-md shadow-accent transition-transform active:scale-95"
 				>
 					Go Home
 				</Link>

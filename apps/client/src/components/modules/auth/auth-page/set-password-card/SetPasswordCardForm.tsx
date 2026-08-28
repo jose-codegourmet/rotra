@@ -68,8 +68,7 @@ export function SetPasswordCardForm() {
 				<div className="space-y-2">
 					<label
 						htmlFor="set-password"
-						className="text-xs font-bold uppercase tracking-wider"
-						style={{ color: "#9090A0" }}
+						className="text-xs font-bold uppercase tracking-wider text-text-secondary"
 					>
 						Password
 					</label>
@@ -85,12 +84,12 @@ export function SetPasswordCardForm() {
 									autoComplete="new-password"
 									disabled={busy}
 									className={cn(
-										"h-11 border-[#2A2A2E] bg-[#0B0B0C] pr-11 text-[#F0F0F2]",
+										"h-11 border-border bg-bg-base pr-11 text-text-primary",
 									)}
 								/>
 								<button
 									type="button"
-									className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-[#9090A0] transition-colors hover:text-[#F0F0F2]"
+									className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-text-secondary transition-colors hover:text-text-primary"
 									onClick={() => setShowPassword((c) => !c)}
 									aria-label={showPassword ? "Hide password" : "Show password"}
 									disabled={busy}
@@ -113,8 +112,7 @@ export function SetPasswordCardForm() {
 				<div className="space-y-2">
 					<label
 						htmlFor="set-password-confirm"
-						className="text-xs font-bold uppercase tracking-wider"
-						style={{ color: "#9090A0" }}
+						className="text-xs font-bold uppercase tracking-wider text-text-secondary"
 					>
 						Confirm password
 					</label>
@@ -130,12 +128,12 @@ export function SetPasswordCardForm() {
 									autoComplete="new-password"
 									disabled={busy}
 									className={cn(
-										"h-11 border-[#2A2A2E] bg-[#0B0B0C] pr-11 text-[#F0F0F2]",
+										"h-11 border-border bg-bg-base pr-11 text-text-primary",
 									)}
 								/>
 								<button
 									type="button"
-									className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-[#9090A0] transition-colors hover:text-[#F0F0F2]"
+									className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-text-secondary transition-colors hover:text-text-primary"
 									onClick={() => setShowConfirm((c) => !c)}
 									aria-label={
 										showConfirm
