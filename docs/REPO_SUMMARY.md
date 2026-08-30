@@ -618,7 +618,7 @@ rotra-app/
 │   └── views/            # View/screen inventories
 ├── openspec/
 │   ├── config.yaml       # Spec-driven workflow rules
-│   ├── specs/            # Current-behavior specs (36 domains)
+│   ├── specs/            # Current-behavior specs (37 domains)
 │   └── changes/          # Active OpenSpec changes (often empty / gitkeep)
 ├── .agents/skills/       # Repo skills: create-component, form audit/correct, shadcn, supabase
 ├── .cursor/
@@ -626,7 +626,7 @@ rotra-app/
 │   └── skills/           # OpenSpec Cursor skills
 ├── .github/workflows/    # biome.yml (PR lint matrix: client, admin, umpire)
 ├── .husky/               # pre-commit lint; pre-push lint+build; commit-msg commitlint
-├── email-templates/      # Supabase Auth HTML (paste into dashboard)
+├── email-templates/      # Shared Supabase Auth HTML (paste into dashboard); per-app copies in apps/*/src/email-templates/
 ├── exported/             # Logo asset exports (not app code)
 ├── otf-web-fonts/        # Font source package
 ├── Makefile              # nvm + pnpm + optional ngrok helpers

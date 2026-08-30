@@ -4,7 +4,7 @@
 > Everything deeper is loaded **on demand** via the routing table in §2 — do not read the whole
 > `docs/` tree or `docs/REPO_SUMMARY.md` "just in case."
 
-**Last verified against the tree:** 2026-08-26 · **Budget:** this file stays under 250 lines.
+**Last verified against the tree:** 2026-08-30 · **Budget:** this file stays under 275 lines.
 
 ---
 
@@ -26,6 +26,7 @@ Violating any of these produces a diff that will be rejected. They cost you noth
    are sanctioned. Existing app barrels are debt — see `docs/tech-debt.md` — not precedent.
 7. **No hardcoded hex in components.** Tailwind / CSS-variable tokens only. **Both themes ship**
    (dark default, light toggleable on client). Hex literals freeze dark values and break light mode.
+   **Exception: email templates** (§5) — inline hex and table layout are required there.
 8. **Next.js 15 dynamic routes:** `params` and `searchParams` are `Promise<...>` and must be
    `await`ed. Sync pages without dynamic props are fine and common.
 9. **Mapbox is client-only** — `next/dynamic({ ssr: false })` or `"use client"`. No Google Maps.
@@ -78,6 +79,7 @@ Find your task, load those files, ignore the rest. Each row is roughly self-suff
 | Commands / ports / CI / env | `.agents/context/commands.md` |
 | Wire **mock → real** | `docs/ways-of-working.md` Mock→Real checklist |
 | Working inside one app | `apps/<app>/AGENTS.md` |
+| Add/modify an **auth email template** | §5 "Auth email" + `email-templates/README.md` + `openspec/specs/auth-email/spec.md` |
 | Human onboarding / deep audit | `docs/REPO_SUMMARY.md` (large — not for typo fixes) |
 
 **Rule:** if a loaded file did not change what you wrote, you did not need it — prefer grepping code.
@@ -150,6 +152,15 @@ Local UI chrome → React local state. Never reach for Redux for something a `us
 Admin = email + password primary; OTP exists for invite/recovery, not the main login card.
 Umpire = one-time token (**docs only**). Landing = public.
 
+**Auth email:** templates are **copy-paste artifacts, not build inputs**. Authored as standalone
+HTML in `apps/<app>/src/email-templates/` (app-specific) or root `email-templates/` (shared across
+apps), then pasted into **Supabase Dashboard → Authentication → Emails → Templates**. Supabase
+renders the Go-template vars (`{{ .Token }}`, `{{ .ConfirmationURL }}`, `{{ .TokenHash }}`,
+`{{ .RedirectTo }}`, `{{ .Email }}`) and relays delivery through **Resend** (custom SMTP). No app
+code imports these files. Inline CSS + table layout only — no Tailwind, no design tokens, no JSX.
+When both a shared and an app-specific template exist for the same Supabase template slot, the
+app-specific one wins for that app.
+
 ---
 
 ## 6. Where new code goes
@@ -168,6 +179,8 @@ Umpire = one-time token (**docs only**). Landing = public.
 | Form | colocated `SomeForm/{SomeForm.tsx,schema.ts,default.ts}` |
 | Shared legal copy | `packages/legal-content` |
 | Design tokens | `packages/config/tailwind-config` |
+| Auth email template (one app) | `apps/<app>/src/email-templates/<name>.html` |
+| Auth email template (shared) | `email-templates/<provider>/<name>.html` |
 
 **Folder names:** `components/ui/` + `components/modules/`. Older docs say `shadcn/` + `rotra/` —
 those directories do not exist. Admin also has `admin-ui/`, `layout/`, `custom/`, `providers/`.
@@ -190,6 +203,8 @@ Full table: `.agents/context/implementation-status.md`. The ones that burn agent
 5. **RLS is enabled on the `places` table only**, despite broad RLS in `docs/database/`.
 6. **`/profile` is PARTIAL** — identity from API; stats / match history / skills / gear still
    `MOCK_PLAYER`.
+7. **Email templates do not ship on merge.** Editing `*/email-templates/*.html` changes nothing
+   until a human pastes it into the Supabase dashboard.
 
 Known contradiction: canonical rules say only Club Owner / Que Master may create Que Sessions,
 but code allows player **Quick Session** create (`POST /api/sessions/quick`). Do not "fix"
@@ -232,6 +247,8 @@ CI runs **Biome lint** (client/admin/umpire; landing excluded) and **`pnpm type-
 - [ ] The PR description states **what you manually verified** — coverage is thin by design
 - [ ] Domain math (cost, MMR, EXP) touched? Unit tests are **required** there — see
       `docs/ways-of-working.md` §6.1. Do not add tests or a test runner elsewhere without asking.
+- [ ] Changed an email template? The PR says so — it takes effect only once pasted into the
+      Supabase dashboard (Authentication → Emails → Templates).
 
 ---
 

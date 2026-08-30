@@ -11,6 +11,7 @@
 | `canonical-rules` | partial | Some RULE-* conflict with code (Quick Session) |
 | `user-roles` | partial | Roles modeled; club role UI largely mock |
 | `auth-flow` | built | Client Facebook + gates; Admin password |
+| `auth-email` | built | Admin-triggered Supabase Auth mail; templates pasted to dashboard, relayed via Resend |
 | `onboarding` | built | Wizard + complete API |
 | `landing` | built | Waitlist + legal |
 | `legal` | built | Shared legal-content pages |
