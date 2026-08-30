@@ -20,9 +20,8 @@ function isPublicPath(pathname: string): boolean {
 	if (
 		pathname === "/login" ||
 		pathname.startsWith("/login/") ||
-		pathname === "/login-admin" ||
-		pathname === "/login-tester" ||
-		pathname.startsWith("/login-tester/")
+		pathname === "/sign-up" ||
+		pathname === "/forgot-password"
 	) {
 		return true;
 	}
@@ -50,6 +49,23 @@ export async function middleware(request: NextRequest) {
 	const { response, user } = await updateSession(request);
 	const url = request.nextUrl;
 
+	const legacyAuthPath =
+		url.pathname === "/login-admin" || url.pathname === "/login-tester";
+	if (legacyAuthPath) {
+		const target = new URL(request.url);
+		target.pathname = "/login";
+		const redirectResponse = NextResponse.redirect(target);
+		copyCookies(response, redirectResponse);
+		return redirectResponse;
+	}
+	if (url.pathname === "/login-tester/auth/accept-invite") {
+		const target = new URL(request.url);
+		target.pathname = "/auth/accept-invite";
+		const redirectResponse = NextResponse.redirect(target);
+		copyCookies(response, redirectResponse);
+		return redirectResponse;
+	}
+
 	// When redirectTo isn't in Supabase "Redirect URLs", Supabase sends ?code= to Site URL (often "/").
 	// Forward to our route handler so exchangeCodeForSession runs and cookies are set.
 	if (url.pathname === "/" && url.searchParams.has("code")) {
@@ -73,14 +89,11 @@ export async function middleware(request: NextRequest) {
 
 	if (user) {
 		if (
-			url.pathname === "/login-tester" ||
-			url.pathname === "/login-admin" ||
-			url.pathname === "/login"
+			url.pathname === "/login" ||
+			url.pathname === "/sign-up" ||
+			url.pathname === "/forgot-password"
 		) {
-			const dest = new URL(
-				url.pathname === "/login-tester" ? "/home" : "/dashboard",
-				request.url,
-			);
+			const dest = new URL("/dashboard", request.url);
 			const redirectResponse = NextResponse.redirect(dest);
 			copyCookies(response, redirectResponse);
 			return redirectResponse;

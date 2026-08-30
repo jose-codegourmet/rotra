@@ -4,7 +4,7 @@
 > Everything deeper is loaded **on demand** via the routing table in §2 — do not read the whole
 > `docs/` tree or `docs/REPO_SUMMARY.md` "just in case."
 
-**Last verified against the tree:** 2026-08-26 · **Budget:** this file stays under 250 lines.
+**Last verified against the tree:** 2026-08-30 · **Budget:** this file stays under 250 lines.
 
 ---
 
@@ -35,6 +35,9 @@ Violating any of these produces a diff that will be rejected. They cost you noth
 12. **Test coverage is near-zero and that is deliberate.** Nothing catches your regression. Verify
     manually and state exactly what you verified. Do not add a test runner or component tests
     unprompted — see `docs/ways-of-working.md` §6.1.
+13. **Always `nvm use` before Node tooling.** Prefix every `pnpm` / `make` / `node` / `npx`
+    command with `nvm use &&` so the shell matches `.nvmrc` (Node 24). If `nvm` is not a
+    function in this shell, `source ~/.nvm/nvm.sh` first. Never assume a leftover Node.
 
 ---
 
@@ -199,19 +202,21 @@ either side without a spec change.
 
 ## 8. Commands
 
+**Always `nvm use` first** (see §0.13). Then:
+
 ```bash
 nvm use && pnpm install        # Node 24, pnpm 11
-pnpm approve-builds            # first install only
+nvm use && pnpm approve-builds # first install only
 
-make dev                       # all apps (+ ngrok); SKIP_NGROK=1 to skip
-make dev-client                # or dev-admin / dev-umpire / dev-landing
+nvm use && make dev            # all apps (+ ngrok); SKIP_NGROK=1 to skip
+nvm use && make dev-client     # or dev-admin / dev-umpire / dev-landing
 
-pnpm lint                      # biome — CI gate (client/admin/umpire)
-pnpm type-check                # tsc --noEmit — CI gate (after pnpm db:generate)
-pnpm build                     # NOT in CI, but pre-push hook runs it
-make check-fix                 # biome autofix
+nvm use && pnpm lint           # biome — CI gate (client/admin/umpire)
+nvm use && pnpm type-check     # tsc --noEmit — CI gate (after pnpm db:generate)
+nvm use && pnpm build          # NOT in CI, but pre-push hook runs it
+nvm use && make check-fix      # biome autofix
 
-pnpm db:generate | db:push | db:migrate | db:studio | db:seed
+nvm use && pnpm db:generate    # also: db:push | db:migrate | db:studio | db:seed
 ```
 
 Hooks: `pre-commit` = lint · `pre-push` = lint + build · `commit-msg` = commitlint.

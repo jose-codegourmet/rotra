@@ -23,6 +23,8 @@
 | Admin hub copy | “Static pages only — no APIs” on `/` | Admin has ~42 API routes; many ops pages are REAL |
 | Tests | Silent / aspirational | Near-zero test files; no test runner in CI |
 | Business logic vs OpenSpec | Both may describe a feature | OpenSpec + code = implemented; `docs/business_logic/` may be unbuilt |
+| Client authentication | Business docs describe Facebook as the player identity anchor plus separate tester/admin client routes | `/login` is universal email/password; legacy tester/admin URLs redirect; Facebook implementation is dormant |
+| `profiles.is_verified` | Database docs describe a generated composite verification value | Migration schema stores a plain `BOOLEAN NOT NULL DEFAULT false`; client code does not read it |
 
 ## Rules the code still violates (debt, not precedent)
 

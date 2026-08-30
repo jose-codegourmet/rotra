@@ -36,10 +36,11 @@ Volatile counts: regenerate via `scripts/refresh-context.sh` → `.agents/contex
 | Route | Status | Notes |
 |-------|--------|-------|
 | `/` | STUB | Dev coming-soon shell; authed → `/dashboard` |
-| `/login` | REAL | Facebook OAuth |
-| `/login-tester` | REAL | Tester password API |
-| `/login-admin` | REAL | Gate + admin sign-in |
-| `/set-password` | REAL | |
+| `/login` | REAL | Universal email/password for users, testers, and admins; Facebook UI dormant |
+| `/sign-up` | REAL | Supabase email/password account creation |
+| `/forgot-password` | REAL | Supabase recovery email; provider response is anti-enumeration |
+| `/login-tester` `/login-admin` | STUB | Compatibility redirects → `/login` |
+| `/set-password` | REAL | Session-gated invite + recovery modes |
 | `/privacy` `/terms` `/data-deletion` | REAL | `@rotra/legal-content` |
 | `/onboarding` | REAL | POST `/api/onboarding/complete` |
 | `/home` | STUB | Redirect → `/dashboard` |
@@ -60,7 +61,7 @@ Volatile counts: regenerate via `scripts/refresh-context.sh` → `.agents/contex
 
 ### Client APIs (all REAL handlers; not exhaustive)
 
-Auth (tester/admin-gate/set-password), profile, onboarding, notifications, club-applications, places search/submit, sessions discover/available/my/active/quick/[id]/live/roster/console/start/close/leave.
+Auth (universal sign-up/sign-in, forgot/reset password, set-password), profile, onboarding, notifications, club-applications, places search/submit, sessions discover/available/my/active/quick/[id]/live/roster/console/start/close/leave.
 
 ---
 
@@ -108,6 +109,6 @@ Five OpenSpecs (`umpire-*`) describe product intent; **nothing built**.
 
 | App | Enforcement |
 |-----|-------------|
-| Client | Session required except public paths; Facebook + tester + admin-gate |
+| Client | Session required except public paths; universal email/password, dormant Facebook OAuth |
 | Admin | Session + `role === admin` |
 | Landing / Umpire | None |

@@ -38,6 +38,10 @@ export const Default: Story = {
 	args: baseArgs,
 };
 
+export const EmailPasswordAccount: Story = {
+	args: baseArgs,
+};
+
 export const TesterAccount: Story = {
 	args: {
 		...baseArgs,

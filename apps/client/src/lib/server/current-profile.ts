@@ -16,6 +16,8 @@ export type CurrentProfileTag = {
 	assignedAt: Date;
 };
 
+export type ClientRole = "user" | "tester" | AdminRole;
+
 export type CurrentProfile = {
 	id: string;
 	name: string;
@@ -26,6 +28,7 @@ export type CurrentProfile = {
 	createdAt: Date;
 	adminRole: AdminRole | null;
 	adminIsActive: boolean;
+	roles: ClientRole[];
 	tags: CurrentProfileTag[];
 };
 
@@ -68,26 +71,28 @@ type ProfileSelectRow = {
 
 function mapProfileRowToCurrent(row: ProfileSelectRow): CurrentProfile {
 	const { tagsAssigned, ...rest } = row;
+	const roles: ClientRole[] = ["user"];
+	if (row.isTesterAccount) roles.push("tester");
+	if (row.adminRole) roles.push(row.adminRole);
 	return {
 		...rest,
+		roles,
 		tags: tagsAssigned,
 	};
 }
 
 /**
  * Create a `profiles` row for a Supabase user when the DB trigger did not run.
- * `facebook_id` is required; we use provider metadata, with a last-resort
- * unique placeholder so the app can function (log in dev for follow-up).
+ * Email/password users intentionally have no Facebook identity.
  */
-async function ensureProfileRow(user: User): Promise<CurrentProfile> {
-	const fromMeta = facebookIdFromAuthUser(user);
-	const facebookId = fromMeta ?? `fallback_${user.id}`;
-	if (!fromMeta && process.env.NODE_ENV === "development") {
-		// c8: real signups should always have provider_id
-		console.warn(
-			"[getCurrentProfile] Missing Facebook provider_id; using fallback facebook_id.",
-		);
-	}
+export async function ensureProfileRow(user: User): Promise<CurrentProfile> {
+	const existing = await db.profile.findUnique({
+		where: { id: user.id },
+		select: profileSelect,
+	});
+	if (existing) return mapProfileRowToCurrent(existing);
+
+	const facebookId = facebookIdFromAuthUser(user);
 
 	const name = displayNameFromAuthUser({ user });
 	const avatarUrl = avatarUrlFromAuthUser(user);
@@ -112,11 +117,13 @@ async function ensureProfileRow(user: User): Promise<CurrentProfile> {
 				select: profileSelect,
 			});
 			if (byId) return mapProfileRowToCurrent(byId);
-			const byFb = await db.profile.findUnique({
-				where: { facebookId },
-				select: profileSelect,
-			});
-			if (byFb) return mapProfileRowToCurrent(byFb);
+			if (facebookId) {
+				const byFb = await db.profile.findUnique({
+					where: { facebookId },
+					select: profileSelect,
+				});
+				if (byFb) return mapProfileRowToCurrent(byFb);
+			}
 		}
 		throw e;
 	}

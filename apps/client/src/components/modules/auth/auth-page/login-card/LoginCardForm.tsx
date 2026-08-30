@@ -1,5 +1,7 @@
 "use client";
 
+// Dormant while Meta review is blocked; preserved for the Facebook-linking follow-up (#85).
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Controller, FormProvider, useForm } from "react-hook-form";

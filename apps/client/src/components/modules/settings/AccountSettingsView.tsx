@@ -37,13 +37,7 @@ function SettingsSection({
 	);
 }
 
-function passwordSectionDescription(
-	isTesterAccount: boolean,
-	isFacebookUser: boolean,
-): string {
-	if (isTesterAccount) {
-		return "Choose a new password for your tester account.";
-	}
+function passwordSectionDescription(isFacebookUser: boolean): string {
 	if (isFacebookUser) {
 		return "Your account uses Facebook sign-in. Password changes are managed on Facebook.";
 	}
@@ -53,10 +47,8 @@ function passwordSectionDescription(
 export function AccountSettingsView({
 	name,
 	email,
-	isTesterAccount,
 	isFacebookUser,
 }: AccountSettingsViewProps) {
-	const showPasswordSection = isTesterAccount || isFacebookUser;
 	return (
 		<div className="mx-auto flex w-full max-w-2xl flex-col gap-10">
 			<div>
@@ -88,24 +80,19 @@ export function AccountSettingsView({
 				/>
 			</SettingsSection>
 
-			{showPasswordSection ? (
-				<SettingsSection
-					title="Password"
-					description={passwordSectionDescription(
-						isTesterAccount,
-						isFacebookUser,
-					)}
-				>
-					{isTesterAccount ? (
-						<ChangePlayerPasswordForm
-							onSuccess={() => undefined}
-							onError={() => undefined}
-						/>
-					) : (
-						<FacebookManagedPasswordInfo />
-					)}
-				</SettingsSection>
-			) : null}
+			<SettingsSection
+				title="Password"
+				description={passwordSectionDescription(isFacebookUser)}
+			>
+				{isFacebookUser ? (
+					<FacebookManagedPasswordInfo />
+				) : (
+					<ChangePlayerPasswordForm
+						onSuccess={() => undefined}
+						onError={() => undefined}
+					/>
+				)}
+			</SettingsSection>
 
 			<section className="flex flex-col gap-3">
 				<div>

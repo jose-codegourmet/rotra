@@ -1,4 +1,3 @@
-import { db, PlayerProfileError } from "@rotra/db";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { playerProfileErrorResponse } from "@/app/api/profile/route-helpers";
@@ -40,25 +39,21 @@ export async function POST(request: Request) {
 		if (!profile) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
-		if (!profile.isTesterAccount) {
-			throw new PlayerProfileError(
-				"forbidden",
-				"Password changes are only available for tester accounts.",
-			);
-		}
-
-		const row = await db.profile.findUnique({
-			where: { id: profile.id },
-			select: { isTesterAccount: true },
-		});
-		if (!row?.isTesterAccount) {
-			throw new PlayerProfileError(
-				"forbidden",
-				"Password changes are only available for tester accounts.",
-			);
-		}
-
 		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+		if (
+			user?.identities?.some((identity) => identity.provider === "facebook")
+		) {
+			return NextResponse.json(
+				{
+					error: "Password changes are managed by your sign-in provider.",
+					code: "provider_managed",
+				},
+				{ status: 403 },
+			);
+		}
 		const { error } = await supabase.auth.updateUser({
 			password: parsed.data.password,
 		});
