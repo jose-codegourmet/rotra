@@ -38,28 +38,75 @@ template edit as incomplete until the dashboard paste is done (or explicitly def
 - THEN recipients continue to receive the previously pasted dashboard HTML
 
 ### Requirement: One template slot per Supabase project
-The Supabase project exposes exactly one HTML body per Auth email template slot (Invite user,
-Magic link, Reset password, Confirm signup, Change email, Reauthentication). Where multiple
-audiences share a slot, the single deployed template MUST serve all of them. Per-app folders
-in the repo are authoring conventions; they do not deploy independently.
+The Supabase project exposes exactly one HTML body per Auth email template slot (13 slots:
+6 authentication + 7 security notification). Where multiple audiences share a slot, the
+single deployed template MUST serve all of them. Per-app files in
+`apps/<app>/src/email-templates/` are **audience-specific source branches**; they do not
+deploy independently. At paste time a human SHALL compose those branches (typically with Go
+`{{ if }}` / `{{ else }}` on `{{ .Data }}` or similar) into the one body pasted into the
+dashboard slot.
 
 #### Scenario: Admin and tester share Invite user
 - GIVEN both admin invite and tester invite call Supabase `inviteUserByEmail`
 - WHEN Supabase sends the invite email
 - THEN both audiences receive the HTML currently pasted into the "Invite user" slot
 
+#### Scenario: Client and admin branches compose into one Invite user body
+- GIVEN both `apps/client/src/email-templates/invite-user.html` and
+  `apps/admin/src/email-templates/invite-user.html` exist as audience branches
+- WHEN a human pastes the Invite user slot
+- THEN they paste one composed body that covers both audiences
+- AND the Supabase project still has only one Invite user template
+
+### Requirement: Required template set
+Client and admin SHALL each track the full Supabase Auth template set in
+`docs/email-templates.md`. The required slots by config key are:
+
+**Authentication (6):** `confirmation`, `invite`, `magic_link`, `email_change`, `recovery`,
+`reauthentication`.
+
+**Security notifications (7):** `notification.password_changed`,
+`notification.email_changed`, `notification.phone_changed`, `notification.identity_linked`,
+`notification.identity_unlinked`, `notification.mfa_factor_enrolled`,
+`notification.mfa_factor_unenrolled`.
+
+An unauthored slot (`[ ]` in the matrix) SHALL fall back to the Supabase default body until
+ROTRA HTML is committed and pasted. Security notification emails SHALL only send when the
+matching notification is enabled at the project level in the dashboard. Adding or removing a
+repo HTML file MUST flip the matching checkbox in `docs/email-templates.md` in the same PR.
+
+#### Scenario: Unauthored slot uses Supabase default
+- GIVEN `apps/client/src/email-templates/confirm-signup.html` is absent
+  (`[ ]` in `docs/email-templates.md`)
+- WHEN Supabase would send a Confirm sign up email
+- THEN the project’s default Confirm sign up template is used
+- AND no ROTRA-branded client confirm-signup body is delivered
+
+#### Scenario: Matrix stays in sync with the tree
+- GIVEN a PR adds `apps/admin/src/email-templates/password-changed.html`
+- WHEN the PR is reviewed
+- THEN `docs/email-templates.md` marks that admin Password changed row `[x]`
+- AND the coverage summary counts are updated
+
 ### Requirement: Supported Go-template variables
 Auth email templates SHALL only use Supabase Auth Go-template variables that the Auth service
-injects. The variables used by committed ROTRA templates are `{{ .Token }}`,
-`{{ .ConfirmationURL }}`, `{{ .TokenHash }}`, `{{ .RedirectTo }}`, `{{ .Email }}`, and
-`{{ index .UserMetadata "<key>" }}`. Templates MUST NOT assume app-runtime env vars or
-client-side data.
+injects. Always-available variables include `{{ .ConfirmationURL }}`, `{{ .Token }}`,
+`{{ .TokenHash }}`, `{{ .SiteURL }}`, `{{ .RedirectTo }}`, `{{ .Data }}`, `{{ .Email }}`, and
+`{{ index .UserMetadata "<key>" }}`. Slot-scoped variables MUST only appear in their slots:
+`{{ .NewEmail }}` (Change email address), `{{ .OldEmail }}` (Email address changed),
+`{{ .Phone }}` / `{{ .OldPhone }}` (Phone number changed), `{{ .Provider }}` (Sign-in method
+linked / removed), `{{ .FactorType }}` (MFA method added / removed). Templates MUST NOT
+assume app-runtime env vars or client-side data.
 
 #### Scenario: Magic link shows OTP
 - GIVEN the Magic link template includes `{{ .Token }}`
 - WHEN Supabase renders an OTP email
 - THEN the recipient sees the six-digit code in place of that placeholder
 
+#### Scenario: Slot-scoped variable on wrong template
+- GIVEN a Reset password template incorrectly includes `{{ .NewEmail }}`
+- WHEN Supabase renders a recovery email
+- THEN that placeholder renders empty (or unused) and MUST NOT be relied on
 ### Requirement: Invite links compose from redirectTo
 The committed Invite user template composes the accept URL as
 `{{ .RedirectTo }}/auth/accept-invite?token_hash={{ .TokenHash }}&type=invite&next=/set-password`.
@@ -115,22 +162,23 @@ auth email by calling Resend directly.
 ## Known gaps
 
 These are current defects or ambiguities. They are **not** requirements to implement from this
-spec alone.
+spec alone. Checkbox detail: `docs/email-templates.md`.
 
-1. **Invite user branding mismatch.** Committed `invite-user.html` is admin-branded end to end
+1. **Coverage is 3 of 26.** Admin has three committed templates (`invite-user.html`,
+   `magic-link.html`, `reset-password.html`). Client has **no** `src/email-templates/` folder
+   (0/13). All **seven** security notification templates are unauthored for both apps.
+2. **Invite user branding mismatch.** Committed `invite-user.html` is admin-branded end to end
    ("Internal Platform Operations Applet", "ROTRA Admin", idle-session footer) yet the same
    Supabase slot also serves player **tester** invites (`redirectTo` → client `/login-tester`).
    `docs/business_logic/admin_app/11_tester_management.md` expects admin-vs-tester branches in
    the dashboard template; the committed file has none.
-2. **Duplicate Magic link sources.** Both `apps/admin/src/email-templates/magic-link.html` and
+3. **Duplicate Magic link sources.** Both `apps/admin/src/email-templates/magic-link.html` and
    `email-templates/supabase/magic-link-otp.html` target the Magic link slot. Which body is
    actually pasted in the dashboard is not recorded in the repo.
-3. **Per-app folders are aspirational beyond admin.** Only `apps/admin/src/email-templates/`
-   exists today. Client, landing, and umpire have no template folders yet; the convention in
-   `AGENTS.md` is the standard going forward.
 
 ## Source
 
+- `docs/email-templates.md`
 - `apps/admin/src/email-templates/invite-user.html`
 - `apps/admin/src/email-templates/magic-link.html`
 - `apps/admin/src/email-templates/reset-password.html`

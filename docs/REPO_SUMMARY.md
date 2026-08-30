@@ -615,6 +615,7 @@ rotra-app/
 │   ├── marketing/        # Landing copy / structure
 │   ├── forms/            # Form-specific product notes
 │   ├── plans/            # Implementation plans
+│   ├── email-templates.md # Supabase Auth template coverage matrix (13 slots × 2 apps)
 │   └── views/            # View/screen inventories
 ├── openspec/
 │   ├── config.yaml       # Spec-driven workflow rules

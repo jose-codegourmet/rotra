@@ -4,7 +4,7 @@
 > Everything deeper is loaded **on demand** via the routing table in §2 — do not read the whole
 > `docs/` tree or `docs/REPO_SUMMARY.md` "just in case."
 
-**Last verified against the tree:** 2026-08-30 · **Budget:** this file stays under 275 lines.
+**Last verified against the tree:** 2026-08-30 · **Budget:** this file stays under 290 lines.
 
 ---
 
@@ -79,7 +79,7 @@ Find your task, load those files, ignore the rest. Each row is roughly self-suff
 | Commands / ports / CI / env | `.agents/context/commands.md` |
 | Wire **mock → real** | `docs/ways-of-working.md` Mock→Real checklist |
 | Working inside one app | `apps/<app>/AGENTS.md` |
-| Add/modify an **auth email template** | §5 "Auth email" + `email-templates/README.md` + `openspec/specs/auth-email/spec.md` |
+| Add/modify an **auth email template** | `docs/email-templates.md` (coverage matrix) + §5 "Auth email" |
 | Human onboarding / deep audit | `docs/REPO_SUMMARY.md` (large — not for typo fixes) |
 
 **Rule:** if a loaded file did not change what you wrote, you did not need it — prefer grepping code.
@@ -158,8 +158,9 @@ apps), then pasted into **Supabase Dashboard → Authentication → Emails → T
 renders the Go-template vars (`{{ .Token }}`, `{{ .ConfirmationURL }}`, `{{ .TokenHash }}`,
 `{{ .RedirectTo }}`, `{{ .Email }}`) and relays delivery through **Resend** (custom SMTP). No app
 code imports these files. Inline CSS + table layout only — no Tailwind, no design tokens, no JSX.
-When both a shared and an app-specific template exist for the same Supabase template slot, the
-app-specific one wins for that app.
+Supabase exposes **13 slots** (6 authentication + 7 security notification). One project means
+**one deployed body per slot**, so per-app files are audience branches composed at paste time.
+Current coverage is **3 of 26** — the checklist in `docs/email-templates.md` is authoritative.
 
 ---
 
@@ -204,7 +205,8 @@ Full table: `.agents/context/implementation-status.md`. The ones that burn agent
 6. **`/profile` is PARTIAL** — identity from API; stats / match history / skills / gear still
    `MOCK_PLAYER`.
 7. **Email templates do not ship on merge.** Editing `*/email-templates/*.html` changes nothing
-   until a human pastes it into the Supabase dashboard.
+   until a human pastes it into the Supabase dashboard. Most of the 13 slots have no committed
+   template yet — check `docs/email-templates.md` before assuming one exists.
 
 Known contradiction: canonical rules say only Club Owner / Que Master may create Que Sessions,
 but code allows player **Quick Session** create (`POST /api/sessions/quick`). Do not "fix"
