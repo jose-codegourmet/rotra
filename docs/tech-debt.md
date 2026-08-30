@@ -21,12 +21,11 @@ Both themes ship. Hex in components freezes dark values and breaks the light tog
 - `apps/client/src/components/modules/onboarding/OnboardingStepPanel/OnboardingStepPanel.tsx`
 - Auth cards: `LoginCard*`, `LoginTesterCard*`, `LoginAdminCard*`, `SetPasswordCard*`
 - `apps/client/src/components/ui/sidebar/Sidebar.tsx`
-- `apps/client/src/app/(onboarding)/layout.tsx`
 - `apps/client/src/app/not-found.tsx`
-- `apps/admin/.../AdminAuthBackgroundLayout.tsx`
-- `DarkVeil.tsx` (client / admin / landing) — isolate if canvas requires raw colors
 
 `globals.css` hex in `:root` / `.dark` is **expected**. Mapbox paint props may need hex — comment why.
+DarkVeil WebGL is the same: the GLSL shader stays raw (commented in the three copies);
+wrappers use tokens (`bg-bg-base`, `bg-accent/5`).
 
 ## 2. App-level barrel files
 

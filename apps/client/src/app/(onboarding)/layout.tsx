@@ -27,20 +27,11 @@ export default async function OnboardingShellLayout({
 				<DarkVeil speed={1.4} hueShift={78} />
 			</div>
 
-			<div
-				className="pointer-events-none absolute inset-0 z-[1]"
-				style={{ background: "rgba(0,0,0,0.52)" }}
-			/>
+			<div className="pointer-events-none absolute inset-0 z-[1] bg-bg-base/55" />
 
 			<div className="pointer-events-none absolute inset-0 z-[1]">
-				<div
-					className="absolute left-1/4 top-1/3 h-[min(560px,70vh)] w-[min(560px,55vw)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-					style={{ background: "rgba(0,255,136,0.06)" }}
-				/>
-				<div
-					className="absolute bottom-1/4 right-1/4 h-[360px] w-[360px] rounded-full blur-3xl"
-					style={{ background: "rgba(0,204,106,0.05)" }}
-				/>
+				<div className="absolute left-1/4 top-1/3 h-[min(560px,70vh)] w-[min(560px,55vw)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-3xl" />
+				<div className="absolute bottom-1/4 right-1/4 h-[360px] w-[360px] rounded-full bg-accent-dim/5 blur-3xl" />
 			</div>
 
 			<div className="relative z-10 flex min-h-screen flex-col">

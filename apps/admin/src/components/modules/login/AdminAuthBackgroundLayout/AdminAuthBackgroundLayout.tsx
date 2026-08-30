@@ -11,25 +11,16 @@ export function AdminAuthBackgroundLayout({
 	tagline,
 }: AdminAuthBackgroundLayoutProps) {
 	return (
-		<div className="relative min-h-screen overflow-hidden bg-black">
+		<div className="relative min-h-screen overflow-hidden bg-bg-base">
 			<div className="absolute inset-0">
 				<DarkVeil speed={1.4} />
 			</div>
 
-			<div
-				className="absolute inset-0"
-				style={{ background: "rgba(0,0,0,0.55)" }}
-			/>
+			<div className="absolute inset-0 bg-bg-base/55" />
 
 			<div className="pointer-events-none absolute inset-0">
-				<div
-					className="absolute left-1/4 top-1/3 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-					style={{ background: "rgba(59,130,246,0.05)" }}
-				/>
-				<div
-					className="absolute bottom-1/4 right-1/3 h-[320px] w-[320px] rounded-full blur-3xl"
-					style={{ background: "rgba(100,120,180,0.04)" }}
-				/>
+				<div className="absolute left-1/4 top-1/3 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-3xl" />
+				<div className="absolute bottom-1/4 right-1/3 h-[320px] w-[320px] rounded-full bg-accent-dim/5 blur-3xl" />
 			</div>
 
 			<main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pb-24 pt-12">
