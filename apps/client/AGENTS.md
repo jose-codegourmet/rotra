@@ -9,7 +9,7 @@
 | Path | Truth |
 |------|-------|
 | `/find-sessions`, `/find-sessions/[sessionId]` | **REAL** live session |
-| `/sessions/join|joined|queue|court|attendance` | **MOCK** — do not wire “for real” here without a deliberate migration |
+| `/sessions/join|joined|queue|court|attendance|add-match` | **MOCK** — do not wire “for real” here without a deliberate migration |
 | `/clubs/apply` | **REAL** |
 | Other `/clubs/*` | **MOCK** / ProvisionBox |
 | `/profile` | **PARTIAL** — identity real; cards mock |

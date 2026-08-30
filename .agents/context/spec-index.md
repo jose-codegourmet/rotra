@@ -17,7 +17,7 @@
 | `legal` | built | Shared legal-content pages |
 | `settings` | partial | Account real; hub partially theatre |
 | `clubs` | partial | Apply real; browse/manage mock |
-| `queue-session` | partial | `/find-sessions/*` real; `/sessions/*` mock; queue/court/attendance product incomplete |
+| `queue-session` | partial | `/find-sessions/*` real; `/sessions/*` mock; queue/court/attendance/add-match product incomplete |
 | `automatic-queueing` | unbuilt | Spec only |
 | `umpire-overview` | unbuilt | Umpire app stub |
 | `umpire-token-access` | unbuilt | |

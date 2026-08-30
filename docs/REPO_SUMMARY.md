@@ -508,7 +508,7 @@ Create `packages/db/.env` for Prisma; each app may have `.env.local` for public 
 | Path | Reality |
 |------|---------|
 | `/` | Stub — “Player-facing app — coming soon” |
-| `/sessions/join`, `/joined`, `/queue`, `/court`, `/attendance` | Polished UI defaulting to **`MOCK_SESSION_*`**; local toasts |
+| `/sessions/join`, `/joined`, `/queue`, `/court`, `/attendance`, `/add-match` | Polished UI defaulting to **`MOCK_SESSION_*`**; local toasts |
 | `/clubs`, `/clubs/explore`, `/explore` | Mock club lists |
 | `/clubs/[clubId]/*` overview/members/rules/schedule/announcements | `MOCK_CLUB` / placeholders |
 | `/clubs/[clubId]/manage/*` | ProvisionBox stubs; “not wired” toasts |

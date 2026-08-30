@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Client queue-session discovery, casual session creation, live lobby/console reads, mock join/waitlist screens, a mock attendance check-in screen, a mock QM Court View, and a mock QM Queue View in `apps/client`. Players can find open/active sessions, create a Quick Session, start/close as host, and leave. Standalone `/sessions/join` and `/sessions/joined` screens render the Smash Hub Ortigas fixture; JOIN does not persist a registration. Standalone `/sessions/attendance` renders the Smash Hub Ortigas attendance fixture; I AM IN is a client-only toast and local arrived flip. Standalone `/sessions/court` renders the Smash Hub Ortigas court fixture; HOLD COURT 1 is a client-only toast and local On Hold flip. Standalone `/sessions/queue` renders the Smash Hub Ortigas queue fixture; SEND TO COURT 2 is a client-only toast. `GET /api/sessions/[id]` is still mock discovery only. There is no POST register/waitlist, attendance, court, or queue API. The prepared-flow step is shown locked and is not implemented. Umpire/QR scoring is not implemented in the client.
+Client queue-session discovery, casual session creation, live lobby/console reads, mock join/waitlist screens, a mock attendance check-in screen, a mock QM Court View, a mock QM Queue View, and a mock QM Add Match screen in `apps/client`. Players can find open/active sessions, create a Quick Session, start/close as host, and leave. Standalone `/sessions/join` and `/sessions/joined` screens render the Smash Hub Ortigas fixture; JOIN does not persist a registration. Standalone `/sessions/attendance` renders the Smash Hub Ortigas attendance fixture; I AM IN is a client-only toast and local arrived flip. Standalone `/sessions/court` renders the Smash Hub Ortigas court fixture; HOLD COURT 1 is a client-only toast and local On Hold flip. Standalone `/sessions/queue` renders the Smash Hub Ortigas queue fixture; SEND TO COURT 2 is a client-only toast. Standalone `/sessions/add-match` renders the Smash Hub Ortigas add-match fixture; ADD MATCH is a client-only toast. `GET /api/sessions/[id]` is still mock discovery only. There is no POST register/waitlist, attendance, court, queue, or add-match API. The prepared-flow step is shown locked and is not implemented. Umpire/QR scoring is not implemented in the client.
 
 ## Requirements
 
@@ -188,6 +188,31 @@ Session APIs under `/api/sessions/*` MUST require a current profile. Missing aut
 - THEN drag grips and “Drag to reorder” are shown
 - AND reordering is not implemented
 
+### Requirement: Mock QM Add Match screen
+`/sessions/add-match` SHALL render standalone mock UI: dashboard chrome and the tester banner MUST be hidden via `isSessionStandaloneRoute`. The header SHALL be ROTRA / Run the game. with a QUE MASTER pill and no tester chip. Copy, team slots, and the waiting pool SHALL come from `MOCK_SESSION_ADD_MATCH`, `MOCK_ADD_MATCH_TEAM_A`, `MOCK_ADD_MATCH_TEAM_B`, and `MOCK_ADD_MATCH_POOL` (Smash Hub Ortigas). Default state SHALL be COURT 2 FREE, Add match, `Smash Hub Ortigas · Doubles · Court 2 free`, TEAM A Nico Cruz + Open vs TEAM B Bea Ong + Open, and WAITING longest-wait-first with `2 of 4` selected (Nico Cruz 22 min and Bea Ong 19 min selected; Eli Park 16 min, Sam Cruz 12 min, Ana Dela Cruz 9 min unselected). Sticky ADD MATCH SHALL toast only and MUST NOT change the teams or waiting list. It MUST NOT call a match or queue API or write the database. Team assignment and pool selection are visual only.
+
+#### Scenario: Add match is standalone mock
+- GIVEN a signed-in player
+- WHEN they open `/sessions/add-match`
+- THEN the Smash Hub Ortigas add-match fixture renders (COURT 2 FREE, TEAM A / TEAM B slots, WAITING pool)
+- AND the QUE MASTER pill is shown
+- AND dashboard chrome and the tester banner are hidden
+- AND no tester chip is shown
+
+#### Scenario: ADD MATCH is local only
+- GIVEN the player is on `/sessions/add-match`
+- WHEN they activate ADD MATCH
+- THEN a client toast reports Match added
+- AND the team slots and waiting list do not change
+- AND no match or queue API is called
+- AND no match or court row is written
+
+#### Scenario: Pool selection does not persist
+- GIVEN the player is on `/sessions/add-match`
+- WHEN they view WAITING
+- THEN longest-wait-first and `2 of 4` selected are shown
+- AND assigning players to teams is not implemented
+
 ### Requirement: Session-id join check remains mock-only
 `GET /api/sessions/[id]` SHALL look up `MOCK_SESSION_DISCOVERY` only (HTTP 404 if absent, 410 if status is not `open` or `active`). There is no POST register/waitlist endpoint. The register button on the live `/find-sessions/[sessionId]` page SHALL be a no-op stub. Dashboard join that depends on the mock GET MAY report real database sessions as unavailable.
 
@@ -211,7 +236,7 @@ Session APIs under `/api/sessions/*` MUST require a current profile. Missing aut
 
 ## Documented product rules
 
-The following rules come from `docs/business_logic/client_app/08_queue_session.md` (canonical Que Sessions). They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current discovery/create/start/close/leave and live reads are implemented; join, waitlist, attendance, court, and queue screens remain mock.
+The following rules come from `docs/business_logic/client_app/08_queue_session.md` (canonical Que Sessions). They are product intent and MUST NOT be treated as implemented unless a Current requirement above already states the same fact. Current discovery/create/start/close/leave and live reads are implemented; join, waitlist, attendance, court, queue, and add-match screens remain mock.
 
 Automatic Queueing is specified separately in `automatic-queueing`.
 
@@ -284,12 +309,14 @@ All assigned Que Masters SHALL have identical session-management permissions. On
 - `apps/client/src/app/(protected)/sessions/attendance/page.tsx`
 - `apps/client/src/app/(protected)/sessions/court/page.tsx`
 - `apps/client/src/app/(protected)/sessions/queue/page.tsx`
+- `apps/client/src/app/(protected)/sessions/add-match/page.tsx`
 - `apps/client/src/app/api/sessions/**`
 - `apps/client/src/app/api/sessions/[id]/route.ts`
 - `apps/client/src/constants/mock-session-join.ts`
 - `apps/client/src/constants/mock-session-attendance.ts`
 - `apps/client/src/constants/mock-session-court.ts`
 - `apps/client/src/constants/mock-session-queue.ts`
+- `apps/client/src/constants/mock-session-add-match.ts`
 - `apps/client/src/lib/sessions/session-standalone-route.ts`
 - `apps/client/src/lib/sessions/session-display-utils.ts`
 - `apps/client/src/components/modules/session/session-join-view/SessionJoinView.tsx`
@@ -297,11 +324,13 @@ All assigned Que Masters SHALL have identical session-management permissions. On
 - `apps/client/src/components/modules/session/session-attendance-view/SessionAttendanceView.tsx`
 - `apps/client/src/components/modules/session/session-court-view/SessionCourtView.tsx`
 - `apps/client/src/components/modules/session/session-queue-view/SessionQueueView.tsx`
+- `apps/client/src/components/modules/session/session-add-match-view/SessionAddMatchView.tsx`
 - `apps/client/src/components/modules/session/session-join-view/SessionJoinView.stories.tsx`
 - `apps/client/src/components/modules/session/session-joined-view/SessionJoinedView.stories.tsx`
 - `apps/client/src/components/modules/session/session-attendance-view/SessionAttendanceView.stories.tsx`
 - `apps/client/src/components/modules/session/session-court-view/SessionCourtView.stories.tsx`
 - `apps/client/src/components/modules/session/session-queue-view/SessionQueueView.stories.tsx`
+- `apps/client/src/components/modules/session/session-add-match-view/SessionAddMatchView.stories.tsx`
 - `apps/client/src/lib/api/session-discovery.ts`
 - `apps/client/src/lib/api/session-live.ts`
 - `apps/client/src/lib/api/session-roster.ts`
