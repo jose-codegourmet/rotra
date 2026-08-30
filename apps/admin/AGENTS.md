@@ -21,3 +21,6 @@ Hub `/` copy saying “static only” is outdated — there are many API routes.
 - Extra UI buckets: `components/admin-ui/`, `layout/`, `custom/`
 - Mapbox for places — client-only dynamic import
 - Founding Super Admin guarded by `FOUNDING_SUPER_ADMIN_ID`
+- Auth email HTML in `src/email-templates/` — copy-paste into Supabase Dashboard →
+  Authentication → Emails → Templates (Supabase relays via Resend); see
+  `openspec/specs/auth-email/spec.md`
