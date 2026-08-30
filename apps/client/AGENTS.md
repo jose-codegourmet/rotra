@@ -2,7 +2,7 @@
 
 > Nested entry for `apps/client`. Root: `/AGENTS.md`. Status: `.agents/context/implementation-status.md`.
 
-**Port:** 3000 · **Auth:** Facebook OAuth + tester / admin-gate paths · middleware session.
+**Port:** 3000 · **Auth:** universal email/password + middleware session. Facebook OAuth is dormant; no client OTP login.
 
 ## Do not confuse these routes
 
