@@ -87,7 +87,7 @@ export function Sidebar({
 			<div className="px-4 mb-6">
 				<button
 					type="button"
-					className="w-full h-12 flex items-center justify-center rounded-md bg-gradient-to-br from-[#f1ffef] to-accent text-bg-base font-black transition-transform active:scale-95 shadow-accent"
+					className="w-full h-12 flex items-center justify-center rounded-md bg-gradient-to-br from-accent to-accent-dim text-bg-base font-black transition-transform active:scale-95 shadow-accent"
 				>
 					<Plus size={20} strokeWidth={2} className="lg:hidden shrink-0" />
 					<span className="hidden lg:block text-micro font-black uppercase tracking-widest">

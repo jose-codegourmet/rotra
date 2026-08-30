@@ -75,8 +75,7 @@ export function LoginTesterCardForm() {
 				<div className="space-y-2">
 					<label
 						htmlFor="tester-email"
-						className="text-xs font-bold uppercase tracking-wider"
-						style={{ color: "#9090A0" }}
+						className="text-xs font-bold uppercase tracking-wider text-text-secondary"
 					>
 						Email
 					</label>
@@ -90,7 +89,7 @@ export function LoginTesterCardForm() {
 								type="email"
 								autoComplete="email"
 								disabled={busy}
-								className="h-11 border-[#2A2A2E] bg-[#0B0B0C] text-[#F0F0F2]"
+								className="h-11 border-border bg-bg-base text-text-primary"
 							/>
 						)}
 					/>
@@ -103,8 +102,7 @@ export function LoginTesterCardForm() {
 				<div className="space-y-2">
 					<label
 						htmlFor="tester-password"
-						className="text-xs font-bold uppercase tracking-wider"
-						style={{ color: "#9090A0" }}
+						className="text-xs font-bold uppercase tracking-wider text-text-secondary"
 					>
 						Tester password
 					</label>
@@ -120,12 +118,12 @@ export function LoginTesterCardForm() {
 									autoComplete="current-password"
 									disabled={busy}
 									className={cn(
-										"h-11 border-[#2A2A2E] bg-[#0B0B0C] pr-11 text-[#F0F0F2]",
+										"h-11 border-border bg-bg-base pr-11 text-text-primary",
 									)}
 								/>
 								<button
 									type="button"
-									className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-[#9090A0] transition-colors hover:text-[#F0F0F2]"
+									className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-text-secondary transition-colors hover:text-text-primary"
 									onClick={() => setShowPassword((c) => !c)}
 									aria-label={showPassword ? "Hide password" : "Show password"}
 									disabled={busy}

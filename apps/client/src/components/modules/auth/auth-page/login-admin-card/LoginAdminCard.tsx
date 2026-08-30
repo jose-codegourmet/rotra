@@ -13,24 +13,17 @@ export function LoginAdminCard({
 }: LoginAdminCardProps) {
 	return (
 		<div
-			className="w-full"
+			className="w-full rounded-xl border border-border bg-bg-surface p-8"
 			style={{
-				background: "#1A1A1D",
-				border: "1px solid #2A2A2E",
-				borderRadius: "20px",
 				boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)",
-				padding: "2rem",
 			}}
 		>
 			<div className="flex flex-col gap-8">
 				<header className="flex flex-col gap-2">
-					<h2
-						className="text-2xl font-bold tracking-tight"
-						style={{ color: "#F0F0F2" }}
-					>
+					<h2 className="text-2xl font-bold tracking-tight text-text-primary">
 						Admin access
 					</h2>
-					<p className="text-sm leading-relaxed" style={{ color: "#9090A0" }}>
+					<p className="text-sm leading-relaxed text-text-secondary">
 						Enter the internal access password, then continue with admin
 						credentials.
 					</p>

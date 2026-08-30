@@ -107,6 +107,7 @@ export function LoginCardForm({ onSuccess, onError }: LoginCardFormProps) {
 							: "hover:brightness-90 active:scale-[0.98]",
 					)}
 					style={{
+						// Facebook brand blue — official identity; no theme token. Same in both themes.
 						backgroundColor: signInMutation.isPending ? "#1467D4" : "#1877F2",
 					}}
 					aria-label="Continue with Facebook"

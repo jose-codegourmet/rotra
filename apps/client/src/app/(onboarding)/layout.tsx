@@ -23,7 +23,7 @@ export default async function OnboardingShellLayout({
 
 	return (
 		<div className="relative flex min-h-screen flex-col overflow-hidden text-text-primary">
-			<div className="absolute inset-0 z-0 bg-[#0e0e0f]">
+			<div className="absolute inset-0 z-0 bg-bg-base">
 				<DarkVeil speed={1.4} hueShift={78} />
 			</div>
 

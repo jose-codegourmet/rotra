@@ -102,8 +102,7 @@ export function LoginAdminCardForm({
 				<div className="space-y-2">
 					<label
 						htmlFor="admin-gate-password"
-						className="text-xs font-bold uppercase tracking-wider"
-						style={{ color: "#9090A0" }}
+						className="text-xs font-bold uppercase tracking-wider text-text-secondary"
 					>
 						Access password
 					</label>
@@ -118,7 +117,7 @@ export function LoginAdminCardForm({
 								autoComplete="off"
 								aria-invalid={!!gateForm.formState.errors.password}
 								disabled={gateBusy}
-								className="h-11 border-[#2A2A2E] bg-[#0B0B0C] text-[#F0F0F2]"
+								className="h-11 border-border bg-bg-base text-text-primary"
 							/>
 						)}
 					/>
@@ -151,8 +150,7 @@ export function LoginAdminCardForm({
 				<div className="space-y-2">
 					<label
 						htmlFor="admin-client-email"
-						className="text-xs font-bold uppercase tracking-wider"
-						style={{ color: "#9090A0" }}
+						className="text-xs font-bold uppercase tracking-wider text-text-secondary"
 					>
 						Email
 					</label>
@@ -167,7 +165,7 @@ export function LoginAdminCardForm({
 								autoComplete="email"
 								aria-invalid={!!credForm.formState.errors.email}
 								disabled={credBusy}
-								className="h-11 border-[#2A2A2E] bg-[#0B0B0C] text-[#F0F0F2]"
+								className="h-11 border-border bg-bg-base text-text-primary"
 							/>
 						)}
 					/>
@@ -180,8 +178,7 @@ export function LoginAdminCardForm({
 				<div className="space-y-2">
 					<label
 						htmlFor="admin-client-password"
-						className="text-xs font-bold uppercase tracking-wider"
-						style={{ color: "#9090A0" }}
+						className="text-xs font-bold uppercase tracking-wider text-text-secondary"
 					>
 						Password
 					</label>
@@ -198,12 +195,12 @@ export function LoginAdminCardForm({
 									aria-invalid={!!credForm.formState.errors.password}
 									disabled={credBusy}
 									className={cn(
-										"h-11 border-[#2A2A2E] bg-[#0B0B0C] pr-11 text-[#F0F0F2]",
+										"h-11 border-border bg-bg-base pr-11 text-text-primary",
 									)}
 								/>
 								<button
 									type="button"
-									className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-[#9090A0] transition-colors hover:text-[#F0F0F2]"
+									className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-text-secondary transition-colors hover:text-text-primary"
 									onClick={() => setShowPassword((c) => !c)}
 									aria-label={showPassword ? "Hide password" : "Show password"}
 									disabled={credBusy}
