@@ -9,7 +9,7 @@
 
 | Track | Routes | Status |
 |-------|--------|--------|
-| **Mock prototypes** | `/sessions/join`, `/joined`, `/queue`, `/court`, `/attendance`, `/add-match` | MOCK — `MOCK_SESSION_*`, local toasts |
+| **Mock prototypes** | `/sessions/join`, `/joined`, `/queue`, `/court`, `/attendance`, `/add-match`, `/play/courts`, `/play/queue`, `/play/standings` | MOCK — `MOCK_SESSION_*` / `MOCK_PLAYER_*`, local toasts |
 | **Wired live session** | `/find-sessions`, `/find-sessions/[sessionId]` | REAL — `@rotra/db` + session APIs |
 
 Do **not** rebuild session ops against `/sessions/*`. Extend `/find-sessions/*`.
@@ -48,7 +48,7 @@ Volatile counts: regenerate via `scripts/refresh-context.sh` → `.agents/contex
 | `/explore` | MOCK | `MOCK_CLUBS` |
 | `/find-sessions` | REAL | Open + my sessions |
 | `/find-sessions/[sessionId]` | REAL | Live lobby / QM console |
-| `/sessions/join` `/joined` `/queue` `/court` `/attendance` `/add-match` | MOCK | Theatre only |
+| `/sessions/join` `/joined` `/queue` `/court` `/attendance` `/add-match` `/play/*` | MOCK | Theatre only |
 | `/profile` `/profile/[userId]` | PARTIAL | Header API; stats/history/skills/gear = `MOCK_PLAYER` |
 | `/notifications` | REAL | |
 | `/settings` | PARTIAL | Profile card real-ish; some buttons unwired |
