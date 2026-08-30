@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { LoginCard } from "@/components/modules/auth/auth-page/login-card/LoginCard";
+import Link from "next/link";
 import { LoginPageFooter } from "@/components/modules/auth/auth-page/login-page-footer/LoginPageFooter";
+import { PlayerSignInCard } from "@/components/modules/auth/auth-page/player-sign-in-card/PlayerSignInCard";
 import DarkVeil from "@/components/ui/dark-veil/DarkVeil";
 import { Logo } from "@/components/ui/logo/Logo";
 
@@ -8,7 +9,34 @@ export const metadata: Metadata = {
 	title: "Login — ROTRA",
 };
 
-export default function LoginPage() {
+const ERROR_MESSAGES: Record<string, string> = {
+	oauth: "We could not complete that sign-in. Try again.",
+	auth: "We could not complete that sign-in. Try again.",
+	session_expired: "Your session expired. Please sign in again.",
+	invalid_link: "That link is invalid. Request a new one.",
+	reset_expired: "That reset link expired. Request a new one.",
+	invite_expired: "That invitation link expired. Ask for a new invitation.",
+};
+
+export default async function LoginPage({
+	searchParams,
+}: {
+	searchParams: Promise<{
+		next?: string;
+		error?: string;
+		reset?: string;
+		password?: string;
+	}>;
+}) {
+	const params = await searchParams;
+	const message =
+		params.reset === "1"
+			? "Password updated. Sign in with your new password."
+			: params.password === "1"
+				? "Password saved. Sign in to continue."
+				: params.error
+					? ERROR_MESSAGES[params.error]
+					: undefined;
 	return (
 		<div className="relative min-h-screen overflow-hidden bg-black">
 			{/* Dark Veil animated WebGL background */}
@@ -37,7 +65,26 @@ export default function LoginPage() {
 
 				{/* Auth card */}
 				<div className="animate-auth-fade-up-delayed w-full max-w-[420px]">
-					<LoginCard />
+					{message ? (
+						<div
+							className="mb-4 rounded-lg border border-border bg-bg-surface p-3 text-sm text-text-secondary"
+							role="status"
+						>
+							{message}
+							{params.error === "reset_expired" ? (
+								<>
+									{" "}
+									<Link
+										href="/forgot-password"
+										className="font-semibold text-accent underline underline-offset-4"
+									>
+										Request another link.
+									</Link>
+								</>
+							) : null}
+						</div>
+					) : null}
+					<PlayerSignInCard nextPath={params.next} />
 				</div>
 			</main>
 

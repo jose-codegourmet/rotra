@@ -1,13 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { safeNextPath } from "@/lib/auth/safe-next";
 import { createClientForOAuthResponse } from "@/lib/supabase/server";
-
-function safeNextPath(raw: string | null): string {
-	if (!raw?.startsWith("/") || raw.startsWith("//")) {
-		return "/dashboard";
-	}
-	return raw;
-}
 
 export async function GET(request: NextRequest) {
 	const url = request.nextUrl;

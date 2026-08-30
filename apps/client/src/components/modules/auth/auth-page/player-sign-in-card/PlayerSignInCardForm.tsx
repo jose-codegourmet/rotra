@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -13,60 +14,50 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from "@/components/ui/field/Field";
+import { Input } from "@/components/ui/input/Input";
 import { PasswordInput } from "@/components/ui/password-input/PasswordInput";
-import { createClient } from "@/lib/supabase/client";
-import { setPasswordDefault } from "./default";
-import { type SetPasswordValues, setPasswordSchema } from "./schema";
+import { signInPlayer } from "@/lib/auth/client";
+import { playerSignInDefault } from "./default";
+import { type PlayerSignInValues, playerSignInSchema } from "./schema";
 
-async function submitSetPassword(password: string): Promise<void> {
-	const response = await fetch("/api/auth/set-password", {
-		method: "POST",
-		headers: { "content-type": "application/json" },
-		body: JSON.stringify({ password }),
-	});
-	const payload = (await response.json().catch(() => null)) as {
-		error?: string;
-	} | null;
-	if (!response.ok)
-		throw new Error(payload?.error ?? "Unable to set password right now.");
-}
-
-export type SetPasswordCardFormProps = {
-	mode: "invite" | "reset";
-	onSuccess?: () => void;
+export type PlayerSignInCardFormProps = {
+	nextPath?: string | undefined;
+	onSuccess?: (redirectTo: string) => void;
 	onError?: (error: unknown) => void;
 };
 
-export function SetPasswordCardForm({
-	mode,
+export function PlayerSignInCardForm({
+	nextPath,
 	onSuccess,
 	onError,
-}: SetPasswordCardFormProps) {
+}: PlayerSignInCardFormProps) {
 	const router = useRouter();
-	const form = useForm<SetPasswordValues>({
-		resolver: zodResolver(setPasswordSchema),
-		defaultValues: setPasswordDefault,
+	const form = useForm<PlayerSignInValues>({
+		resolver: zodResolver(playerSignInSchema),
+		defaultValues: playerSignInDefault,
 	});
 	const mutation = useMutation({
-		mutationFn: (values: SetPasswordValues) =>
-			submitSetPassword(values.password),
-		onSuccess: async () => {
-			toast.success(mode === "reset" ? "Password updated." : "Password saved.");
-			onSuccess?.();
-			await createClient().auth.signOut();
-			router.replace(mode === "reset" ? "/login?reset=1" : "/login?password=1");
+		mutationFn: (values: PlayerSignInValues) =>
+			signInPlayer({
+				email: values.email.trim().toLowerCase(),
+				password: values.password,
+				next: nextPath,
+			}),
+		onSuccess: ({ redirectTo }) => {
+			toast.success("Signed in.");
+			onSuccess?.(redirectTo);
+			router.replace(redirectTo);
 			router.refresh();
 		},
 		onError: (error) => {
 			toast.error(
-				error instanceof Error
-					? error.message
-					: "Unable to set password right now.",
+				error instanceof Error ? error.message : "Unable to sign in right now.",
 			);
 			onError?.(error);
 		},
 	});
 	const busy = mutation.isPending;
+
 	return (
 		<FormProvider {...form}>
 			<form
@@ -78,16 +69,18 @@ export function SetPasswordCardForm({
 				<FieldGroup>
 					<Controller
 						control={form.control}
-						name="password"
+						name="email"
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel htmlFor="set-password">Password</FieldLabel>
-								<PasswordInput
+								<FieldLabel htmlFor="login-email">Email</FieldLabel>
+								<Input
 									{...field}
-									id="set-password"
-									autoComplete="new-password"
+									id="login-email"
+									type="email"
+									autoComplete="email"
 									disabled={busy}
 									aria-invalid={fieldState.invalid}
+									className="h-11 border-border bg-bg-base text-text-primary"
 								/>
 								<FieldError errors={[fieldState.error]} />
 							</Field>
@@ -95,16 +88,14 @@ export function SetPasswordCardForm({
 					/>
 					<Controller
 						control={form.control}
-						name="confirmPassword"
+						name="password"
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel htmlFor="set-password-confirm">
-									Confirm password
-								</FieldLabel>
+								<FieldLabel htmlFor="login-password">Password</FieldLabel>
 								<PasswordInput
 									{...field}
-									id="set-password-confirm"
-									autoComplete="new-password"
+									id="login-password"
+									autoComplete="current-password"
 									disabled={busy}
 									aria-invalid={fieldState.invalid}
 								/>
@@ -125,12 +116,26 @@ export function SetPasswordCardForm({
 								className="animate-spin"
 								aria-hidden
 							/>
-							<span className="sr-only">Saving password</span>
+							<span className="sr-only">Signing in</span>
 						</>
 					) : (
-						"Save password"
+						"Sign in"
 					)}
 				</Button>
+				<div className="flex items-center justify-between gap-4 text-sm">
+					<Link
+						href="/forgot-password"
+						className="text-text-secondary hover:text-text-primary"
+					>
+						Forgot password?
+					</Link>
+					<Link
+						href="/sign-up"
+						className="font-semibold text-accent hover:text-accent-dim"
+					>
+						Create an account
+					</Link>
+				</div>
 			</form>
 		</FormProvider>
 	);

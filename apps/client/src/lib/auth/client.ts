@@ -1,64 +1,63 @@
-export type ClientAdminAuthResponse = {
+export type AuthResponse = {
 	ok: boolean;
-	message: string;
+	error?: string;
 	code?: string;
 	redirectTo?: string;
+	needsConfirmation?: boolean;
 };
 
-export class ClientAdminAuthError extends Error {
+export class ClientAuthError extends Error {
 	constructor(
 		public readonly status: number,
 		public readonly code: string | undefined,
 		message: string,
 	) {
 		super(message);
-		this.name = "ClientAdminAuthError";
+		this.name = "ClientAuthError";
 	}
 }
 
-export async function unlockClientAdminGate(password: string): Promise<void> {
-	const response = await fetch("/api/auth/admin-gate", {
+async function postAuth<T extends AuthResponse>(
+	path: string,
+	input: Record<string, string | undefined>,
+): Promise<T> {
+	const response = await fetch(path, {
 		method: "POST",
-		headers: {
-			"content-type": "application/json",
-		},
-		body: JSON.stringify({ password }),
-	});
-
-	const body = (await response
-		.json()
-		.catch(() => null)) as ClientAdminAuthResponse | null;
-	if (!response.ok || !body?.ok) {
-		throw new ClientAdminAuthError(
-			response.status,
-			body?.code,
-			body?.message ?? "Unable to verify access password.",
-		);
-	}
-}
-
-export async function signInClientAdmin(input: {
-	email: string;
-	password: string;
-}): Promise<string> {
-	const response = await fetch("/api/auth/admin-sign-in", {
-		method: "POST",
-		headers: {
-			"content-type": "application/json",
-		},
+		headers: { "content-type": "application/json" },
 		body: JSON.stringify(input),
 	});
-
-	const body = (await response
-		.json()
-		.catch(() => null)) as ClientAdminAuthResponse | null;
+	const body = (await response.json().catch(() => null)) as T | null;
 	if (!response.ok || !body?.ok) {
-		throw new ClientAdminAuthError(
+		throw new ClientAuthError(
 			response.status,
 			body?.code,
-			body?.message ?? "Unable to sign in right now.",
+			body?.error ?? "Unable to complete that request right now.",
 		);
 	}
+	return body;
+}
 
-	return body.redirectTo ?? "/dashboard";
+export function signUpPlayer(input: { email: string; password: string }) {
+	return postAuth<AuthResponse & { ok: true }>(
+		"/api/auth/player-sign-up",
+		input,
+	);
+}
+
+export function signInPlayer(input: {
+	email: string;
+	password: string;
+	next?: string | undefined;
+}) {
+	return postAuth<AuthResponse & { ok: true; redirectTo: string }>(
+		"/api/auth/player-sign-in",
+		input,
+	);
+}
+
+export function requestPasswordReset(input: { email: string }) {
+	return postAuth<AuthResponse & { ok: true }>(
+		"/api/auth/forgot-password",
+		input,
+	);
 }
