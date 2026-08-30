@@ -199,7 +199,7 @@ those directories do not exist. Admin also has `admin-ui/`, `layout/`, `custom/`
 Full table: `.agents/context/implementation-status.md`. The ones that burn agents most:
 
 1. **Umpire app is a stub** with 5 OpenSpecs and no implementation.
-2. **Client `/sessions/*` (join, queue, court, attendance, add-match)** is mock theatre (`MOCK_SESSION_*` +
+2. **Client `/sessions/*` (join, queue, court, attendance, add-match, play Courts/Queue/Standings)** is mock theatre (`MOCK_SESSION_*` / `MOCK_PLAYER_*` +
    toasts). The **real** live session stack is **`/find-sessions` and `/find-sessions/[sessionId]`**.
 3. **Admin `/dashboard`, `/analytics`, `/moderation`, `/platform-config`, `/kill-switches`,
    `/skills-management`, `/mmr-management`** are mock or in-memory. Edit does not save.
