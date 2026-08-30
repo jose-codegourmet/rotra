@@ -85,7 +85,10 @@ function StandingRow({
 			</span>
 			<div className="min-w-0 flex-1">
 				<p className="truncate text-body font-semibold text-text-primary">
-					{row.name}
+					<span className="md:hidden">{row.name}</span>
+					<span className="hidden md:inline">
+						{row.isYou ? `You · ${row.name}` : row.name}
+					</span>
 					{row.isYou ? (
 						<span className="ml-1.5 inline-flex h-5 align-middle items-center rounded-full border border-accent/20 bg-accent/15 px-1.5 text-micro font-bold uppercase tracking-widest text-accent">
 							{youBadge}

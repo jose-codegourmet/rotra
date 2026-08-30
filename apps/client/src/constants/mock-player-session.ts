@@ -38,6 +38,7 @@ export type PlayerQueueRow = {
 	id: string;
 	rank: number;
 	teamA: string;
+	teamAWide?: string;
 	teamB: string;
 	waitLabel: string;
 	badge: PlayerQueueBadge;
@@ -129,6 +130,7 @@ export const MOCK_PLAYER_QUEUE_ROWS: PlayerQueueRow[] = [
 		id: "match-2",
 		rank: 2,
 		teamA: "You + Drew",
+		teamAWide: "You · Jo Cruz + Drew",
 		teamB: "Pia + Ken",
 		waitLabel: "8 min",
 		badge: "you",

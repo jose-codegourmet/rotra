@@ -35,7 +35,7 @@ export function PlayerCourtsView({
 			headline={copy.headline}
 			subLine={copy.subLine}
 		>
-			<ul className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4">
+			<ul className="grid grid-cols-1 gap-2 md:grid-cols-2 md:gap-4 md:items-stretch">
 				{courts.map((court) => (
 					<li key={court.id}>
 						<PlayerCourtCard court={court} />
@@ -69,7 +69,7 @@ function PlayerCourtCard({ court }: { court: PlayerCourt }) {
 	const isEmpty = court.status === "empty";
 
 	return (
-		<article className="h-full rounded-lg border border-border bg-bg-surface p-4 shadow-card">
+		<article className="flex h-full min-h-0 flex-col rounded-lg border border-border bg-bg-surface p-4 shadow-card md:min-h-[280px]">
 			<div className="flex items-center justify-between gap-3">
 				<p className="flex items-center gap-2 text-small font-semibold text-text-primary">
 					<LayoutGrid className="size-4 text-text-secondary" aria-hidden />
@@ -79,7 +79,7 @@ function PlayerCourtCard({ court }: { court: PlayerCourt }) {
 			</div>
 
 			{isEmpty ? (
-				<div className="flex flex-col items-center justify-center px-2 py-8 text-center md:py-16">
+				<div className="flex flex-1 flex-col items-center justify-center px-2 py-8 text-center">
 					<LayoutGrid className="size-6 text-text-secondary" aria-hidden />
 					<p className="mt-2 text-small text-text-secondary">
 						{court.emptyMessage}

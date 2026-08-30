@@ -35,15 +35,15 @@ export function PlayerQueueView({
 			headline={copy.headline}
 			subLine={copy.subLine}
 		>
-			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:items-stretch">
-				<section>
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] md:items-stretch">
+				<section className="flex min-w-0 flex-col">
 					<div className="mb-2 flex items-center justify-between gap-3">
 						<h2 className="text-micro font-medium uppercase tracking-widest text-text-secondary">
 							{copy.nextUpLabel}
 						</h2>
 						<p className="text-micro text-text-secondary">{copy.nextUpMatch}</p>
 					</div>
-					<article className="rounded-lg border border-accent/30 bg-bg-surface p-4 shadow-card">
+					<article className="flex flex-1 flex-col rounded-lg border border-accent/30 bg-bg-surface p-4 shadow-card">
 						<div className="flex items-center justify-between gap-3">
 							<p className="flex items-center gap-2 text-small font-semibold text-text-primary">
 								<Users className="size-4 text-text-secondary" aria-hidden />
@@ -91,7 +91,7 @@ export function PlayerQueueView({
 					</article>
 				</section>
 
-				<section>
+				<section className="flex min-w-0 flex-col">
 					<div className="mb-2 flex items-center justify-between gap-3">
 						<h2 className="text-micro font-medium uppercase tracking-widest text-text-secondary">
 							{copy.upNextLabel}
@@ -172,7 +172,8 @@ function QueueRow({ row }: { row: PlayerQueueRow }) {
 			<QueueAvatars players={row.players} />
 			<div className="min-w-0 flex-1">
 				<p className="truncate text-small font-semibold text-text-primary">
-					{row.teamA}
+					<span className="md:hidden">{row.teamA}</span>
+					<span className="hidden md:inline">{row.teamAWide ?? row.teamA}</span>
 				</p>
 				<p className="truncate text-micro text-text-secondary">{`vs ${row.teamB}`}</p>
 			</div>
