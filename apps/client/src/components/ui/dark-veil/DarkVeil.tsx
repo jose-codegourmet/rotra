@@ -3,6 +3,9 @@
 import { Mesh, Program, Renderer, Triangle, Vec2 } from "ogl";
 import { useEffect, useRef } from "react";
 
+// WebGL fragment shader paints procedurally on the canvas. CSS variables and
+// Tailwind tokens cannot drive GPU output (same rule as Mapbox paint props).
+// This shader has no hex literals — leave the animation unchanged.
 const vertex = `
 attribute vec2 position;
 void main(){gl_Position=vec4(position,0.0,1.0);}

@@ -38,19 +38,19 @@ export default async function LoginPage({
 					? ERROR_MESSAGES[params.error]
 					: undefined;
 	return (
-		<div className="relative min-h-screen overflow-hidden bg-black">
+		<div className="relative min-h-screen overflow-hidden bg-bg-base">
 			{/* Dark Veil animated WebGL background */}
 			<div className="absolute inset-0">
 				<DarkVeil speed={1.4} />
 			</div>
 
 			{/* Readability overlay */}
-			<div className="auth-page-overlay absolute inset-0" />
+			<div className="absolute inset-0 bg-bg-base/55" />
 
 			{/* Radial depth accents */}
 			<div className="pointer-events-none absolute inset-0">
-				<div className="auth-page-accent-primary absolute left-1/4 top-1/3 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl" />
-				<div className="auth-page-accent-secondary absolute bottom-1/4 right-1/3 h-[320px] w-[320px] rounded-full blur-3xl" />
+				<div className="absolute left-1/4 top-1/3 h-[480px] w-[480px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-3xl" />
+				<div className="absolute bottom-1/4 right-1/3 h-[320px] w-[320px] rounded-full bg-accent-dim/5 blur-3xl" />
 			</div>
 
 			{/* Main content — centered column */}
