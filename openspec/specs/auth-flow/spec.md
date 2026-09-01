@@ -22,7 +22,7 @@ The client middleware SHALL treat `/login`, `/login/*`, `/login-admin`, `/login-
 - THEN the page is served without an auth redirect
 
 ### Requirement: Root path is the existing login
-Unauthenticated `GET /` MUST NOT render a coming-soon shell. It SHALL redirect to `/login` so the existing player email/password sign-in is the only logged-out landing UI. `/login` remains the canonical login URL. `/login-tester` and `/login-admin` are unchanged by this rule.
+The client app (`apps/client`) root page SHALL redirect unauthenticated visitors to `/login`. It MUST NOT render a coming-soon shell, waitlist, landing art, or a second login UI. `/login` remains the canonical login URL and SHALL keep the existing email/password sign-in. This is the page redirect at `apps/client` `/`; public-path membership of `/` stays in Public and protected routes. `/login-tester` and `/login-admin` are unchanged by this rule.
 
 #### Scenario: Logged-out visitor opens the client root
 - GIVEN no Supabase session
@@ -30,12 +30,23 @@ Unauthenticated `GET /` MUST NOT render a coming-soon shell. It SHALL redirect t
 - THEN the app redirects to `/login`
 - AND "Player-facing app — coming soon" is not shown
 
+#### Scenario: Client root reuses the existing login screen
+- GIVEN the visitor arrives at `/login` from `/`
+- WHEN the login page renders
+- THEN the existing email/password sign-in is shown
+- AND no additional login UI is introduced
+
 ### Requirement: Logged-in login-page redirects
 When a Supabase session exists, the middleware SHALL redirect `/login` and `/login-admin` to `/dashboard`, `/login-tester` to `/home`, and `/` to `/dashboard`.
 
 #### Scenario: Signed-in player opens /login
 - GIVEN a valid Supabase session
 - WHEN the player requests `/login`
+- THEN the middleware redirects to `/dashboard`
+
+#### Scenario: Signed-in player opens the client root
+- GIVEN a valid Supabase session
+- WHEN the player requests `/`
 - THEN the middleware redirects to `/dashboard`
 
 #### Scenario: Signed-in tester opens /login-tester

@@ -2,16 +2,16 @@
 
 ## Purpose
 
-Public marketing site in `apps/landing`: coming-soon home, waitlist capture, and legal pages. No authentication.
+Public marketing site in `apps/landing`: coming-soon home, waitlist capture, and legal pages. No authentication. This is not the client app; `apps/client` `/` is specified in `auth-flow`.
 
 ## Requirements
 
 ### Requirement: Coming-soon home
-`/` SHALL render the landing nav, hero, architecture grid, secondary CTA, and footer. The waitlist form on the page SHALL POST to `/api/waitlist`. There is no auth middleware.
+On the marketing site (`apps/landing`), `/` SHALL render the landing nav, hero, architecture grid, secondary CTA, and footer. The waitlist form on the page SHALL POST to `/api/waitlist`. There is no auth middleware. Client-app `/` is not this page.
 
-#### Scenario: Anonymous visitor opens the site
+#### Scenario: Anonymous visitor opens the landing site
 - GIVEN an unauthenticated visitor
-- WHEN they request `/`
+- WHEN they request `/` on the landing app
 - THEN the coming-soon landing page is served
 
 ### Requirement: Waitlist signup
