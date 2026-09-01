@@ -55,10 +55,19 @@ Directory table / list stories already did. Remaining module stories still inlin
 Resolved: `.github/workflows/biome.yml` now has a `type-check` job (`pnpm db:generate` then
 `pnpm type-check`) alongside Biome. Snippet remains in `docs/ways-of-working.md` §6.1.
 
-## 6. Missing verification recipes
+## 6. Verification recipes — authored; residual human gaps
 
-`.agents/context/verification-recipes.md` is a stub. Fill with human-owned seed/login steps before
-agents can rely on it.
+`.agents/context/verification-recipes.md` is filled from repo-sourced facts (seed, auth
+routes, session APIs, Mapbox env, Studio columns). Agents should follow it instead of
+inventing login/seed steps.
+
+**Still human-owned (labeled GAP in that file):** first Super Admin credentials;
+`club_members` / Que Master rows (`pnpm db:seed` does not create them; approve-club
+does not insert membership); Facebook provider + Meta test users (OAuth dormant);
+Mapbox token values; paste of auth email HTML into the Supabase dashboard. There is
+**no** REAL UI/API to create a Club Que Session of type MMR (`origin: club_queue` +
+`scheduleType: mmr`) — do not treat the §6.2 example in `docs/ways-of-working.md` as
+shipped.
 
 ## 7. Routes that bypass `@rotra/db` services
 

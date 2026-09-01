@@ -1,6 +1,6 @@
 # Commands, ports, CI, env
 
-> **Last verified:** 2026-08-26 · Tooling as wired in the repo.
+> **Last verified:** 2026-09-01 · Tooling as wired in the repo.
 
 ## Versions
 
@@ -77,6 +77,9 @@ Only `apps/client/.env.example` exists (Mapbox). Others are tribal — do not in
 | `FOUNDING_SUPER_ADMIN_ID` | admin user guards |
 | `NODE_ENV` | all |
 
-## Verification stub
+## Verification recipes
 
-`verification-recipes.md` is **not written** yet (needs human tribal knowledge: seed club, admin OTP, Facebook test users). Until then: use `docs/ways-of-working.md` §6 verification block and `pnpm db:studio`.
+`.agents/context/verification-recipes.md` — seed vs Studio, admin invite/OTP, client
+login (email/password; Facebook dormant), Quick Session vs Club Que rows, Mapbox env.
+Human-owned gaps are labeled in that file. Pair with `docs/ways-of-working.md` §6
+verification block and `pnpm db:studio`.
