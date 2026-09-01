@@ -35,7 +35,7 @@ Volatile counts: regenerate via `scripts/refresh-context.sh` → `.agents/contex
 
 | Route | Status | Notes |
 |-------|--------|-------|
-| `/` | STUB | Dev coming-soon shell; authed → `/dashboard` |
+| `/` | STUB | Redirect → `/login` (no coming-soon shell); authed → `/dashboard` |
 | `/login` | REAL | Universal email/password for users, testers, and admins; Facebook UI dormant |
 | `/sign-up` | REAL | Supabase email/password account creation |
 | `/forgot-password` | REAL | Supabase recovery email; provider response is anti-enumeration |

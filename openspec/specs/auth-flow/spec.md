@@ -21,6 +21,15 @@ The client middleware SHALL treat `/login`, `/login/*`, `/login-admin`, `/login-
 - WHEN the visitor requests `/login` or `/privacy`
 - THEN the page is served without an auth redirect
 
+### Requirement: Root path is the existing login
+Unauthenticated `GET /` MUST NOT render a coming-soon shell. It SHALL redirect to `/login` so the existing player email/password sign-in is the only logged-out landing UI. `/login` remains the canonical login URL. `/login-tester` and `/login-admin` are unchanged by this rule.
+
+#### Scenario: Logged-out visitor opens the client root
+- GIVEN no Supabase session
+- WHEN the visitor requests `/`
+- THEN the app redirects to `/login`
+- AND "Player-facing app — coming soon" is not shown
+
 ### Requirement: Logged-in login-page redirects
 When a Supabase session exists, the middleware SHALL redirect `/login` and `/login-admin` to `/dashboard`, `/login-tester` to `/home`, and `/` to `/dashboard`.
 
@@ -216,6 +225,7 @@ Documented JWT access-token expiry is 1 hour and refresh-token expiry is 7 days.
 
 - `apps/client/src/middleware.ts`
 - `apps/client/src/lib/supabase/middleware.ts`
+- `apps/client/src/app/page.tsx`
 - `apps/client/src/app/login/page.tsx`
 - `apps/client/src/app/login-admin/page.tsx`
 - `apps/client/src/app/login-tester/page.tsx`
