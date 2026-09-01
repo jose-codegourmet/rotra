@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 import { StepBlock } from "@/components/modules/onboarding/StepBlock/StepBlock";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field/Field";
@@ -23,12 +23,7 @@ type PhoneStepProps = {
 };
 
 export function PhoneStep({ countryOptions, getDialPreview }: PhoneStepProps) {
-	const {
-		register,
-		formState: { errors },
-	} = useFormContext<OnboardingFormValues>();
-
-	const nationalInvalid = Boolean(errors.phoneNational);
+	const { control } = useFormContext<OnboardingFormValues>();
 
 	return (
 		<StepBlock
@@ -39,32 +34,53 @@ export function PhoneStep({ countryOptions, getDialPreview }: PhoneStepProps) {
 			<div className="flex flex-col gap-3 sm:flex-row">
 				<Field className="min-w-0 flex-1">
 					<FieldLabel htmlFor="onboarding-phone-country">Country</FieldLabel>
-					<NativeSelect
-						id="onboarding-phone-country"
-						className="w-full min-w-0"
-						{...register("phoneIso")}
-					>
-						{countryOptions.map((country) => (
-							<NativeSelectOption key={country.iso} value={country.iso}>
-								{country.label} ({getDialPreview(country.iso)})
-							</NativeSelectOption>
-						))}
-					</NativeSelect>
-				</Field>
-				<Field className="min-w-0 flex-[2]" data-invalid={nationalInvalid}>
-					<FieldLabel htmlFor="onboarding-phone-national">
-						Mobile number
-					</FieldLabel>
-					<Input
-						id="onboarding-phone-national"
-						className="h-12 w-full rounded-lg border-border bg-bg-elevated px-3 text-body text-text-primary"
-						placeholder="Digits without country code"
-						inputMode="tel"
-						aria-invalid={nationalInvalid}
-						{...register("phoneNational")}
+					<Controller
+						control={control}
+						name="phoneIso"
+						render={({ field }) => (
+							<NativeSelect
+								id="onboarding-phone-country"
+								className="w-full min-w-0"
+								value={field.value}
+								onChange={field.onChange}
+								onBlur={field.onBlur}
+								name={field.name}
+							>
+								{countryOptions.map((country) => (
+									<NativeSelectOption key={country.iso} value={country.iso}>
+										{country.label} ({getDialPreview(country.iso)})
+									</NativeSelectOption>
+								))}
+							</NativeSelect>
+						)}
 					/>
-					<FieldError errors={[errors.phoneNational]} />
 				</Field>
+				<Controller
+					control={control}
+					name="phoneNational"
+					render={({ field, fieldState }) => {
+						const nationalInvalid = Boolean(fieldState.error);
+						return (
+							<Field
+								className="min-w-0 flex-[2]"
+								data-invalid={nationalInvalid}
+							>
+								<FieldLabel htmlFor="onboarding-phone-national">
+									Mobile number
+								</FieldLabel>
+								<Input
+									id="onboarding-phone-national"
+									className="h-12 w-full rounded-lg border-border bg-bg-elevated px-3 text-body text-text-primary"
+									placeholder="Digits without country code"
+									inputMode="tel"
+									aria-invalid={nationalInvalid}
+									{...field}
+								/>
+								<FieldError errors={[fieldState.error]} />
+							</Field>
+						);
+					}}
+				/>
 			</div>
 		</StepBlock>
 	);
