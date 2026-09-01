@@ -1,6 +1,7 @@
 import type {
 	AdminNotificationType,
 	AdminRole,
+	NotificationSeverity,
 	NotificationType,
 	Prisma,
 	PrismaClient,
@@ -253,4 +254,82 @@ export async function broadcastNotificationByTags(
 		...rest,
 		audience: { tagSlugs },
 	});
+}
+
+export type NotificationBroadcastListRow = {
+	id: string;
+	notificationType: NotificationType;
+	adminNotificationType: AdminNotificationType;
+	severity: NotificationSeverity;
+	title: string;
+	body: string;
+	appScopes: string[];
+	tagSlugs: string[];
+	recipientCount: number;
+	relatedEntityType: string | null;
+	relatedEntityId: string | null;
+	targetUrl: string | null;
+	scheduledAt: Date | null;
+	createdById: string | null;
+	createdAt: Date;
+};
+
+export type ListNotificationBroadcastsInput = {
+	page: number;
+	limit: number;
+};
+
+export type ListNotificationBroadcastsResult = {
+	rows: NotificationBroadcastListRow[];
+	page: number;
+	limit: number;
+	total: number;
+	hasMore: boolean;
+};
+
+/**
+ * Super Admin broadcast directory. Pagination matches inbox list helpers
+ * (`listNotificationsForInbox` / `listAdminNotificationsForInbox`).
+ */
+export async function listNotificationBroadcasts(
+	db: PrismaClient,
+	input: ListNotificationBroadcastsInput,
+): Promise<ListNotificationBroadcastsResult> {
+	const page = Math.max(1, Math.floor(input.page));
+	const limit = Math.min(50, Math.max(1, Math.floor(input.limit)));
+	const skip = (page - 1) * limit;
+
+	const [rows, total] = await Promise.all([
+		db.notificationBroadcast.findMany({
+			orderBy: { createdAt: "desc" },
+			skip,
+			take: limit,
+			select: {
+				id: true,
+				notificationType: true,
+				adminNotificationType: true,
+				severity: true,
+				title: true,
+				body: true,
+				appScopes: true,
+				tagSlugs: true,
+				recipientCount: true,
+				relatedEntityType: true,
+				relatedEntityId: true,
+				targetUrl: true,
+				scheduledAt: true,
+				createdById: true,
+				createdAt: true,
+			},
+		}),
+		db.notificationBroadcast.count(),
+	]);
+
+	return {
+		rows,
+		page,
+		limit,
+		total,
+		hasMore: skip + rows.length < total,
+	};
 }

@@ -7,6 +7,7 @@ import {
 	BroadcastNotificationError,
 	broadcastNotification,
 	db,
+	listNotificationBroadcasts,
 } from "@rotra/db";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -50,35 +51,9 @@ export async function GET(request: Request) {
 
 		const { searchParams } = new URL(request.url);
 		const { page, limit } = parseListPagination(searchParams);
-		const skip = (page - 1) * limit;
+		const result = await listNotificationBroadcasts(db, { page, limit });
 
-		const [rows, total] = await Promise.all([
-			db.notificationBroadcast.findMany({
-				orderBy: { createdAt: "desc" },
-				skip,
-				take: limit,
-				select: {
-					id: true,
-					notificationType: true,
-					adminNotificationType: true,
-					severity: true,
-					title: true,
-					body: true,
-					appScopes: true,
-					tagSlugs: true,
-					recipientCount: true,
-					relatedEntityType: true,
-					relatedEntityId: true,
-					targetUrl: true,
-					scheduledAt: true,
-					createdById: true,
-					createdAt: true,
-				},
-			}),
-			db.notificationBroadcast.count(),
-		]);
-
-		const serialized = rows.map((row) => ({
+		const serialized = result.rows.map((row) => ({
 			id: row.id,
 			notificationType: row.notificationType,
 			adminNotificationType: row.adminNotificationType,
@@ -98,10 +73,10 @@ export async function GET(request: Request) {
 
 		return NextResponse.json({
 			rows: serialized,
-			page,
-			limit,
-			total,
-			hasMore: skip + rows.length < total,
+			page: result.page,
+			limit: result.limit,
+			total: result.total,
+			hasMore: result.hasMore,
 		});
 	} catch (error) {
 		if (error instanceof AdminSessionError) {

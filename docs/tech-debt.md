@@ -74,6 +74,12 @@ shipped.
 Sessions / places / onboarding / waitlist often call `db.*` in route handlers. Prefer services for
 new non-trivial domain logic; migrate when touching those routes.
 
+Partial (#95 slice, not done): admin notification **broadcasts list** GET now uses
+`listNotificationBroadcasts` in `notification-broadcast-service` (POST already did). Testers,
+customers, player `/profile/me`, and inbox notifications already called matching services.
+Remaining bypasses include sessions, places, onboarding, waitlist, club-application directory /
+name-collisions, and leftover one-liners (tag-definition audit logs, admin-user delete rollback).
+
 ---
 
 **Cadence:** pick items when touching the file anyway; do not open a mega-cleanup PR without asking.

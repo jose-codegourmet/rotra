@@ -146,11 +146,15 @@ export {
 	broadcastNotificationByTags,
 	broadcastNotificationInTx,
 	BroadcastNotificationError,
+	listNotificationBroadcasts,
 	type BroadcastAppScope,
 	type BroadcastAudience,
 	type BroadcastNotificationInput,
 	type BroadcastNotificationResult,
 	type BroadcastSeverity,
+	type ListNotificationBroadcastsInput,
+	type ListNotificationBroadcastsResult,
+	type NotificationBroadcastListRow,
 } from "./notification-broadcast-service";
 export {
 	AdminNotificationError,
