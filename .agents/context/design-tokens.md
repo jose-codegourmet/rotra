@@ -40,4 +40,4 @@ unavoidable — isolate and comment.
 - Touch targets ~44×44 where interactive
 - Status-first hierarchy; toast voice is short and operational
 
-Debt: ~30 component files still contain hex — see `docs/tech-debt.md`.
+Debt leftover: Mapbox paint, Facebook brand, Logo.stories light canvases — see `docs/tech-debt.md` §1.

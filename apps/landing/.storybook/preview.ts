@@ -41,7 +41,7 @@ const preview: Preview = {
 		},
 		(Story) => {
 			document.documentElement.classList.add("dark");
-			document.documentElement.style.backgroundColor = "#0b0b0c";
+			document.documentElement.style.backgroundColor = "var(--color-bg-base)";
 			return Story();
 		},
 	],
