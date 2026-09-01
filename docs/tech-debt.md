@@ -46,6 +46,10 @@ Prefer `Controller` + `Field` for new work. Cleanup targets:
 Prefer `@/constants/...`. Many of ~181 stories inline mocks; data-heavy module stories should migrate
 when touched. Do not block PRs solely for primitive `args`-only stories.
 
+Partial (#93 slice, not done): admin customer *detail* stories import
+`MOCK_CUSTOMER_PROFILE*` from `apps/admin/src/constants/mock-customers.ts`.
+Directory table / list stories already did. Remaining module stories still inline.
+
 ## 5. CI does not run `type-check` — **done**
 
 Resolved: `.github/workflows/biome.yml` now has a `type-check` job (`pnpm db:generate` then
