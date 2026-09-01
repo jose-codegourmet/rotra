@@ -25,7 +25,7 @@ Do **not** rebuild session ops against `/sessions/*`. Extend `/find-sessions/*`.
 | Client REAL / MOCK / PARTIAL / STUB | ~14 / 19 / 4 / 3 |
 | Admin REAL / MOCK / STUB | ~16 / 7 / 3 |
 | Landing | 4 REAL |
-| Umpire | 1 STUB |
+| Umpire | 2 MOCK + 1 STUB redirect |
 
 Volatile counts: regenerate via `scripts/refresh-context.sh` → `.agents/context/metrics.md`.
 
@@ -97,11 +97,14 @@ Auth (universal sign-up/sign-in, forgot/reset password, set-password), profile, 
 
 ## Umpire (`@rotra/umpire` :3002)
 
-| Route | Status |
-|-------|--------|
-| `/` | STUB — “coming soon”; no APIs, no middleware |
+| Route | Status | Notes |
+|-------|--------|-------|
+| `/` | STUB | Redirect → `/scoreboard` |
+| `/scoreboard` | MOCK | Fake Smash Hub match; local +POINT / undo; no API |
+| `/submit` | MOCK | Fake Team A 21–19 (2–0); local lock only; no API |
 
-Five OpenSpecs (`umpire-*`) describe product intent; **nothing built**.
+Five OpenSpecs (`umpire-*`) describe token access, scoring engine, realtime, and
+submission. **Those are not built.** The two screens are UI shells only.
 
 ---
 

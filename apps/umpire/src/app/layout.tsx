@@ -33,7 +33,11 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en" className={satoshi.variable} suppressHydrationWarning>
+		<html
+			lang="en"
+			className={`${satoshi.variable} dark`}
+			suppressHydrationWarning
+		>
 			<body className="bg-bg-base text-text-primary antialiased font-sans">
 				<QueryProvider>
 					<ThemeProvider>{children}</ThemeProvider>

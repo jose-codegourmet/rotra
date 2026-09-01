@@ -9,7 +9,7 @@
 | Client | SSR-first | 39/40 `page.tsx` are Server Components; 1 client page (`/clubs/apply`). ~177 `"use client"` files as islands. |
 | Admin | SSR-first | 26/26 server pages; ~120 client component files. |
 | Landing | Sync Server Components | 4 pages, no ISR/`force-static`/`generateStaticParams`. Waitlist API is dynamic. |
-| Umpire | Stub | 1 server page (“coming soon”). No scoring CSR. |
+| Umpire | SSR pages + client islands | `/scoreboard` + `/submit` shells. Fake match, local tap/undo/lock. No APIs. |
 
 Protected layouts (client/admin) prefetch + dehydrate React Query on the server.
 

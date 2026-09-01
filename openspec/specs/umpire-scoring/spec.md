@@ -6,7 +6,8 @@ Documented Umpire App scoring interface: points, undo, sets, deuce, and visual s
 
 ## Status
 
-**Documented intent — not implemented.** Umpire App is coming-soon.
+**Documented intent — not implemented.** `/scoreboard` is a UI shell: fake match,
+local +POINT / undo, no deuce / set-win engine. Do not treat these rules as shipped.
 
 ## Actors
 
@@ -51,3 +52,5 @@ Interactive elements SHALL meet a minimum 44×44pt touch target. Color SHALL not
 ## Source
 
 - `docs/business_logic/umpire_app/03_scoring_interface.md`
+- `apps/umpire/src/components/modules/live-score/LiveScoreView.tsx`
+- `apps/umpire/src/constants/mock-umpire-match.ts`

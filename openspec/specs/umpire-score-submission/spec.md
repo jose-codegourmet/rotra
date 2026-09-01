@@ -6,7 +6,9 @@ Documented final-score lock, confirmation, Client App review-phase trigger, disp
 
 ## Status
 
-**Documented intent — not implemented.** Umpire App is coming-soon.
+**Documented intent — not implemented.** `/submit` is a UI shell: fake 2–0
+confirm copy and a local “scores locked” state. No API, no review-phase trigger.
+Do not treat these rules as shipped.
 
 ## Actors
 
@@ -58,4 +60,6 @@ Authenticated umpires MAY rate 1–5 per skill dimension (skippable) at weight �
 ## Source
 
 - `docs/business_logic/umpire_app/04_score_submission.md`
+- `apps/umpire/src/components/modules/submit-confirm/SubmitConfirmView.tsx`
+- `apps/umpire/src/constants/mock-umpire-match.ts`
 - `docs/business_logic/client_app/18_canonical_rules.md`

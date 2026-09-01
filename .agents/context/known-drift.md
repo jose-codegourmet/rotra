@@ -12,7 +12,7 @@
 | Client fetch layer | `lib/api` helpers + centralized keys (`AGENTS.md` pre-2026-08-26) | Fetch in `hooks/*/server.ts`; keys in `hooks/*/queryKey.ts`; `lib/api` is server Prisma helpers |
 | Redux live session | Redux owns queue / score / player status | Only `auth` + `ui` slices; live session is React Query |
 | Admin Redux | “Redux NOT used in Admin” (older tech docs) | Admin has `authSlice` + Redux store |
-| Umpire Redux / PWA | Store + `next-pwa` | Umpire stub; **no** Redux deps; **no** `next-pwa` |
+| Umpire Redux / PWA | Store + `next-pwa` | Umpire UI shells; **no** Redux deps; **no** `next-pwa` |
 | Supabase Realtime | Two shipped cases (smart monitor; score→review) | **Zero** subscriptions in apps; cases are specs/docs only |
 | Theme | “Dark mode only — no light theme” | Light + dark CSS vars; client `ThemeToggle` + `next-themes` |
 | Story fixtures path | `app/constants/` | Client/admin: `src/constants/`; landing has `src/app/constants/coming-soon.ts` |
