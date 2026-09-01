@@ -1,6 +1,6 @@
 # Architecture
 
-> **Last verified:** 2026-08-26 · Loaded for page/route work. Prefer neighboring `page.tsx` after this.
+> **Last verified:** 2026-09-01 · Loaded for page/route work. Prefer neighboring `page.tsx` after this.
 
 ## Rendering model
 
@@ -54,3 +54,9 @@ implement channels without a spec change. Default update path: React Query `inva
 | Landing / Umpire | No middleware; public |
 
 Details: `.agents/context/commands.md` (env vars), nested `apps/*/AGENTS.md`.
+
+## TesterOnly feature slices
+
+TesterOnly wraps a **feature slice** (queue, join, attendance, courts, umpire, player view), not an entire route. The same slice may appear on multiple surfaces. Club night is one TesterOnly feature; club is a later container, not a prerequisite.
+
+Do not invent a TesterOnly hook or component if the code has none yet — this is how new work should be shaped. After a Que Master can run a session start to finish, unwrap the night slices. See ADR 0001.

@@ -1,6 +1,6 @@
 # Known drift — docs vs code
 
-> **Last verified:** 2026-08-26 · When sources disagree, the **Reality** column wins.
+> **Last verified:** 2026-09-01 · When sources disagree, the **Reality** column wins.
 > Add a row in the same PR that discovers new drift.
 
 ## Docs that lie (or lag)
@@ -24,6 +24,7 @@
 | Tests | Silent / aspirational | Near-zero test files; no test runner in CI |
 | Business logic vs OpenSpec | Both may describe a feature | OpenSpec + code = implemented; `docs/business_logic/` may be unbuilt |
 | Client authentication | Business docs describe Facebook as the player identity anchor plus separate tester/admin client routes | `/login` is universal email/password; legacy tester/admin URLs redirect; Facebook implementation is dormant |
+| Que Master assignment | Glossary / ubiquitous-language: per-club role assigned by Owner; Club Owner self-assign blocked | Phase 1 decision (ADR 0003): session hat assigned by the session creator (self-assign and multiple QMs allowed). Club preferred QMs are later. |
 | `profiles.is_verified` | Database docs describe a generated composite verification value | Migration schema stores a plain `BOOLEAN NOT NULL DEFAULT false`; client code does not read it |
 
 ## Rules the code still violates (debt, not precedent)
@@ -39,6 +40,7 @@ Tracked in `docs/tech-debt.md`. Summary:
 
 ## Product conflict (do not “fix” silently)
 
-Canonical rules: only Club Owner / Que Master create Que Sessions.
+Canonical OpenSpec: only Club Owner / Que Master create Que Sessions.
 Code: player **Quick Session** via `POST /api/sessions/quick` is real and persists.
-Resolve only via OpenSpec change.
+Phase 1 product heading (2026-09-01, ADR 0001): anyone can create a session because every account is a tester. No Facebook, club, or ranking-cert gate on create.
+Canonical OpenSpec still says CO/QM-only until an OpenSpec change is proposed (`openspec/changes/phase-1-open-session-create/`). Do not silently delete Quick Session. GitHub #75 is the only create-session track.

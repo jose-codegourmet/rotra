@@ -1,6 +1,6 @@
 # Glossary
 
-> **Last verified:** 2026-08-26 · Exact spelling is load-bearing in UI copy and code comments.
+> **Last verified:** 2026-09-01 · Exact spelling is load-bearing in UI copy and code comments.
 
 ## Brand and product
 
@@ -59,8 +59,9 @@
 |------|-------|
 | Player | Default platform role |
 | Club Owner | Per club; from approved club application |
-| Que Master | Per club; assigned by Owner |
-| Umpire | Per match (Preset / On-the-fly; Authenticated / Quick Umpire) |
+| Que Master | Session hat assigned by the session creator (Phase 1; self-assign and multiple QMs allowed). Club-assigned preferred QMs are later. **Never** “Queue Master”. |
+| Umpire | Session hat (not a platform user role). Per-match scoring: Preset / On-the-fly; Authenticated / Quick Umpire. Same person may also hold Que Master, or the scoreboard may be handed off. |
+| Tester | Additive user role (with player / admin), not a separate login. Phase 1 every account has it. Gates unfinished night slices via TesterOnly. After the night works, tester becomes a real subset for whatever is unfinished next. |
 | Admin | Platform-only (Admin app) |
 
 Admin-internal: Founding Super Admin, Super Admin, Platform Admin — see `openspec/specs/admin-users`.
