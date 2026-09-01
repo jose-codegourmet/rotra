@@ -20,7 +20,7 @@ const preview: Preview = {
 				SATOSHI_FONT_STACK,
 			);
 			document.documentElement.classList.add("dark");
-			document.documentElement.style.backgroundColor = "#0b0b0c";
+			document.documentElement.style.backgroundColor = "var(--color-bg-base)";
 			return Story();
 		},
 	],

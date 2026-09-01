@@ -8,24 +8,21 @@
 
 Both themes ship. Hex in components freezes dark values and breaks the light toggle.
 
-**Approx:** ~30 files / ~296 matches under `apps/*/src` (excluding legitimate `globals.css` vars).
+Priority session / map / radar / onboarding / auth / chrome files were tokenized in
+#97 #98 #100 #115. Remaining **component hex** under `apps/*/src` is:
 
-### Priority component files (replace with tokens)
+- `globals.css` `:root` / `.dark` — **expected**
+- DarkVeil GLSL `#define` (not a color) — isolated in #115
+- `DashboardMap` Mapbox paint `#00cc6a` — Mapbox GL does not interpolate CSS vars
+- `LoginCardForm` Facebook brand `#1877F2` / `#1467D4` — official identity (commented)
+- `Logo.stories.tsx` (all four apps) — light contrast canvases stay resolved so the
+  dark mark stays visible when Storybook `html` has `.dark`; dark canvases use
+  `bg-bg-base` + local `.dark`
 
-- `apps/client/src/components/modules/session/SessionStatisticsView/SessionStatisticsView.tsx`
-- `apps/client/src/components/modules/session/SessionFinancialsView/SessionFinancialsView.tsx`
-- `apps/client/src/components/modules/session/AssignCourtModal/AssignCourtModal.tsx`
-- `apps/client/src/components/modules/dashboard/dashboard-map/DashboardMap.tsx`
-- `apps/client/src/components/modules/profile/SkillRadarChart/SkillRadarChart.tsx`
-- `apps/client/src/components/modules/onboarding/ChipRow/ChipRow.tsx`
-- `apps/client/src/components/modules/onboarding/OnboardingStepPanel/OnboardingStepPanel.tsx`
-- Auth cards: `LoginCard*`, `LoginTesterCard*`, `LoginAdminCard*`, `SetPasswordCard*`
-- `apps/client/src/components/ui/sidebar/Sidebar.tsx`
-- `apps/client/src/app/not-found.tsx`
+Storybook preview canvases (`apps/*/.storybook/preview.ts`) use `var(--color-bg-base)`.
 
-`globals.css` hex in `:root` / `.dark` is **expected**. Mapbox paint props may need hex — comment why.
-DarkVeil WebGL is the same: the GLSL shader stays raw (commented in the three copies);
-wrappers use tokens (`bg-bg-base`, `bg-accent/5`).
+Leftover **rgba** glows / chart grid strokes in a few high-traffic views are not hex
+and were left as-is by the #90 slices.
 
 ## 2. App-level barrel files
 

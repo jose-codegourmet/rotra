@@ -33,7 +33,7 @@ Tracked in `docs/tech-debt.md`. Summary:
 | Rule (for new code) | Current debt |
 |---------------------|--------------|
 | No new app-level barrels | ~9+ `index.ts` re-exports under `apps/` |
-| No hardcoded hex (breaks light theme) | ~30 files / ~296 hex matches in component source |
+| No hardcoded hex (breaks light theme) | Remaining: globals.css vars, Mapbox paint, Facebook brand, Logo.stories light canvases — see `docs/tech-debt.md` §1 |
 | Forms: `Controller` not `register` | `ClubApplicationForm`, onboarding steps use `register` |
 | Story fixtures from `src/constants/` | Many stories inline mocks; ~67% of stories skip shared fixtures |
 

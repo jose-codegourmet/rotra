@@ -21,20 +21,28 @@ const meta: Meta<typeof Logo> = {
 export default meta;
 type Story = StoryObj<typeof Logo>;
 
+/** Dark canvas: tokens + local `.dark` so it stays dark in the light toolbar. */
+const darkCanvasFull = "dark w-[280px] rounded-md bg-bg-base px-6 py-8";
+const darkCanvasMini = "dark w-20 rounded-md bg-bg-base px-4 py-6";
+const darkCanvasOverview = "dark w-[280px] rounded-[10px] bg-bg-base px-5 py-6";
+const darkCanvasOverviewMini = "dark w-20 rounded-[10px] bg-bg-base px-4 py-5";
+
+/**
+ * Light contrast canvas stays resolved. `--color-bg-base` inherits from
+ * `html.dark` (Storybook default), which would hide the dark logo mark.
+ */
+const lightCanvasStyle = {
+	background: "#ffffff",
+	border: "1px solid #e4e4e9",
+} as const;
+
 // --- Full wordmark stories (container wide enough to show full logo) ---
 
 export const Dark: Story = {
 	args: { variant: "dark" },
 	decorators: [
 		(Story) => (
-			<div
-				style={{
-					width: 280,
-					padding: "32px 24px",
-					background: "#0b0b0c",
-					borderRadius: 12,
-				}}
-			>
+			<div className={darkCanvasFull}>
 				<Story />
 			</div>
 		),
@@ -45,15 +53,7 @@ export const Light: Story = {
 	args: { variant: "light" },
 	decorators: [
 		(Story) => (
-			<div
-				style={{
-					width: 280,
-					padding: "32px 24px",
-					background: "#ffffff",
-					borderRadius: 12,
-					border: "1px solid #e4e4e9",
-				}}
-			>
+			<div className="w-[280px] rounded-md px-6 py-8" style={lightCanvasStyle}>
 				<Story />
 			</div>
 		),
@@ -67,14 +67,7 @@ export const DarkMini: Story = {
 	args: { variant: "dark" },
 	decorators: [
 		(Story) => (
-			<div
-				style={{
-					width: 80,
-					padding: "24px 16px",
-					background: "#0b0b0c",
-					borderRadius: 12,
-				}}
-			>
+			<div className={darkCanvasMini}>
 				<Story />
 			</div>
 		),
@@ -86,15 +79,7 @@ export const LightMini: Story = {
 	args: { variant: "light" },
 	decorators: [
 		(Story) => (
-			<div
-				style={{
-					width: 80,
-					padding: "24px 16px",
-					background: "#ffffff",
-					borderRadius: 12,
-					border: "1px solid #e4e4e9",
-				}}
-			>
+			<div className="w-20 rounded-md px-4 py-6" style={lightCanvasStyle}>
 				<Story />
 			</div>
 		),
@@ -106,54 +91,27 @@ export const LightMini: Story = {
 export const AllVariants: Story = {
 	name: "All Variants",
 	render: () => (
-		<div style={{ display: "grid", gap: 24 }}>
-			<div style={{ display: "flex", gap: 24, alignItems: "center" }}>
+		<div className="grid gap-6">
+			<div className="flex items-center gap-6">
 				{/* Full — dark */}
-				<div
-					style={{
-						width: 280,
-						padding: "24px 20px",
-						background: "#0b0b0c",
-						borderRadius: 10,
-					}}
-				>
+				<div className={darkCanvasOverview}>
 					<Logo variant="dark" />
 				</div>
 				{/* Mini — dark */}
-				<div
-					style={{
-						width: 80,
-						padding: "20px 16px",
-						background: "#0b0b0c",
-						borderRadius: 10,
-					}}
-				>
+				<div className={darkCanvasOverviewMini}>
 					<Logo variant="dark" />
 				</div>
 			</div>
-			<div style={{ display: "flex", gap: 24, alignItems: "center" }}>
+			<div className="flex items-center gap-6">
 				{/* Full — light */}
 				<div
-					style={{
-						width: 280,
-						padding: "24px 20px",
-						background: "#ffffff",
-						borderRadius: 10,
-						border: "1px solid #e4e4e9",
-					}}
+					className="w-[280px] rounded-[10px] px-5 py-6"
+					style={lightCanvasStyle}
 				>
 					<Logo variant="light" />
 				</div>
 				{/* Mini — light */}
-				<div
-					style={{
-						width: 80,
-						padding: "20px 16px",
-						background: "#ffffff",
-						borderRadius: 10,
-						border: "1px solid #e4e4e9",
-					}}
-				>
+				<div className="w-20 rounded-[10px] px-4 py-5" style={lightCanvasStyle}>
 					<Logo variant="light" />
 				</div>
 			</div>

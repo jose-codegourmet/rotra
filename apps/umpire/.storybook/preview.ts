@@ -33,8 +33,7 @@ const preview: Preview = {
 		(Story, context) => {
 			const theme = (context.globals.theme as string) ?? "dark";
 			document.documentElement.classList.toggle("dark", theme === "dark");
-			document.documentElement.style.backgroundColor =
-				theme === "dark" ? "#0b0b0c" : "#ffffff";
+			document.documentElement.style.backgroundColor = "var(--color-bg-base)";
 			return Story();
 		},
 	],
