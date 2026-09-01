@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 
 import { StepBlock } from "@/components/modules/onboarding/StepBlock/StepBlock";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field/Field";
@@ -15,14 +15,18 @@ type ExperienceStepProps = {
 	years: number[];
 };
 
+function parseSelectNumber(value: string): number | "" {
+	if (value === "" || value === undefined) {
+		return "" as const;
+	}
+	const n = Number(value);
+	return Number.isNaN(n) ? ("" as const) : n;
+}
+
 export function ExperienceStep({ years }: ExperienceStepProps) {
-	const { register, watch, setValue, formState } =
-		useFormContext<OnboardingFormValues>();
+	const { control, watch, setValue } = useFormContext<OnboardingFormValues>();
 
 	const playingLessThanOneYear = watch("playing_since_less_than_one_year");
-	const errors = formState.errors;
-	const ageInvalid = Boolean(errors.age);
-	const playingSinceInvalid = Boolean(errors.playing_since_year);
 
 	return (
 		<StepBlock
@@ -30,33 +34,39 @@ export function ExperienceStep({ years }: ExperienceStepProps) {
 			title="Your experience"
 			subtitle="Age stays private. Playing history can appear on your profile."
 		>
-			<Field data-invalid={ageInvalid}>
-				<FieldLabel htmlFor="onboarding-age">Age</FieldLabel>
-				<NativeSelect
-					id="onboarding-age"
-					className={cn("mb-4 w-full", ageInvalid && "aria-invalid")}
-					aria-invalid={ageInvalid}
-					{...register("age", {
-						setValueAs: (v) => {
-							if (v === "" || v === undefined) {
-								return "" as const;
-							}
-							const n = Number(v);
-							return Number.isNaN(n) ? ("" as const) : n;
-						},
-					})}
-				>
-					<NativeSelectOption value="">Select age</NativeSelectOption>
-					{Array.from({ length: 99 - 13 + 1 }, (_, i) => i + 13).map(
-						(value) => (
-							<NativeSelectOption key={value} value={String(value)}>
-								{value}
-							</NativeSelectOption>
-						),
-					)}
-				</NativeSelect>
-				<FieldError errors={[errors.age]} />
-			</Field>
+			<Controller
+				control={control}
+				name="age"
+				render={({ field, fieldState }) => {
+					const ageInvalid = Boolean(fieldState.error);
+					return (
+						<Field data-invalid={ageInvalid}>
+							<FieldLabel htmlFor="onboarding-age">Age</FieldLabel>
+							<NativeSelect
+								id="onboarding-age"
+								className={cn("mb-4 w-full", ageInvalid && "aria-invalid")}
+								aria-invalid={ageInvalid}
+								name={field.name}
+								value={field.value === "" ? "" : String(field.value)}
+								onBlur={field.onBlur}
+								onChange={(event) => {
+									field.onChange(parseSelectNumber(event.target.value));
+								}}
+							>
+								<NativeSelectOption value="">Select age</NativeSelectOption>
+								{Array.from({ length: 99 - 13 + 1 }, (_, i) => i + 13).map(
+									(value) => (
+										<NativeSelectOption key={value} value={String(value)}>
+											{value}
+										</NativeSelectOption>
+									),
+								)}
+							</NativeSelect>
+							<FieldError errors={[fieldState.error]} />
+						</Field>
+					);
+				}}
+			/>
 			<FieldLabel
 				htmlFor="onboarding-playing-since-toggle"
 				className="text-small font-medium text-text-secondary"
@@ -91,38 +101,47 @@ export function ExperienceStep({ years }: ExperienceStepProps) {
 			>
 				Less than 1 year
 			</button>
-			<Field data-invalid={playingSinceInvalid}>
-				<FieldLabel htmlFor="onboarding-playing-since" className="sr-only">
-					Year started
-				</FieldLabel>
-				<NativeSelect
-					id="onboarding-playing-since"
-					disabled={playingLessThanOneYear}
-					className={cn(
-						"w-full",
-						playingLessThanOneYear && "pointer-events-none opacity-40",
-						playingSinceInvalid && "aria-invalid",
-					)}
-					aria-invalid={playingSinceInvalid}
-					{...register("playing_since_year", {
-						setValueAs: (v) => {
-							if (v === "" || v === undefined) {
-								return "" as const;
-							}
-							const n = Number(v);
-							return Number.isNaN(n) ? ("" as const) : n;
-						},
-					})}
-				>
-					<NativeSelectOption value="">Select year</NativeSelectOption>
-					{years.map((year) => (
-						<NativeSelectOption key={year} value={String(year)}>
-							{year}
-						</NativeSelectOption>
-					))}
-				</NativeSelect>
-				<FieldError errors={[errors.playing_since_year]} />
-			</Field>
+			<Controller
+				control={control}
+				name="playing_since_year"
+				render={({ field, fieldState }) => {
+					const playingSinceInvalid = Boolean(fieldState.error);
+					return (
+						<Field data-invalid={playingSinceInvalid}>
+							<FieldLabel
+								htmlFor="onboarding-playing-since"
+								className="sr-only"
+							>
+								Year started
+							</FieldLabel>
+							<NativeSelect
+								id="onboarding-playing-since"
+								disabled={playingLessThanOneYear}
+								className={cn(
+									"w-full",
+									playingLessThanOneYear && "pointer-events-none opacity-40",
+									playingSinceInvalid && "aria-invalid",
+								)}
+								aria-invalid={playingSinceInvalid}
+								name={field.name}
+								value={field.value === "" ? "" : String(field.value)}
+								onBlur={field.onBlur}
+								onChange={(event) => {
+									field.onChange(parseSelectNumber(event.target.value));
+								}}
+							>
+								<NativeSelectOption value="">Select year</NativeSelectOption>
+								{years.map((year) => (
+									<NativeSelectOption key={year} value={String(year)}>
+										{year}
+									</NativeSelectOption>
+								))}
+							</NativeSelect>
+							<FieldError errors={[fieldState.error]} />
+						</Field>
+					);
+				}}
+			/>
 		</StepBlock>
 	);
 }

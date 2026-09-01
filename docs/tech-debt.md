@@ -39,7 +39,6 @@ Not pure re-export barrels (OK): `apps/*/src/store/index.ts` (store config),
 Prefer `Controller` + `Field` for new work. Cleanup targets:
 
 - `ClubApplicationForm`
-- Onboarding `NameStep`, `PhoneStep`, `ExperienceStep`
 - Login/OTP/Waitlist patterns that skip colocated schema/default/toast — see `.agents/context/forms.md`
 
 ## 4. Story fixtures inlined

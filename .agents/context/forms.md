@@ -32,7 +32,6 @@ Reference: `apps/client/src/components/modules/settings/update-player-name-form/
 | Form | Issue |
 |------|--------|
 | `ClubApplicationForm` | Uses `register`; `schema.tsx` + `club-application-defaults.ts` naming |
-| Onboarding `NameStep` / `PhoneStep` / `ExperienceStep` | `register` via `useFormContext` |
 | `AdminLoginForm` / `AdminOtpForm` | Inline defaults; errors inline (no toast) |
 | Landing `WaitlistForm` | No Zod module; no toast |
 | Some dialogs | Inline Zod; toast delegated to parent |
