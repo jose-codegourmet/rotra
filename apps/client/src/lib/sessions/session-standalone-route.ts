@@ -1,4 +1,5 @@
 export const SESSION_STANDALONE_ROUTES = [
+	"/sessions/new",
 	"/sessions/join",
 	"/sessions/joined",
 	"/sessions/attendance",
