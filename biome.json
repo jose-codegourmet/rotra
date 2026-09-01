@@ -34,7 +34,8 @@
       "!**/dist/**",
       "!**/.turbo/**",
       "!**/storybook-static/**",
-      "!**/apps/admin/src/email-templates/**"
+      "!**/apps/admin/src/email-templates/**",
+      "!**/apps/client/src/email-templates/**"
     ]
   }
 }
