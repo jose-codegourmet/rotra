@@ -25,10 +25,10 @@ project level in the Supabase dashboard.
 | App | Authored | Required | Status |
 |-----|----------|----------|--------|
 | Admin (`apps/admin`) | 3 | 13 | 3/13 |
-| Client (`apps/client`) | 0 | 13 | 0/13 |
-| **Overall** | **3** | **26** | **3/26** |
+| Client (`apps/client`) | 1 | 13 | 1/13 |
+| **Overall** | **4** | **26** | **4/26** |
 
-Last verified against the tree: **2026-08-30**.
+Last verified against the tree: **2026-09-01**.
 
 ## Filenames (kebab-case)
 
@@ -77,7 +77,7 @@ Path pattern: `apps/<app>/src/email-templates/<filename>`.
 
 ## Client (`apps/client/src/email-templates/`)
 
-> Folder does not exist yet. Every row below is MISSING until HTML is committed and the box
+> Folder exists. Remaining rows below are MISSING until HTML is committed and the box
 > is flipped in the same PR.
 
 ### Authentication emails
@@ -86,7 +86,7 @@ Path pattern: `apps/<app>/src/email-templates/<filename>`.
 - [ ] Invite user — `invite` — `apps/client/src/email-templates/invite-user.html`
 - [ ] Magic link or OTP — `magic_link` — `apps/client/src/email-templates/magic-link.html`
 - [ ] Change email address — `email_change` — `apps/client/src/email-templates/change-email-address.html`
-- [ ] Reset password — `recovery` — `apps/client/src/email-templates/reset-password.html`
+- [x] Reset password — `recovery` — `apps/client/src/email-templates/reset-password.html`
 - [ ] Reauthentication — `reauthentication` — `apps/client/src/email-templates/reauthentication.html`
 
 ### Security notification emails
