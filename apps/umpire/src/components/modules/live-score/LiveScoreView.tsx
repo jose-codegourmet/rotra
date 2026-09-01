@@ -94,7 +94,7 @@ export function LiveScoreView({
 						{match.window} · {match.rulesShort}
 					</p>
 
-					<div className="mt-4 grid min-h-0 flex-1 grid-cols-2 gap-2 md:mt-6 md:gap-3">
+					<div className="mt-4 grid min-h-0 flex-1 grid-cols-2 gap-2 md:mt-4 md:gap-3 lg:mt-6 lg:gap-3.5">
 						<TeamPad
 							label={MOCK_UMPIRE_TEAMS.A.label}
 							score={teamA}
@@ -180,7 +180,7 @@ export function LiveScoreView({
 						</button>
 						<Link
 							href="/submit"
-							className="inline-flex min-h-11 items-center justify-center text-small font-medium text-text-secondary transition-colors duration-default hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+							className="inline-flex min-h-11 items-center justify-center text-micro font-medium uppercase tracking-widest text-text-disabled transition-colors duration-default hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 						>
 							{match.submitLink}
 						</Link>
