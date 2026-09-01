@@ -35,7 +35,7 @@ Tracked in `docs/tech-debt.md`. Summary:
 | No new app-level barrels | Listed debt barrels removed (#91). Do not add new `index.ts` re-exports under `apps/`. Store/config `index.ts` are OK (not re-export barrels). |
 | No hardcoded hex (breaks light theme) | Remaining: globals.css vars, Mapbox paint, Facebook brand, Logo.stories light canvases — see `docs/tech-debt.md` §1 |
 | Forms: `Controller` not `register` | `ClubApplicationForm` uses `register` |
-| Story fixtures from `src/constants/` | Many stories inline mocks; ~67% of stories skip shared fixtures |
+| Story fixtures from `src/constants/` | Many stories inline mocks; admin customer detail stories now import `@/constants/mock-customers` (#93 slice). Remaining still inlined. |
 
 ## Product conflict (do not “fix” silently)
 
