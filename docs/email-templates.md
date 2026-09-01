@@ -25,8 +25,8 @@ project level in the Supabase dashboard.
 | App | Authored | Required | Status |
 |-----|----------|----------|--------|
 | Admin (`apps/admin`) | 3 | 13 | 3/13 |
-| Client (`apps/client`) | 1 | 13 | 1/13 |
-| **Overall** | **4** | **26** | **4/26** |
+| Client (`apps/client`) | 2 | 13 | 2/13 |
+| **Overall** | **5** | **26** | **5/26** |
 
 Last verified against the tree: **2026-09-01**.
 
@@ -82,7 +82,7 @@ Path pattern: `apps/<app>/src/email-templates/<filename>`.
 
 ### Authentication emails
 
-- [ ] Confirm sign up — `confirmation` — `apps/client/src/email-templates/confirm-signup.html`
+- [x] Confirm sign up — `confirmation` — `apps/client/src/email-templates/confirm-signup.html`
 - [ ] Invite user — `invite` — `apps/client/src/email-templates/invite-user.html`
 - [ ] Magic link or OTP — `magic_link` — `apps/client/src/email-templates/magic-link.html`
 - [ ] Change email address — `email_change` — `apps/client/src/email-templates/change-email-address.html`
