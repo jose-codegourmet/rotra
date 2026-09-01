@@ -19,9 +19,9 @@
 | `clubs` | partial | Apply real; browse/manage mock |
 | `queue-session` | partial | `/find-sessions/*` real; `/sessions/*` mock; queue/court/attendance/add-match/player play screens product incomplete |
 | `automatic-queueing` | unbuilt | Spec only |
-| `umpire-overview` | unbuilt | Umpire app stub |
+| `umpire-overview` | unbuilt / UI shell | `/scoreboard` + `/submit` fake-match shells; no token/API |
 | `umpire-token-access` | unbuilt | |
-| `umpire-scoring` | unbuilt | |
+| `umpire-scoring` | unbuilt / UI shell | Local +POINT / undo only; no scoring engine |
 | `umpire-realtime` | unbuilt | No Realtime in apps |
 | `umpire-score-submission` | unbuilt | |
 | `skill-rating` | unbuilt / UI mock | Profile skills show `MOCK_PLAYER` |

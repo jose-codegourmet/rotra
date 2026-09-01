@@ -6,7 +6,10 @@ Documented Umpire App role: a temporary match-scoped scoring function, not a reg
 
 ## Status
 
-**Documented intent — not implemented.** `apps/umpire` is coming-soon. Do not treat these rules as shipped.
+**Documented intent — not implemented.** `apps/umpire` ships `/scoreboard` and
+`/submit` UI shells with a fake Smash Hub match and local tap/undo/lock state.
+Token access, scoring engine, realtime, and score APIs are not wired. Do not
+treat these product rules as shipped.
 
 ## Actors
 
@@ -46,3 +49,6 @@ If no umpire is assigned, the Que Master SHALL enter the score in the Client App
 
 - `docs/business_logic/umpire_app/01_umpire_overview.md`
 - `docs/business_logic/umpire_app/README.md`
+- `apps/umpire/src/app/scoreboard/page.tsx`
+- `apps/umpire/src/app/submit/page.tsx`
+- `apps/umpire/src/constants/mock-umpire-match.ts`

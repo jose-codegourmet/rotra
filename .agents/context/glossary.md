@@ -10,7 +10,7 @@
 | Tagline | *Run the game.* |
 | Que Session / Que Schedule | Synonyms for the core scheduled/live session entity |
 | Que Master | Session operator role — **never** “Queue Master” |
-| Quick Umpire | Guest scorer via one-time token (docs/specs; umpire app not built) |
+| Quick Umpire | Guest scorer via one-time token (docs/specs; umpire app is a UI shell) |
 | Rate and Review | Canonical post-match rating CTA |
 | Quick Session | Player-organized session create on client dashboard (code is REAL; product conflict with Owner/QM-only create) |
 
