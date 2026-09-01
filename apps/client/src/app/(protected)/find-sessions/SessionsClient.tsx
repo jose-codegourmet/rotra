@@ -11,8 +11,8 @@ import {
 	TabsList,
 	TabsTrigger,
 } from "@/components/ui/tabs/Tabs";
-import { useAvailableSessions } from "@/hooks/useAvailableSessions";
-import { useUserSessions } from "@/hooks/useUserSessions";
+import { useAvailableSessions } from "@/hooks/useAvailableSessions/client";
+import { useUserSessions } from "@/hooks/useUserSessions/client";
 import { isUserSessionUpcoming } from "@/lib/sessions/user-session-utils";
 
 export function SessionsClient() {
