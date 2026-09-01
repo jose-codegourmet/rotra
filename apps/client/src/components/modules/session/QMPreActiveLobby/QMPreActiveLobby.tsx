@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button/Button";
-import { useCloseSessionMutation } from "@/hooks/useCloseSessionMutation";
+import { useCloseSessionMutation } from "@/hooks/useCloseSessionMutation/client";
 import { fetchPlayerProfile } from "@/hooks/usePlayerProfile/server";
 import { useStartSessionMutation } from "@/hooks/useStartSessionMutation";
 import {

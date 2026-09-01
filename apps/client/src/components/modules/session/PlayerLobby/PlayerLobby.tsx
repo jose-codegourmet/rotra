@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button/Button";
-import { useLeaveSessionMutation } from "@/hooks/useLeaveSessionMutation";
+import { useLeaveSessionMutation } from "@/hooks/useLeaveSessionMutation/client";
 import { fetchPlayerProfile } from "@/hooks/usePlayerProfile/server";
 import {
 	admissionBadgeLabel,

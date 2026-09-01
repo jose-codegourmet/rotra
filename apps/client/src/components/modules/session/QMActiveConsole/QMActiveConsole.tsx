@@ -9,7 +9,7 @@ import {
 	QM_TAB_LABELS,
 	type QMTabId,
 } from "@/constants/session-tabs";
-import { useCloseSessionMutation } from "@/hooks/useCloseSessionMutation";
+import { useCloseSessionMutation } from "@/hooks/useCloseSessionMutation/client";
 import { useSessionConsole } from "@/hooks/useSessionConsole/client";
 import { cn } from "@/lib/utils";
 import type { SessionLiveContext } from "@/types/session-live";

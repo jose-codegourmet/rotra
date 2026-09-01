@@ -16,7 +16,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FilterPanel } from "@/components/modules/dashboard/filter-panel/FilterPanel";
 import { viewToggleTabVariants } from "@/components/modules/dashboard/view-toggle/ViewToggle.variants";
 import { DateRangePicker } from "@/components/ui/date-range-picker/DateRangePicker";
-import { Slider } from "@/components/ui/slider";
+import { Slider } from "@/components/ui/slider/Slider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs/Tabs";
 import { MAX_RADIUS_KM } from "@/constants/dashboard";
 import type { GeolocationStatus } from "@/hooks/useGeolocation";

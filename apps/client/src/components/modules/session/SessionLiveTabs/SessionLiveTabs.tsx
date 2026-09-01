@@ -17,8 +17,8 @@ import {
 	MOCK_STANDING_MINI,
 	SESSION_TAB_IDS,
 } from "@/constants/mock-session-ui";
-import { useCloseSessionMutation } from "@/hooks/useCloseSessionMutation";
-import { useLeaveSessionMutation } from "@/hooks/useLeaveSessionMutation";
+import { useCloseSessionMutation } from "@/hooks/useCloseSessionMutation/client";
+import { useLeaveSessionMutation } from "@/hooks/useLeaveSessionMutation/client";
 
 import { ActiveQueueView } from "../ActiveQueueView/ActiveQueueView";
 import { AssignCourtModal } from "../AssignCourtModal/AssignCourtModal";

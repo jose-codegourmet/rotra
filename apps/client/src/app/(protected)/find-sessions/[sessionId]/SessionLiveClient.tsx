@@ -1,13 +1,11 @@
 "use client";
 
-import {
-	PlayerActiveView,
-	PlayerLobby,
-	QMActiveConsole,
-	QMPreActiveLobby,
-	SessionClosedView,
-} from "@/components/modules/session";
-import { useSessionLive } from "@/hooks/useSessionLive";
+import { PlayerActiveView } from "@/components/modules/session/PlayerActiveView/PlayerActiveView";
+import { PlayerLobby } from "@/components/modules/session/PlayerLobby/PlayerLobby";
+import { QMActiveConsole } from "@/components/modules/session/QMActiveConsole/QMActiveConsole";
+import { QMPreActiveLobby } from "@/components/modules/session/QMPreActiveLobby/QMPreActiveLobby";
+import { SessionClosedView } from "@/components/modules/session/SessionClosedView/SessionClosedView";
+import { useSessionLive } from "@/hooks/useSessionLive/client";
 
 export interface SessionLiveClientProps {
 	sessionId: string;

@@ -61,4 +61,4 @@ modules/settings/update-player-name-form/
 ## Import style
 
 Import from the source file (`.../Button/Button`). Do not add new app-level `index.ts` barrels.
-Existing barrels are listed in `docs/tech-debt.md`.
+Listed debt barrels were removed (#91); see `docs/tech-debt.md` §2.

@@ -9,7 +9,7 @@ import {
 	PLAYER_TAB_LABELS,
 	type PlayerTabId,
 } from "@/constants/session-tabs";
-import { useLeaveSessionMutation } from "@/hooks/useLeaveSessionMutation";
+import { useLeaveSessionMutation } from "@/hooks/useLeaveSessionMutation/client";
 import { useSessionConsole } from "@/hooks/useSessionConsole/client";
 import {
 	admissionBadgeLabel,

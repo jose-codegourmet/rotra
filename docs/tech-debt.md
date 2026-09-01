@@ -28,16 +28,8 @@ and were left as-is by the #90 slices.
 
 Sanctioned: `packages/db/src/index.ts`, `packages/legal-content/src/index.ts`.
 
-**Debt (do not copy):**
-
-- `apps/client/src/components/modules/session/index.ts`
-- `apps/client/src/components/ui/slider/index.ts`
-- `apps/client/src/hooks/useSessionLive/index.ts`
-- `apps/client/src/hooks/useCloseSessionMutation/index.ts`
-- `apps/client/src/hooks/useAvailableSessions/index.ts`
-- `apps/client/src/hooks/useUserSessions/index.ts`
-- `apps/client/src/hooks/useLeaveSessionMutation/index.ts`
-- `apps/umpire/src/components/ui/{button,logo,theme-toggle}/index.ts`
+**Debt (do not copy):** none remaining from the 2026-08-26 register. The listed
+session / slider / hook / umpire `index.ts` re-exports were removed (#91).
 
 Not pure re-export barrels (OK): `apps/*/src/store/index.ts` (store config),
 `packages/config/tailwind-config/index.ts` (config object).
